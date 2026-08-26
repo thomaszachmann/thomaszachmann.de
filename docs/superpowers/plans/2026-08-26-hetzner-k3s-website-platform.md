@@ -145,6 +145,8 @@ Dies ist der einzige Task mit echtem Test-First-Zyklus: Wir schreiben den Prüfe
 ```bash
 #!/usr/bin/env bash
 # Prüft, dass jede lokal referenzierte Datei in den HTML-Seiten wirklich existiert.
+# Erfasst HTML-Attribute (href, src) UND CSS-url(...) aus inline <style>-Blöcken —
+# die self-hosted Fonts stehen nur dort und wären sonst unsichtbar.
 # Externe Referenzen (http, mailto, tel, data:, Anker) werden übersprungen.
 set -euo pipefail
 
@@ -173,7 +175,15 @@ while IFS= read -r -d '' html; do
       *)  target="$(dirname "$html")/$ref" ;;        # dokumentrelativ
     esac
     [ -e "$target" ] || printf '%s\t%s\n' "${html#./}" "$ref" >>"$missing"
-  done < <(grep -oE '(href|src)="[^"]*"' "$html" | sed -E 's/^(href|src)="//; s/"$//')
+  done < <(
+    {
+      # HTML-Attribute
+      grep -oE '(href|src)="[^"]*"' "$html" | sed -E 's/^(href|src)="//; s/"$//'
+      # CSS url(...) — auch aus inline <style>-Bloecken. Die self-hosted Fonts
+      # stehen genau hier und wuerden sonst uebersehen.
+      grep -oE 'url\([^)]*\)' "$html" | sed -E 's/^url\(//; s/\)$//' | tr -d "\"'"
+    } | sort -u
+  )
 done < <(find "$ROOT" -name '*.html' -print0)
 
 if [ -s "$missing" ]; then
@@ -212,6 +222,8 @@ Expected: **Exit 1**, und auf stderr genau diese vier fehlenden Referenzen:
 ```
 
 Wenn stattdessen Exit 0 kommt, findet das Skript die Referenzen nicht — dann ist der `grep`-Ausdruck kaputt, nicht die Website. Nicht weitermachen, bevor dieser Fehlschlag exakt so aussieht.
+
+**Warum die CSS-Extraktion im Skript nicht optional ist:** Die beiden Fonts werden nicht über ein HTML-Attribut geladen, sondern über `src:url(fonts/outfit.woff2)` in einem `@font-face`-Block im inline-`<style>` (index.html:19-20). Ein Prüfer, der nur `href=` und `src=` liest, meldet hier bloß zwei statt vier fehlender Dateien — und übersieht ausgerechnet die, die den optischen Eindruck der Seite bestimmen.
 
 - [ ] **Step 4: Fonts von den offiziellen Quellen holen**
 
