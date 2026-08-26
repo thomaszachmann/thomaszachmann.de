@@ -1,0 +1,21 @@
+# Claude Code lokale Einstellungen
+.claude/settings.local.json
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+.terraform.lock.hcl.bak
+
+# Kubeconfig / Credentials
+kubeconfig
+kubeconfig.yaml
+*.age
+age.key
+
+# macOS
+.DS_Store

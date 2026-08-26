@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomas Zachmann — Kubernetes-Plattformen für regulierte Umgebungen</title>
+<meta name="description" content="Freiberuflicher Plattform-Architekt aus Hamburg. Kubernetes On-Prem, Bare-Metal und auf europäischen Clouds — für Banken, Behörden und Sicherheitstechnologie. CKS, CKA, CKAD.">
+<meta name="author" content="Thomas Zachmann">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Thomas Zachmann — Kubernetes-Plattformen für regulierte Umgebungen">
+<meta property="og:description" content="Freiberuflicher Plattform-Architekt aus Hamburg. On-Prem, Bare-Metal und europäische Clouds. CKS, CKA, CKAD.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thomaszachmann.de">
+<meta property="og:locale" content="de_DE">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+
+<style>
+/* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
+
+/* ---------- Quiet Blue ---------- */
+:root{
+  --bg:#ffffff;
+  --surface:#f8fafc;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --text-2:#475569;
+  --text-3:#64748b;
+  --accent:#1d4ed8;
+  --accent-hover:#1e40af;
+  --radius:6px;
+  --wrap:1120px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Outfit',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;font-weight:350;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
+/* Deutsche Komposita brechen sonst aus schmalen Viewports aus */
+h1,h2,h3,p,dd,li{overflow-wrap:break-word;hyphens:auto}
+h1{font-size:clamp(1.75rem,6.4vw,3.15rem);letter-spacing:-.025em}
+h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
+h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
+p{margin:0 0 1.1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.prose{max-width:66ch}
+section{padding:88px 0}
+.tinted{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);margin:0 0 14px;
+}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:100;background:#fff;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius)}
+
+/* ---------- Nav ---------- */
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border)}
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{color:var(--text);font-weight:550;letter-spacing:-.02em;font-size:1.0625rem}
+.brand:hover{text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:30px;font-size:.9375rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-links a.btn-primary,.nav-links a.btn-primary:hover{color:#fff}
+@media(max-width:820px){.nav-links a:not(.btn){display:none}}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:var(--radius);
+  font-size:.9375rem;font-weight:500;line-height:1;
+  border:1px solid transparent;cursor:pointer;
+  transition:background-color .15s ease,border-color .15s ease;
+}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:#cbd5e1;background:var(--surface)}
+
+/* ---------- Hero ---------- */
+.hero{padding:104px 0 80px}
+.hero h1{margin-bottom:22px;max-width:17ch}
+.hero .lead{font-size:1.1875rem;color:var(--text-2);max-width:60ch;margin-bottom:30px}
+.status{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:.875rem;color:var(--text-2);margin-bottom:26px;
+}
+.status .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;flex:none}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ---------- Über mich: asymmetrisch ---------- */
+.split{display:grid;grid-template-columns:1.55fr 1fr;gap:64px;align-items:start}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:40px}}
+.facts{border-top:1px solid var(--border)}
+.facts div{display:flex;justify-content:space-between;gap:20px;padding:11px 0;border-bottom:1px solid var(--border);font-size:.9375rem}
+.facts dt{color:var(--text-3);margin:0;flex:none}
+.facts dd{margin:0;text-align:right;color:var(--text)}
+
+/* ---------- Schwerpunkte ---------- */
+.focus{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:8px}
+@media(max-width:940px){.focus{grid-template-columns:1fr;gap:0}}
+.focus article{padding-top:22px;border-top:2px solid var(--text)}
+@media(max-width:940px){
+  .focus article{border-top:1px solid var(--border);padding:22px 0}
+  .focus article:first-child{border-top:2px solid var(--text)}
+}
+.focus h3{margin-bottom:9px}
+.focus p{color:var(--text-2);font-size:.9375rem;margin:0}
+.icon{width:20px;height:20px;stroke:var(--accent);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-bottom:13px;display:block}
+
+/* ---------- Kompetenz-Tabelle ---------- */
+.skills{border-top:1px solid var(--border);margin-top:34px}
+.skills > div{
+  display:grid;grid-template-columns:210px 1fr;gap:28px;
+  padding:15px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.skills > div{grid-template-columns:1fr;gap:5px}}
+.skills dt{font-weight:500;font-size:.9375rem;margin:0}
+.skills dd{margin:0;color:var(--text-2);font-size:.9375rem}
+.secondary-skills{margin-top:26px;color:var(--text-3);font-size:.875rem;max-width:80ch}
+
+/* ---------- Projekte ---------- */
+.projects{margin-top:34px;border-top:1px solid var(--border)}
+.projects article{
+  display:grid;grid-template-columns:150px 1fr 190px;gap:32px;
+  padding:24px 0;border-bottom:1px solid var(--border);align-items:baseline;
+}
+@media(max-width:900px){
+  .projects article{grid-template-columns:1fr;gap:7px;padding:22px 0}
+}
+.projects .when{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.8125rem;color:var(--text-3);white-space:nowrap;
+}
+.projects h3{margin-bottom:5px}
+.projects .desc{color:var(--text-2);font-size:.9375rem;margin:0}
+.projects .who{font-size:.875rem;color:var(--text-3)}
+@media(max-width:900px){.projects .who{order:-1}}
+
+/* ---------- Kontakt ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start}
+@media(max-width:880px){.contact-grid{grid-template-columns:1fr;gap:40px}}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.875rem;font-weight:500;margin-bottom:6px}
+.field input,.field textarea{
+  width:100%;padding:10px 12px;font:inherit;font-size:.9375rem;
+  color:var(--text);background:#fff;
+  border:1px solid var(--border);border-radius:var(--radius);
+}
+.field textarea{min-height:130px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.contact-list{border-top:1px solid var(--border)}
+.contact-list div{padding:13px 0;border-bottom:1px solid var(--border);font-size:.9375rem}
+.contact-list .k{color:var(--text-3);font-size:.8125rem;display:block;margin-bottom:2px}
+.form-note{font-size:.8125rem;color:var(--text-3);margin:12px 0 0}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
+.foot-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+@media(max-width:760px){.foot-cols{grid-template-columns:1fr 1fr;gap:32px}}
+.foot-cols p{color:var(--text-2);margin:0}
+.foot-cols h4{font-size:.9375rem;font-weight:550;margin:0 0 11px}
+.foot-cols ul{list-style:none;margin:0;padding:0}
+.foot-cols li{margin-bottom:7px}
+.foot-cols li a{color:var(--text-2)}
+.foot-cols li a:hover{color:var(--text)}
+.foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header>
+  <nav class="wrap">
+    <a class="brand" href="/">Thomas Zachmann</a>
+    <div class="nav-links">
+      <a href="#profil">Profil</a>
+      <a href="#schwerpunkte">Schwerpunkte</a>
+      <a href="#kompetenz">Kompetenz</a>
+      <a href="#projekte">Projekte</a>
+      <a class="btn btn-primary" href="#kontakt">Kontakt</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="status"><span class="dot" aria-hidden="true"></span>Verfügbar für neue Projekte</p>
+      <h1>Kubernetes-Plattformen für regulierte Umgebungen</h1>
+      <p class="lead">
+        Freiberuflicher Plattform-Architekt aus Hamburg. Ich baue und härte Container-Plattformen
+        dort, wo Sicherheit und Nachweisbarkeit die Anforderung sind und nicht die Kür —
+        On-Prem, auf Bare-Metal und auf europäischen Cloud-Plattformen.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#kontakt">Projekt besprechen</a>
+        <a class="btn btn-secondary" href="https://github.com/thomaszachmann" rel="noopener">GitHub ansehen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROFIL ================= -->
+  <section id="profil" class="tinted">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">Profil</p>
+        <h2>Seit 2020 durchgängig in regulierten Umfeldern</h2>
+        <div class="prose" style="margin-top:20px">
+          <p>
+            Behördennahe IT, Sicherheitstechnologie und Banken — Umgebungen, in denen eine
+            Plattform nicht nur laufen, sondern auch belegen muss, dass sie richtig läuft.
+            Mein Schwerpunkt liegt auf dem Teil, den die meisten Plattformen auslassen:
+            Policy Enforcement, Secrets Management, Mandantentrennung, Supply-Chain-Nachweise
+            und die Dokumentation, die im Audit standhält.
+          </p>
+          <p>
+            Davor zwanzig Jahre Software-Engineering, unter anderem fünf Jahre bei SAP an
+            C/C++-Laufzeitsystemen. Das ist der Grund, warum die Automatisierung hier
+            geschrieben und nicht zusammengeklickt ist — und warum ich Plattformen so übergebe,
+            dass das interne Team sie danach ohne mich betreiben kann.
+          </p>
+        </div>
+      </div>
+      <dl class="facts">
+        <div><dt>Erfahrung</dt><dd>20 Jahre IT</dd></div>
+        <div><dt>Als Freelancer</dt><dd>seit 2020</dd></div>
+        <div><dt>Zertifikate</dt><dd>CKS · CKA · CKAD</dd></div>
+        <div><dt>Standort</dt><dd>Hamburg</dd></div>
+        <div><dt>Sprachen</dt><dd>Deutsch · Dänisch · Englisch</dd></div>
+        <div><dt>Branchen</dt><dd>Banken, Behörden, Security</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= SCHWERPUNKTE ================= -->
+  <section id="schwerpunkte">
+    <div class="wrap">
+      <p class="eyebrow">Schwerpunkte</p>
+      <h2>Drei Dinge, für die man mich holt</h2>
+      <div class="focus">
+
+        <article>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 4 7v5c0 4.4 3.4 8.2 8 9 4.6-.8 8-4.6 8-9V7l-8-4Z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <h3>Audit-feste Plattform On-Prem</h3>
+          <p>
+            Aufbau oder Härtung bestehender Cluster: Policy Enforcement mit Kyverno,
+            Secrets über Vault, Mandantentrennung, Supply-Chain-Nachweise — inklusive
+            der Nachweisdokumentation.
+          </p>
+        </article>
+
+        <article>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="6" rx="1.5"/>
+            <rect x="3" y="14" width="18" height="6" rx="1.5"/>
+            <path d="M7 7h.01M7 17h.01"/>
+          </svg>
+          <h3>Migration weg von VMware</h3>
+          <p>
+            Überführung virtualisierter Workloads nach Kubernetes beziehungsweise
+            KubeVirt und OpenShift Virtualization — oder auf europäische Anbieter,
+            mit Betriebskonzept und Wissenstransfer.
+          </p>
+        </article>
+
+        <article>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 17V7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+            <path d="M8 12h8"/>
+          </svg>
+          <h3>Plattform-Rettung</h3>
+          <p>
+            Übernahme von Plattformen, die betrieblich klemmen: Stabilisierung,
+            Automatisierung des Cluster-Lifecycles, Workshops und Enablement
+            der internen Teams.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KOMPETENZ ================= -->
+  <section id="kompetenz" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Kompetenz</p>
+      <h2>Womit ich arbeite</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Kein vollständiger Werkzeugkasten, sondern das, worin tatsächlich Betriebstiefe steckt.
+      </p>
+
+      <dl class="skills">
+        <div>
+          <dt>Kubernetes</dt>
+          <dd>On-Prem und Bare-Metal (RKE2, Kubespray, OpenShift, Rancher), Managed (EKS), MetalLB, Istio, Helm, Kustomize</dd>
+        </div>
+        <div>
+          <dt>Security &amp; Policy</dt>
+          <dd>Kyverno, HashiCorp Vault, Keycloak, Trivy, Harbor, Dependency Track, cert-manager</dd>
+        </div>
+        <div>
+          <dt>Automatisierung &amp; IaC</dt>
+          <dd>Ansible, Terraform, Crossplane, Go, Python</dd>
+        </div>
+        <div>
+          <dt>GitOps &amp; CI/CD</dt>
+          <dd>Argo CD, Flux, GitLab CI, Jenkins, GitHub Actions</dd>
+        </div>
+        <div>
+          <dt>Observability</dt>
+          <dd>Prometheus, Grafana, Loki, Tempo, Elastic</dd>
+        </div>
+        <div>
+          <dt>Souveräne Plattformen</dt>
+          <dd>IONOS Cloud, Open Telekom Cloud, On-Prem-Virtualisierung</dd>
+        </div>
+      </dl>
+
+      <p class="secondary-skills">
+        Außerdem im Einsatz: AWS, Google Cloud, Azure, Docker, Podman, Amazon ECS,
+        PostgreSQL, MariaDB, Cassandra, MongoDB sowie C/C++, Rust, C#, Perl und Bash.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= PROJEKTE ================= -->
+  <section id="projekte">
+    <div class="wrap">
+      <p class="eyebrow">Referenzen</p>
+      <h2>Ausgewählte Projekte</h2>
+
+      <div class="projects">
+
+        <article>
+          <p class="when">seit 10/2025</p>
+          <div>
+            <h3>Platform Engineer — Kubernetes &amp; Policy-Driven Operations</h3>
+            <p class="desc">
+              Aufbau und Betrieb einer On-Prem-Kubernetes-Plattform im sicherheitssensitiven Umfeld.
+              RKE2-Cluster-Lifecycle vollständig über Ansible automatisiert, Policy Enforcement
+              mit Kyverno clusterweit durchgesetzt.
+            </p>
+          </div>
+          <p class="who">Software &amp; Security<br>Leipzig</p>
+        </article>
+
+        <article>
+          <p class="when">10/2023 – 10/2025</p>
+          <div>
+            <h3>Technical Solutions Consultant — Containerisierung &amp; Plattform</h3>
+            <p class="desc">
+              Unternehmenskritische Plattform- und Integrationslösungen im regulierten Bankenumfeld.
+              Observability mit Prometheus, Grafana, Loki und Tempo; Supply-Chain-Analysen
+              über Dependency Track in die Lieferkette integriert.
+            </p>
+          </div>
+          <p class="who">Genossenschaftliche<br>Finanzgruppe, Wiesbaden</p>
+        </article>
+
+        <article>
+          <p class="when">10/2023 – 12/2024</p>
+          <div>
+            <h3>Kubernetes DevOps Engineer</h3>
+            <p class="desc">
+              Hochverfügbare Kubernetes-Cluster auf Bare-Metal mit Kubespray, Load-Balancing
+              über MetalLB, GitOps-Workflows mit Argo CD. Workshops zur Verankerung des
+              Betriebswissens im internen Team.
+            </p>
+          </div>
+          <p class="who">Software<br>Hamburg</p>
+        </article>
+
+        <article>
+          <p class="when">08/2022 – 07/2023</p>
+          <div>
+            <h3>Cloud Engineer — Kubernetes &amp; OpenShift</h3>
+            <p class="desc">
+              On-Prem-OpenShift-Plattform auf virtualisierter Infrastruktur im Hochsicherheitsumfeld.
+              Eigene Ansible-Rollen für reproduzierbare Bereitstellung, ML-Workloads über GitOps
+              integriert.
+            </p>
+          </div>
+          <p class="who">Sicherheitstechnologie<br>Berlin</p>
+        </article>
+
+        <article>
+          <p class="when">04/2021 – 12/2021</p>
+          <div>
+            <h3>Cloud &amp; DevOps Engineer — Monitoring &amp; Observability</h3>
+            <p class="desc">
+              Kubernetes-Plattformen in der IONOS Cloud unter regulatorischen Rahmenbedingungen.
+              Zentraler Observability-Stack auf Basis von Elasticsearch und Grafana,
+              Bereitstellung durchgängig über Terraform.
+            </p>
+          </div>
+          <p class="who">Öffentliche Verwaltung<br>Hamburg</p>
+        </article>
+
+        <article>
+          <p class="when">08/2017 – 03/2020</p>
+          <div>
+            <h3>DevOps Engineer — Cloud-Migration &amp; Monitoring</h3>
+            <p class="desc">
+              Migration von On-Prem-Systemen in die Open Telekom Cloud, Aufbau der
+              Monitoring- und Logging-Plattform, Container-Plattformen mit OpenShift
+              und Kubernetes.
+            </p>
+          </div>
+          <p class="who">Logistik<br>Hamburg</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KONTAKT ================= -->
+  <section id="kontakt" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Kontakt</p>
+      <h2>Projekt besprechen</h2>
+
+      <div class="contact-grid" style="margin-top:32px">
+        <div>
+          <p style="color:var(--text-2);max-width:44ch">
+            Kurze Beschreibung der Ausgangslage genügt — ich melde mich in der Regel
+            am selben Werktag mit einer Einschätzung, ob ich der Richtige bin.
+          </p>
+          <div class="contact-list">
+            <div>
+              <span class="k">E-Mail</span>
+              <a href="mailto:thomas@zachmann.work">thomas@zachmann.work</a>
+            </div>
+            <div>
+              <span class="k">Telefon</span>
+              <a href="tel:+4917610365347">0176 1036 5347</a>
+            </div>
+            <div>
+              <span class="k">GitHub</span>
+              <a href="https://github.com/thomaszachmann" rel="noopener">github.com/thomaszachmann</a>
+            </div>
+            <div>
+              <span class="k">Standort</span>
+              Hamburg — remote, vor Ort nach Absprache
+            </div>
+          </div>
+        </div>
+
+        <form id="contact-form" action="https://formspree.io/f/placeholder" method="POST">
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="email">E-Mail</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="subject">Betreff</label>
+            <input type="text" id="subject" name="subject" value="" placeholder="Projektanfrage">
+          </div>
+          <div class="field">
+            <label for="message">Nachricht</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Anfrage senden</button>
+          <p class="form-note">
+            Es werden nur die eingegebenen Angaben übermittelt. Näheres in der
+            <a href="datenschutz.html">Datenschutzerklärung</a>.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Thomas Zachmann</h4>
+        <p>
+          Freiberuflicher Plattform-Architekt.<br>
+          Kubernetes in regulierten und souveränen Umgebungen.
+        </p>
+      </div>
+      <div>
+        <h4>Seite</h4>
+        <ul>
+          <li><a href="#profil">Profil</a></li>
+          <li><a href="#schwerpunkte">Schwerpunkte</a></li>
+          <li><a href="#kompetenz">Kompetenz</a></li>
+          <li><a href="#projekte">Projekte</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="mailto:thomas@zachmann.work">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-bottom">
+      © 2026 Thomas Zachmann · Hamburg
+      <!-- TODO: Vollständige Anschrift wie im Impressum ergänzen — erhöht die Glaubwürdigkeit spürbar. -->
+    </p>
+  </div>
+</footer>
+
+<script>
+// Solange kein echter Formspree-Endpunkt hinterlegt ist: Fallback auf mailto.
+// Sobald die Formspree-ID eingetragen ist, greift dieser Zweig nicht mehr.
+(function () {
+  var form = document.getElementById('contact-form');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    if (form.getAttribute('action').indexOf('placeholder') === -1) return;
+    e.preventDefault();
+    var name = document.getElementById('name').value;
+    var mail = document.getElementById('email').value;
+    var subject = document.getElementById('subject').value || 'Projektanfrage';
+    var body = document.getElementById('message').value
+             + '\n\n--\n' + name + '\n' + mail;
+    window.location.href = 'mailto:thomas@zachmann.work'
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>
