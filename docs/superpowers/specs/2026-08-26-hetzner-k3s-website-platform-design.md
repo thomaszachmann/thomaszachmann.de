@@ -157,7 +157,15 @@ Zertifikate zunächst pro Site mit Apex und `www`, kein Wildcard (YAGNI).
 ### 3.8 Cloudflare als DNS-only
 
 Records: A und AAAA für `thomaszachmann.de` und `www`, per
-`cloudflare_record` in Terraform. Proxy aus ("graue Wolke").
+`cloudflare_dns_record` in Terraform. Proxy aus ("graue Wolke").
+
+Achtung, das ist eine Korrektur gegenüber dem, was man aus älteren
+Beispielen kennt: Der Cloudflare-Provider hat in v5 über 40 Ressourcen
+umbenannt, `cloudflare_record` heißt jetzt `cloudflare_dns_record`. Dabei
+haben sich auch Attribute geändert — `content` statt `value`, `ttl` ist
+verpflichtend, und `name` verlangt den vollen FQDN statt `@` für den Apex.
+Wir starten auf v5, also gibt es keine Migration, aber jedes v4-Beispiel aus
+dem Netz ist für uns falsch.
 
 Kanonisch ist die Apex-Domain, `www` bekommt einen 301-Redirect in Traefik.
 Das deckt sich mit `og:url` in index.html:12.
@@ -220,7 +228,7 @@ terraform/
   variables.tf         admin_ip_cidrs, domain, github_owner, ssh_key, k3s_version
   main.tf              primary_ip, ssh_key, server
   firewall.tf          hcloud_firewall + attachment
-  dns.tf               cloudflare_record (A, AAAA für apex und www)
+  dns.tf               cloudflare_dns_record (A, AAAA für apex und www)
   cloud-init.yaml.tftpl
   outputs.tf           ip, ssh_tunnel_cmd, kubeconfig_hint
   terraform.tfvars.example
