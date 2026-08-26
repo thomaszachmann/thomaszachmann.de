@@ -42,21 +42,37 @@ Redirect liegt unter `ports.web.http.redirections.entryPoint` (mit dem `http`-Zw
 Vor Task 1 einmalig zu erledigen. Task 3 und 4 scheitern sonst mitten im
 Apply, was der unangenehmste Zeitpunkt für einen fehlenden Account ist.
 
-**Werkzeuge** (macOS):
+**Werkzeuge.** Die versionsgebundene Toolchain ist in `mise.toml` im Repo gepinnt und damit Teil des reproduzierbaren Zustands — nicht Zufall der lokalen Maschine:
 
-```bash
-brew install terraform tflint fluxcd/tap/flux sops age kubernetes-cli gh jq
-# Docker Desktop oder colima — fuer Task 2 wird lokal gebaut
-docker version
+```toml
+[tools]
+"aqua:fluxcd/flux2" = "2.9.4"
+kubectl             = "1.36.3"
+terraform           = "1.15.9"
+tflint              = "0.64.0"
 ```
 
-Versionen prüfen — der Plan geht von diesen Mindeststufen aus:
+```bash
+mise install          # holt genau diese Versionen
+mise ls               # im Projektverzeichnis: die vier oben
+```
+
+`kubectl` ist bewusst auf `1.36.3` gepinnt, also exakt die Version des k3s-Servers. Kubernetes unterstützt zwischen Client und apiserver nur ±1 Minor-Version; eine global installierte ältere `kubectl` führt sonst zu Fehlern, die wie Cluster-Probleme aussehen, aber keine sind.
+
+**Achtung bei Homebrew-Dubletten:** Liegt zusätzlich ein `terraform` oder `kubectl` unter `/opt/homebrew/bin/`, überdeckt es die mise-Version, sobald mise im Verzeichnis nicht aktiv ist. Prüfen mit:
 
 ```bash
-terraform version   # >= 1.9.0
-flux version --client  # v2.9.x
-sops --version      # v3.13.x
-gh auth status      # angemeldet, Scope: repo, workflow, write:packages
+which -a terraform kubectl
+mise exec -- terraform version    # muss v1.15.9 zeigen
+```
+
+Nicht über mise verwaltet, aber ebenso nötig — hier reicht Homebrew:
+
+```bash
+brew install sops age gh jq
+sops --version    # v3.13.x
+age-keygen --version
+docker version    # Docker Desktop oder colima muss laufen (Task 2 baut lokal)
 ```
 
 **Accounts und Zugänge:**
@@ -69,6 +85,7 @@ gh auth status      # angemeldet, Scope: repo, workflow, write:packages
 | Zweites Cloudflare-Token für cert-manager, gleicher Scope | Task 6 | dito |
 | SSH-Keypair | Task 3 | `ls ~/.ssh/id_ed25519.pub` — sonst `ssh-keygen -t ed25519` |
 | GitHub-Account mit aktivierten Actions | Task 1, 9 | `gh auth status` |
+| gh-Token mit Scope `write:packages` | Task 7, Step 1 | `gh auth status` — steht der Scope nicht dabei: `gh auth refresh -s write:packages` |
 
 **Der häufigste Blocker:** Die Domain zeigt noch nicht auf Cloudflare-Nameserver.
 Der Nameserver-Wechsel beim Registrar dauert bis zu 24 Stunden und lässt sich
@@ -928,7 +945,8 @@ Expected: `Success! The configuration is valid.`
 Zusätzlich statische Analyse. `tflint` findet Dinge, die `validate` nicht sieht — etwa einen Servertyp, den es bei Hetzner nicht gibt, oder eine Variable ohne Beschreibung:
 
 ```bash
-command -v tflint >/dev/null || brew install tflint
+# tflint kommt aus mise.toml (siehe Voraussetzungen), hier nur absichern:
+mise exec -- tflint --version >/dev/null || mise install
 
 cat > .tflint.hcl <<'TFLINT'
 plugin "terraform" {

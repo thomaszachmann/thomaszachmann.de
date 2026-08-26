@@ -1,0 +1,5 @@
+[tools]
+"aqua:fluxcd/flux2" = "2.9.4"
+kubectl = "1.36.3"
+terraform = "1.15.9"
+tflint = "0.64.0"
