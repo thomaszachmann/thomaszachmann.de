@@ -37,6 +37,47 @@ Redirect liegt unter `ports.web.http.redirections.entryPoint` (mit dem `http`-Zw
 
 ---
 
+## Voraussetzungen
+
+Vor Task 1 einmalig zu erledigen. Task 3 und 4 scheitern sonst mitten im
+Apply, was der unangenehmste Zeitpunkt für einen fehlenden Account ist.
+
+**Werkzeuge** (macOS):
+
+```bash
+brew install terraform tflint fluxcd/tap/flux sops age kubernetes-cli gh jq
+# Docker Desktop oder colima — fuer Task 2 wird lokal gebaut
+docker version
+```
+
+Versionen prüfen — der Plan geht von diesen Mindeststufen aus:
+
+```bash
+terraform version   # >= 1.9.0
+flux version --client  # v2.9.x
+sops --version      # v3.13.x
+gh auth status      # angemeldet, Scope: repo, workflow, write:packages
+```
+
+**Accounts und Zugänge:**
+
+| Was | Wofür | Prüfen mit |
+|---|---|---|
+| Hetzner-Cloud-Projekt + API-Token (Read & Write) | Task 3, 4 | `curl -H "Authorization: Bearer $HCLOUD_TOKEN" https://api.hetzner.cloud/v1/servers` → `200` |
+| Domain mit Cloudflare als Nameserver | Task 3 | `dig +short NS thomaszachmann.de` → muss `*.ns.cloudflare.com` liefern |
+| Cloudflare API-Token für Terraform, Scope `Zone:DNS:Edit` | Task 3 | Cloudflare-Dashboard → API Tokens → Verify |
+| Zweites Cloudflare-Token für cert-manager, gleicher Scope | Task 6 | dito |
+| SSH-Keypair | Task 3 | `ls ~/.ssh/id_ed25519.pub` — sonst `ssh-keygen -t ed25519` |
+| GitHub-Account mit aktivierten Actions | Task 1, 9 | `gh auth status` |
+
+**Der häufigste Blocker:** Die Domain zeigt noch nicht auf Cloudflare-Nameserver.
+Der Nameserver-Wechsel beim Registrar dauert bis zu 24 Stunden und lässt sich
+nicht beschleunigen. Wenn `dig +short NS thomaszachmann.de` keine
+Cloudflare-Nameserver zeigt, ist das **jetzt** anzustoßen — Tasks 1 und 2
+laufen unabhängig davon weiter, Task 3 nicht.
+
+---
+
 ## Dateistruktur
 
 Jede Datei hat genau eine Zuständigkeit. Was zusammen geändert wird, liegt zusammen.
