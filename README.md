@@ -50,6 +50,31 @@ Der Workflow **deployt nie selbst**. Im Cluster liegt kein Credential mit
 Schreibrecht auf das Repo — der Flux-Deploy-Key ist read-only, per API
 verifiziert.
 
+## Infrastruktur aendern
+
+```bash
+cd terraform
+terraform plan -out=tfplan     # lesen, bevor angewendet wird
+terraform apply tfplan
+../scripts/backup-state.sh     # State-Sicherung auffrischen
+```
+
+Der letzte Schritt ist nicht optional. Der State liegt lokal und ist
+gitignored; bei Festplattenverlust muesste ohne Sicherung jede Ressource
+einzeln importiert werden. `backup-state.sh` legt ihn SOPS-verschluesselt
+unter `terraform/state-backup.sops.json` ab, prueft den Round-Trip
+semantisch und verwirft das Backup, wenn es sich nicht zurueckholen laesst.
+
+Das ist ein Backup, kein Remote-Backend: es gibt kein Locking. Solange nur
+eine Person applyt, ist das kein Problem.
+
+Wiederherstellen:
+
+```bash
+SOPS_AGE_KEY_FILE=age.key sops --decrypt terraform/state-backup.sops.json \
+  > terraform/terraform.tfstate
+```
+
 ## Cluster-Zugriff
 
 Port 6443 ist von aussen geschlossen. Zugriff nur über einen SSH-Tunnel.
@@ -129,9 +154,9 @@ Firewall vorbeigeht.
 - **Vier `PLATZHALTER`** in `impressum.html` und `datenschutz.html`: USt-Situation,
   Berufsbezeichnung, Log-Aufbewahrungsdauer, zuständige Aufsichtsbehörde. Stehen
   live auf der Seite und sind in Deutschland abmahnfähig.
-- **Terraform-State-Sicherung**: liegt lokal und gitignored, ohne Backup.
-- **DR-Probe** noch nicht durchgeführt. Damit ist die Reproduzierbarkeit
-  konstruktionsbedingt plausibel, aber nicht gemessen.
+- **DR-Probe** noch nicht durchgefuehrt (siehe unten).
+- **Force-Push-Schutz** ist konfiguriert, aber nicht verifiziert: der einzige
+  belastbare Test waere ein echter Force-Push.
 
 **Was NICHT durch `terraform apply` heilbar ist:** der private age-Schlüssel
 (`age.key`). Ohne ihn sind die SOPS-verschlüsselten Secrets im Repo unbrauchbar.

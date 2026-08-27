@@ -4,3 +4,15 @@ creation_rules:
   - path_regex: .*\.sops\.yaml$
     encrypted_regex: ^(data|stringData)$
     age: age13pkmalyhkrydx8uwgmhj0z7mej0pzehm38negqd2p99adx5huspsg2q4hh
+
+  # Terraform-State-Sicherung. Hier werden ALLE Werte verschluesselt, nicht nur
+  # data/stringData: der State enthaelt durchgehend Betriebsdetails, unter
+  # anderem die gerenderte user_data des Nodes.
+  #
+  # Konsequenz, die man kennen sollte: auch type und name sind verschluesselt.
+  # Ein Diff zeigt also, DASS sich der State geaendert hat, aber nicht welche
+  # Ressource. Das ist der Preis dafuer, nicht einzeln entscheiden zu muessen,
+  # welches Feld sensibel ist - eine Entscheidung, bei der man irgendwann
+  # danebenliegt. Was sich geaendert hat, sagt ohnehin terraform plan.
+  - path_regex: .*\.sops\.json$
+    age: age13pkmalyhkrydx8uwgmhj0z7mej0pzehm38negqd2p99adx5huspsg2q4hh
