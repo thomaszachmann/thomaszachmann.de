@@ -455,18 +455,18 @@ server {
         return 200 "ok\n";
     }
 
-    # Self-hosted Fonts sind unveraenderlich: aggressiv cachen
+    # Self-hosted Fonts sind unveraenderlich: aggressiv cachen.
+    # Bewusst KEINE expires-Direktive daneben: die erzeugt einen eigenen
+    # Cache-Control-Header, und zwei davon nebeneinander sind mehrdeutig.
     location /fonts/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
         try_files $uri =404;
     }
 
     # HTML nie cachen. Sonst sieht ein wiederkehrender Besucher nach einem
     # Deploy weiter die alte Seite, und niemand versteht warum.
     location / {
-        expires -1;
-        add_header Cache-Control "no-cache";
+        add_header Cache-Control "no-cache" always;
         try_files $uri $uri/ =404;
     }
 
@@ -510,6 +510,8 @@ Dockerfile
 docker build -t tz-site:dev sites/thomaszachmann
 ```
 
+Hier bewusst **ohne** `--platform`: der lokale Test läuft nativ und damit schnell. Für den Push nach GHCR in Task 7 gilt das Gegenteil — dort muss `linux/amd64` erzwungen werden, weil der Zielknoten x86_64 ist.
+
 Expected: Build erfolgreich. Bei `failed to solve: nginxinc/nginx-unprivileged:1.31.4-alpine: not found` ist der Tag zurückgezogen worden — dann die verfügbaren Tags prüfen (`curl -s 'https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags?page_size=100&name=alpine'`) und die nächsthöhere Patch-Version des 1.31er-Zweigs pinnen. Nicht auf `alpine` ausweichen.
 
 - [ ] **Step 4: Container starten und alle Endpunkte prüfen**
@@ -538,6 +540,16 @@ Expected:
 - `/fonts/*.woff2` mit Content-Type `font/woff2`
 - `/gibtesnicht` → `404`
 - `id` zeigt `uid=101(nginx)`, **nicht** `uid=0(root)`
+
+Zusätzlich prüfen, dass `Cache-Control` **genau einmal** gesetzt ist — nginx sendet sonst still zwei widersprüchliche Header:
+
+```bash
+curl -sI http://localhost:8081/                     | grep -ic '^cache-control'
+curl -sI http://localhost:8081/fonts/outfit.woff2   | grep -ic '^cache-control'
+curl -sI http://localhost:8081/                     | grep -iE '^(cache-control|server)'
+```
+
+Expected: beide Zählungen `1`, HTML mit `no-cache`, und `Server: nginx` **ohne** Versionsnummer (`server_tokens off` wirkt).
 
 - [ ] **Step 5: Aufräumen und committen**
 
@@ -1641,11 +1653,14 @@ Expected: die ersten Zeichen des echten Tokens, nicht `ENC[`.
 
 Henne-Ei: Das Deployment braucht einen Digest, bevor die Pipeline existiert. Also einmal von Hand.
 
+**`--platform linux/amd64` ist hier nicht optional.** Ein Apple-Silicon-Mac baut standardmäßig `linux/arm64`; der CX33 ist x86_64. Ohne das Flag landet ein arm64-Image in GHCR, und der Pod stirbt mit `exec format error` — ausgerechnet beim allerersten Deploy, wo man die Ursache am wenigsten vermutet. (Der spätere CI-Build in Task 9 braucht das Flag nicht: `ubuntu-latest` ist bereits amd64.)
+
 ```bash
 OWNER=thomaszachmann     # ggf. den echten Owner aus Task 1
 echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$OWNER" --password-stdin
 
-docker build -t "ghcr.io/$OWNER/thomaszachmann:bootstrap" sites/thomaszachmann
+docker build --platform linux/amd64 \
+  -t "ghcr.io/$OWNER/thomaszachmann:bootstrap" sites/thomaszachmann
 docker push "ghcr.io/$OWNER/thomaszachmann:bootstrap"
 
 DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' "ghcr.io/$OWNER/thomaszachmann:bootstrap" | cut -d@ -f2)"
@@ -1653,6 +1668,14 @@ echo "$DIGEST"
 ```
 
 Expected: eine Zeile `sha256:...`. Diesen Wert in Step 7 einsetzen.
+
+Vor dem Weitermachen die Architektur gegenprüfen — das kostet zwei Sekunden und spart eine halbe Stunde Fehlersuche:
+
+```bash
+docker image inspect "ghcr.io/$OWNER/thomaszachmann:bootstrap" --format '{{.Os}}/{{.Architecture}}'
+```
+
+Expected: `linux/amd64`. Steht dort `linux/arm64`, wurde das Flag vergessen.
 
 Das Package anschließend im GitHub-UI auf **public** stellen (Repo → Packages → thomaszachmann → Package settings → Change visibility). Dadurch braucht der Cluster kein Pull-Secret — für eine öffentliche Website wäre eines Sicherheitstheater.
 
