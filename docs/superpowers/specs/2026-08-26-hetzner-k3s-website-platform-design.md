@@ -408,7 +408,7 @@ und Load Balancer (durch ServiceLB ersetzt).
 | `cloudflare_zone_id` | Aus dem Cloudflare-Dashboard |
 | `HCLOUD_TOKEN` | Umgebungsvariable |
 | `CLOUDFLARE_API_TOKEN` | Umgebungsvariable, Zone:DNS:Edit |
-| `ssh_public_key` | Pfad zum öffentlichen SSH-Key für den Node-Zugang |
+| `ssh_key_name` | Name eines **bereits im Hetzner-Projekt hinterlegten** SSH-Keys. Terraform referenziert ihn per Data-Source statt ihn anzulegen: Hetzner lehnt doppelte Fingerprints ab, und ein von Terraform besessener Key koennte bei `destroy` den Zugang zu anderen Servern im selben Projekt mitreissen. |
 | `k3s_version` | Gepinnte k3s-Version, im Implementierungsplan festgelegt |
 | `letsencrypt_email` | Kontaktadresse für die ACME-Registrierung |
 | age-Keypair | Einmalig lokal erzeugt; Public in `.sops.yaml`, Private in den Passwortmanager und als Cluster-Secret |

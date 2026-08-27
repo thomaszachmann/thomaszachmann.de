@@ -1,6 +1,12 @@
-resource "hcloud_ssh_key" "admin" {
-  name       = "tz-admin"
-  public_key = file(pathexpand(var.ssh_public_key_path))
+# Der SSH-Key wird bewusst NICHT von Terraform verwaltet, sondern nur
+# referenziert. Er existierte vor diesem Projekt und wird von weiteren Servern
+# im selben Hetzner-Projekt mitbenutzt. Wuerde Terraform ihn besitzen, koennte
+# ein destroy den Zugang zu jenen Servern mitreissen.
+#
+# Nebeneffekt, der uns entgegenkommt: Hetzner lehnt einen zweiten Key mit
+# gleichem Fingerprint ohnehin ab.
+data "hcloud_ssh_key" "admin" {
+  name = var.ssh_key_name
 }
 
 # Die Primary IPs sind bewusst eigene Ressourcen und nicht Teil des Servers.
@@ -32,7 +38,7 @@ resource "hcloud_server" "web" {
   server_type = var.server_type
   image       = var.os_image
   location    = var.location
-  ssh_keys    = [hcloud_ssh_key.admin.id]
+  ssh_keys    = [data.hcloud_ssh_key.admin.id]
 
   public_net {
     ipv4_enabled = true
@@ -43,7 +49,7 @@ resource "hcloud_server" "web" {
 
   user_data = templatefile("${path.module}/cloud-init.yaml.tftpl", {
     node_user   = var.node_user
-    ssh_pubkey  = trimspace(file(pathexpand(var.ssh_public_key_path)))
+    ssh_pubkey  = trimspace(data.hcloud_ssh_key.admin.public_key)
     k3s_version = var.k3s_version
     node_name   = var.node_name
     tls_san     = hcloud_primary_ip.v4.ip_address

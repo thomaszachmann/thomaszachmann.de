@@ -11,6 +11,13 @@ crash.log
 crash.*.log
 .terraform.lock.hcl.bak
 
+# Umgebungsvariablen mit Tokens. Steht absichtlich weit oben: das Repo ist
+# public, und ein einmal gepushtes Token ist auch nach einem Force-Push
+# kompromittiert.
+.env
+.env.*
+!.env.example
+
 # Kubeconfig / Credentials
 kubeconfig
 kubeconfig.yaml

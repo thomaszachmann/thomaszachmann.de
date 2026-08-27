@@ -34,10 +34,15 @@ variable "admin_ip_cidrs" {
   }
 }
 
-variable "ssh_public_key_path" {
-  description = "Pfad zum oeffentlichen SSH-Key fuer den Node-Zugang."
+variable "ssh_key_name" {
+  description = <<-EOT
+    Name eines bereits im Hetzner-Projekt hinterlegten SSH-Keys.
+    Auflisten mit:
+      curl -s -H "Authorization: Bearer $HCLOUD_TOKEN" \
+        https://api.hetzner.cloud/v1/ssh_keys | jq -r '.ssh_keys[].name'
+    Der Key wird referenziert, nicht angelegt - siehe Kommentar in main.tf.
+  EOT
   type        = string
-  default     = "~/.ssh/id_ed25519.pub"
 }
 
 variable "node_user" {

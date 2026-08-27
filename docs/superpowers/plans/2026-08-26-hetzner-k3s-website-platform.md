@@ -83,7 +83,7 @@ docker version    # Docker Desktop oder colima muss laufen (Task 2 baut lokal)
 | Domain mit Cloudflare als Nameserver | Task 3 | `dig +short NS thomaszachmann.de` → muss `*.ns.cloudflare.com` liefern |
 | Cloudflare API-Token für Terraform, Scope `Zone:DNS:Edit` | Task 3 | Cloudflare-Dashboard → API Tokens → Verify |
 | Zweites Cloudflare-Token für cert-manager, gleicher Scope | Task 6 | dito |
-| SSH-Keypair | Task 3 | `ls ~/.ssh/id_ed25519.pub` — sonst `ssh-keygen -t ed25519` |
+| SSH-Key, **im Hetzner-Projekt hinterlegt** | Task 3 | Namen auflisten (siehe Task 3 Step 3); der Name kommt in `ssh_key_name` |
 | GitHub-Account mit aktivierten Actions | Task 1, 9 | `gh auth status` |
 | gh-Token mit Scope `write:packages` | Task 7, Step 1 | `gh auth status` — steht der Scope nicht dabei: `gh auth refresh -s write:packages` |
 
@@ -640,10 +640,9 @@ variable "admin_ip_cidrs" {
   }
 }
 
-variable "ssh_public_key_path" {
-  description = "Pfad zum oeffentlichen SSH-Key fuer den Node-Zugang."
+variable "ssh_key_name" {
+  description = "Name eines bereits im Hetzner-Projekt hinterlegten SSH-Keys. Wird referenziert, nicht angelegt."
   type        = string
-  default     = "~/.ssh/id_ed25519.pub"
 }
 
 variable "node_user" {
@@ -687,10 +686,20 @@ Die Validierungsbloecke sind nicht Zierde. `admin_ip_cidrs` ohne Praefixlaenge (
 
 - [x] **Step 3: main.tf**
 
+**Der SSH-Key wird referenziert, nicht angelegt.** Hetzner lehnt einen zweiten Key mit gleichem Fingerprint ab — wer den Rechner schon einmal mit diesem Projekt verbunden hat, laeuft sonst in `SSH key with the same fingerprint already exists`. Wichtiger noch: existiert der Key bereits, benutzen ihn womoeglich andere Server im selben Projekt. Wuerde Terraform ihn besitzen, koennte ein `destroy` deren Zugang mitreissen.
+
+Vorhandene Keys auflisten:
+
+```bash
+curl -s -H "Authorization: Bearer $HCLOUD_TOKEN" \
+  https://api.hetzner.cloud/v1/ssh_keys | jq -r '.ssh_keys[] | "\(.name)  \(.fingerprint)"'
+```
+
+Ist der eigene Key noch nicht dabei, einmalig ueber die Hetzner-Konsole oder `hcloud ssh-key create` hinterlegen — bewusst ausserhalb von Terraform.
+
 ```hcl
-resource "hcloud_ssh_key" "admin" {
-  name       = "tz-admin"
-  public_key = file(pathexpand(var.ssh_public_key_path))
+data "hcloud_ssh_key" "admin" {
+  name = var.ssh_key_name
 }
 
 # Die Primary IPs sind bewusst eigene Ressourcen und nicht Teil des Servers.
@@ -722,7 +731,7 @@ resource "hcloud_server" "web" {
   server_type = var.server_type
   image       = var.os_image
   location    = var.location
-  ssh_keys    = [hcloud_ssh_key.admin.id]
+  ssh_keys    = [data.hcloud_ssh_key.admin.id]
 
   public_net {
     ipv4_enabled = true
@@ -733,7 +742,7 @@ resource "hcloud_server" "web" {
 
   user_data = templatefile("${path.module}/cloud-init.yaml.tftpl", {
     node_user   = var.node_user
-    ssh_pubkey  = trimspace(file(pathexpand(var.ssh_public_key_path)))
+    ssh_pubkey  = trimspace(data.hcloud_ssh_key.admin.public_key)
     k3s_version = var.k3s_version
     tls_san     = hcloud_primary_ip.v4.ip_address
   })
@@ -961,7 +970,7 @@ cloudflare_zone_id = "hier-die-zone-id-aus-dem-cloudflare-dashboard"
 # Eigene IP ermitteln: curl -s https://ifconfig.me
 admin_ip_cidrs = ["203.0.113.7/32"]
 
-ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+ssh_key_name = "dein-key-name"
 ```
 
 - [x] **Step 9: Formatierung und Validierung**
@@ -1021,9 +1030,20 @@ cp terraform.tfvars.example terraform.tfvars   # und ausfuellen
 terraform plan -out=tfplan
 ```
 
-Expected: **`Plan: 10 to add, 0 to change, 0 to destroy.`** — sechs Hetzner-Ressourcen (`hcloud_ssh_key.admin`, `hcloud_primary_ip.v4`, `hcloud_primary_ip.v6`, `hcloud_server.web`, `hcloud_firewall.web`, `hcloud_firewall_attachment.web`) plus vier DNS-Records (je ein A und ein AAAA für Apex und `www`).
+Expected: **`Plan: 9 to add, 0 to change, 0 to destroy.`** — fuenf Hetzner-Ressourcen (`hcloud_primary_ip.v4`, `hcloud_primary_ip.v6`, `hcloud_server.web`, `hcloud_firewall.web`, `hcloud_firewall_attachment.web`) plus vier DNS-Records (je ein A und ein AAAA fuer Apex und `www`). Der SSH-Key zaehlt nicht mit, er ist eine Data-Source.
 
 Den Plan durchlesen, insbesondere die Firewall-Regeln: `port = "22"` muss ein `/32` in `source_ips` haben und nicht `0.0.0.0/0`.
+
+**Wenn im Projekt bereits andere Ressourcen liegen**, vorher auf Namenskollisionen pruefen — Terraform bricht sonst mitten im Apply ab:
+
+```bash
+for r in servers firewalls primary_ips ssh_keys; do
+  echo "--- $r ---"
+  curl -s -H "Authorization: Bearer $HCLOUD_TOKEN" "https://api.hetzner.cloud/v1/$r" | jq -r ".$r[].name"
+done
+```
+
+Belegt sein duerfen `tz-web-01`, `tz-web`, `tz-web-01-v4` und `tz-web-01-v6` nicht.
 
 - [ ] **Step 11: Commit**
 
