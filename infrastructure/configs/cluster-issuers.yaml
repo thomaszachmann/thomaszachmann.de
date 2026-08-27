@@ -1,0 +1,39 @@
+# Zwei Issuer mit Absicht. Lets Encrypt erlaubt fuenf Zertifikate pro Domain
+# und Woche; beim Einrichten ist das schneller aufgebraucht als man denkt.
+# Erst gegen Staging verifizieren, dann auf Prod umstellen.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: thomas@zachmann.work
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: thomas@zachmann.work
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      # DNS-01 statt HTTP-01: die Validierung haengt damit nicht an der
+      # Erreichbarkeit von Port 80, und Wildcards waeren moeglich, falls
+      # spaeter *.lab.thomaszachmann.de fuer Demo-Workloads gebraucht wird.
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token

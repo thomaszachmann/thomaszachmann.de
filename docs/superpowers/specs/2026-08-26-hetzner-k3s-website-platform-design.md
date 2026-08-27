@@ -313,9 +313,21 @@ Zu verschlüsseln ist praktisch nur der Cloudflare-API-Token für cert-manager.
 öffentliche Website; ein Credential dafür zu verwalten wäre
 Sicherheitstheater.
 
-**Zwei getrennte Cloudflare-Tokens**, jeweils scoped auf `Zone:DNS:Edit` für
-genau diese Zone: eines für Terraform, eines für cert-manager. So hat ein
-kompromittierter Cluster nicht das Token, mit dem Terraform arbeitet.
+**Zwei getrennte Cloudflare-Tokens**, jeweils scoped auf `Zone:DNS:Edit` plus
+`Zone:Zone:Read` für genau diese Zone: eines für Terraform, eines für
+cert-manager. So hat ein kompromittierter Cluster nicht das Token, mit dem
+Terraform arbeitet.
+
+`Zone:Zone:Read` ist bei cert-manager nicht optional — ohne die Berechtigung
+kann es die Zone-ID zum DNS-Namen nicht auflösen und die Challenge scheitert,
+obwohl das Setzen des TXT-Records erlaubt wäre.
+
+> **Abweichung, umgesetzt am 2026-08-27:** Es wird vorerst *ein* Token für
+> beides verwendet. Der Betreiber hat das bewusst entschieden. Konsequenz: Das
+> Token, mit dem Terraform DNS-Records verwaltet, liegt entschlüsselt in einem
+> Kubernetes-Secret und ist für jeden lesbar, der `get secrets` im Namespace
+> `cert-manager` darf. Die Trennung lässt sich jederzeit nachziehen — es ist
+> ein neues Token und ein erneutes `sops --encrypt`, ohne Codeänderung.
 
 **Terraform-Credentials** kommen aus Umgebungsvariablen (`HCLOUD_TOKEN`,
 `CLOUDFLARE_API_TOKEN`), nie aus `.tfvars`. `.tfvars` ist gitignored,

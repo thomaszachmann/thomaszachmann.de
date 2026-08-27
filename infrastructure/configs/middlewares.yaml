@@ -1,0 +1,43 @@
+# Zentral im Traefik-Namespace, damit Nyrvex spaeter dieselben Regeln bekommt,
+# ohne sie zu duplizieren. Funktioniert, weil Traefik mit
+# providers.kubernetesCRD.allowCrossNamespace: true laeuft.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: security-headers
+  namespace: traefik
+spec:
+  headers:
+    frameDeny: true
+    contentTypeNosniff: true
+    referrerPolicy: "strict-origin-when-cross-origin"
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    forceSTSHeader: true
+    # Die Seite laedt keinerlei externe Ressourcen: Fonts sind self-hosted,
+    # das Favicon ist eine data:-URI. Deshalb kann default-src 'none' sein.
+    # 'unsafe-inline' ist noetig, weil CSS und ein Script inline in der
+    # index.html stehen. Das Auslagern in externe Dateien wuerde das
+    # entfernen - notiert als Folgearbeit, aendert aber Website-Inhalt.
+    contentSecurityPolicy: >-
+      default-src 'none';
+      img-src 'self' data:;
+      style-src 'self' 'unsafe-inline';
+      script-src 'self' 'unsafe-inline';
+      font-src 'self';
+      base-uri 'none';
+      form-action 'none';
+      frame-ancestors 'none'
+    permissionsPolicy: "geolocation=(), microphone=(), camera=()"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: www-redirect
+  namespace: traefik
+spec:
+  # Kanonisch ist die Apex-Domain - passend zu og:url in der index.html.
+  redirectRegex:
+    regex: "^https://www\\.thomaszachmann\\.de/(.*)"
+    replacement: "https://thomaszachmann.de/${1}"
+    permanent: true
