@@ -1,0 +1,6 @@
+# Nur Werte werden verschluesselt, nie Keys. Dadurch bleiben Diffs im Repo
+# lesbar: man sieht, DASS sich ein Secret geaendert hat, ohne es zu sehen.
+creation_rules:
+  - path_regex: .*\.sops\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    age: age13pkmalyhkrydx8uwgmhj0z7mej0pzehm38negqd2p99adx5huspsg2q4hh
