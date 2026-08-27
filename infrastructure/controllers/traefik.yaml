@@ -35,6 +35,12 @@ spec:
   # websecure.tls.enabled sind im Chart 41.3.0 bereits Default und werden
   # deshalb nicht wiederholt.
   values:
+    # Ohne das heissen Deployment, Service und IngressClass "traefik-traefik",
+    # weil der Chart Release- und Chartnamen verkettet. Der Ingress in
+    # apps/base muesste dann ingressClassName: traefik-traefik tragen - eine
+    # Stolperstelle, die man genau einmal sucht.
+    fullnameOverride: traefik
+
     providers:
       kubernetesCRD:
         enabled: true
