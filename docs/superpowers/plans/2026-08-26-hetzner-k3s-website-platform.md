@@ -1157,7 +1157,7 @@ dig +short www.thomaszachmann.de A
 
 Expected: die IPs aus den Terraform-Outputs. Bei leerer Antwort sind entweder die Cloudflare-Nameserver für die Domain noch nicht aktiv, oder `cloudflare_zone_id` zeigt auf die falsche Zone.
 
-- [ ] **Step 7: Zustand festhalten**
+- [x] **Step 7: Zustand festhalten**
 
 Kein Code-Commit — aber die IPs gehören dokumentiert, weil Task 8 und 10 sie brauchen.
 
@@ -2541,11 +2541,17 @@ git push
 
 **Alternative:** Für ein Solo-Repo ist Branch Protection vor allem ein Schutz vor der eigenen Unachtsamkeit. Wenn der Bypass-Aufwand in keinem Verhältnis steht, ist es eine legitime Entscheidung, sie wegzulassen — dann diesen Step überspringen und im README vermerken, dass `main` ungeschützt ist.
 
-- [ ] **Step 4: DR-Probe — der Test für Ziel 2 der Spec**
+- [x] **Step 4: DR-Probe — der Test für Ziel 2 der Spec**
 
 Ohne diesen Schritt ist „reproduzierbar" eine Behauptung.
 
 **Vorher lesen:** Beim Rebuild ist das Secret `thomaszachmann-tls` weg und cert-manager stellt neu aus. Das verbraucht **eine** der fünf Let's-Encrypt-Ausstellungen pro Domain und Woche. Die Probe also nicht direkt nach mehreren Zertifikatsexperimenten laufen lassen.
+
+**Durchgeführt am 2026-08-27.** Gemessene RTO: rund 6 Minuten bis erreichbar, 7 bis gültiges TLS. Server-ID wechselte, IP blieb. Ergebnis und Ablauf stehen im README.
+
+**Was die Probe aufgedeckt hat:** Der erste `terraform apply` scheiterte mit `error during placement (resource_unavailable)` — keine CX33-Kapazität in fsn1. Neuversuch nach 30 Sekunden klappte. Da Primary IPs standortgebunden sind, opfert ein Standortwechsel den DNS-Anker; der richtige Ausweg ist ein anderer Servertyp am selben Standort (`-var="server_type=cx43"`). Das steht jetzt im README, weil man es kennen muss, bevor man es braucht.
+
+**Ohne diese Probe hätte niemand von dem Kapazitätsrisiko gewusst** — genau deshalb ist sie kein Formalismus.
 
 ```bash
 # --- 1. IP festhalten, um sie danach zu vergleichen ---
@@ -2614,7 +2620,7 @@ Expected: `HTTP/2 200`, Issuer `Let's Encrypt` ohne `STAGING`.
 Die benötigte Zeit stoppen und im README unter „Disaster Recovery" als
 tatsächliche RTO eintragen — statt der geschätzten zehn Minuten aus der Spec.
 
-- [ ] **Step 5: Ergebnis der Probe dokumentieren und committen**
+- [x] **Step 5: Ergebnis der Probe dokumentieren und committen**
 
 ```bash
 git add README.md
@@ -2626,7 +2632,7 @@ angefasst werden."
 git push
 ```
 
-- [ ] **Step 6: Offene Punkte übergeben**
+- [x] **Step 6: Offene Punkte übergeben**
 
 Nicht Teil dieses Plans, aber jetzt fällig und dem Betreiber zu melden:
 

@@ -404,6 +404,7 @@ und Load Balancer (durch ServiceLB ersetzt).
 |---|---|
 | Single Node, kein HA | Node weg = Seite weg bis zum Eingriff. RTO ~10 min manuell. Bewusst für den Preis akzeptiert. Für eine Akquise-Seite die relevanteste offene Frage. |
 | Hetzner-Preise | 2026 dreimal erhöht. 8,49 € ist kein stabiler Wert. |
+| **Kapazität am Zielstandort** | In der DR-Probe am 2026-08-27 scheiterte der erste `apply` mit `error during placement (resource_unavailable)` — kein CX33 in fsn1 frei. Neuversuch nach 30 s klappte. Weil Primary IPs standortgebunden sind, opfert ein Standortwechsel den DNS-Anker; der Ausweg ist ein anderer Servertyp am selben Standort. Im README dokumentiert. |
 | Branch Protection blockiert den Bot-Commit | Tritt sicher auf, sobald Protection auf `main` aktiviert wird. Lösung: Bypass für den Actions-Bot. Vorab dokumentiert statt später debuggt. |
 | Let's-Encrypt-Rate-Limit | Durch Staging-First-Vorgehen entschärft. |
 | Aussperren durch geänderte Admin-IP | Hetzner-Konsole als Rückweg, im README dokumentiert. |

@@ -154,13 +154,88 @@ Firewall vorbeigeht.
 - **Vier `PLATZHALTER`** in `impressum.html` und `datenschutz.html`: USt-Situation,
   Berufsbezeichnung, Log-Aufbewahrungsdauer, zuständige Aufsichtsbehörde. Stehen
   live auf der Seite und sind in Deutschland abmahnfähig.
-- **DR-Probe** noch nicht durchgefuehrt (siehe unten).
 - **Force-Push-Schutz** ist konfiguriert, aber nicht verifiziert: der einzige
   belastbare Test waere ein echter Force-Push.
 
 **Was NICHT durch `terraform apply` heilbar ist:** der private age-Schlüssel
 (`age.key`). Ohne ihn sind die SOPS-verschlüsselten Secrets im Repo unbrauchbar.
 Er gehört in den Passwortmanager, nicht nur auf diese Festplatte.
+
+## Disaster Recovery
+
+Am 2026-08-27 durchgefuehrt und gemessen, nicht geschaetzt.
+
+```
+16:58:59  Server zerstoert, Seite offline
+16:59:22  terraform apply FEHLGESCHLAGEN (siehe unten)
+17:00:27  Server neu erstellt, gleiche IP
+17:01:25  cloud-init durch, k3s Ready        (58 s)
+17:02:31  Flux gebootstrappt
+17:04:32  Site laeuft, Seite wieder erreichbar
+17:05:55  Produktivzertifikat neu ausgestellt
+17:06:26  Abnahme vollstaendig gruen
+```
+
+**Gemessene RTO: rund 6 Minuten bis erreichbar, 7 Minuten bis gueltiges TLS.**
+RPO null — alles steht im Repo.
+
+Belegt: Server-ID wechselte von `163777966` auf `163785180`, also eine
+physisch andere Maschine, bei unveraenderter IPv4 `2.28.5.182`. **DNS musste
+nicht angefasst werden.** Genau dafuer sind die Primary IPs eigene Ressourcen
+mit `delete_protection`.
+
+### Der Ablauf
+
+```bash
+cd terraform
+terraform destroy -target=hcloud_server.web
+terraform apply
+ssh-keygen -R "$(terraform output -raw ipv4)"       # Host-Key ist neu
+eval "$(terraform output -raw fetch_kubeconfig_command)"
+# Tunnel in einem eigenen Terminal: terraform output -raw kube_tunnel_command
+
+export KUBECONFIG="$PWD/../kubeconfig"
+kubectl create namespace flux-system
+kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=../age.key
+
+export GITHUB_TOKEN="$(gh auth token)"
+flux bootstrap github --owner=<owner> --repository=thomaszachmann.de \
+  --branch=main --path=clusters/prod --personal --version=v2.9.4
+
+../scripts/backup-state.sh    # State hat eine neue Server-ID
+```
+
+### Was die Probe an einem Risiko aufgedeckt hat
+
+Der erste `terraform apply` scheiterte:
+
+```
+Error: error during placement (resource_unavailable)
+```
+
+Hetzner hatte in diesem Moment **keine CX33-Kapazitaet in fsn1**. Ein
+Neuversuch 30 Sekunden spaeter klappte. Das ist kein Konfigurationsfehler,
+sondern eine echte Abhaengigkeit: Der Rebuild setzt voraus, dass am
+Zielstandort gerade eine Maschine des gewuenschten Typs frei ist.
+
+Das trifft die IP-Anker-Konstruktion an ihrer empfindlichen Stelle. Eine
+Primary IP ist **standortgebunden** — eine IP in `fsn1` laesst sich nicht an
+einen Server in `nbg1` haengen. Ein Ausweichen auf einen anderen Standort
+wuerde also genau die Eigenschaft aufgeben, die die schnelle
+Wiederherstellung ausmacht.
+
+Vorgehen im Ernstfall, in dieser Reihenfolge:
+
+1. **Neu versuchen.** Kapazitaetsengpaesse sind meist Minutensache.
+2. **Anderen Servertyp am selben Standort** nehmen:
+   `terraform apply -var="server_type=cx43"`. Der IP-Anker haelt, es kostet
+   nur mehr Geld — und man kann spaeter in Ruhe zurueckwechseln.
+3. **Erst als letztes den Standort wechseln.** Dann sind neue Primary IPs
+   noetig und DNS muss nachgezogen werden. Aus 6 Minuten RTO werden dann
+   die DNS-TTL von 300 Sekunden plus Cache-Realitaet.
+
+Punkt 2 ist der eigentliche Wert dieser Erkenntnis: Es gibt einen Ausweg, der
+den Anker nicht opfert — aber man muss ihn kennen, bevor man ihn braucht.
 
 ## Kosten
 
