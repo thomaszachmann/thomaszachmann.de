@@ -1,0 +1,67 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://traefik.github.io/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 1h
+  targetNamespace: traefik
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  chart:
+    spec:
+      chart: traefik
+      version: "41.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  # Der Values-Block ist absichtlich klein. ingressClass.enabled,
+  # isDefaultClass, deployment.replicas=1, service.spec.type=LoadBalancer und
+  # websecure.tls.enabled sind im Chart 41.3.0 bereits Default und werden
+  # deshalb nicht wiederholt.
+  values:
+    providers:
+      kubernetesCRD:
+        enabled: true
+        # Erlaubt dem Site-Ingress im Namespace web-thomaszachmann, die
+        # Middlewares im Namespace traefik zu referenzieren. Ohne das muesste
+        # jede Site ihre eigenen Header-Regeln mitbringen - und sie wuerden
+        # auseinanderlaufen.
+        allowCrossNamespace: true
+      kubernetesIngress:
+        enabled: true
+
+    ports:
+      web:
+        # ACHTUNG: der Pfad ist ports.web.http.redirections.entryPoint - mit
+        # dem http-Zwischenschritt. Aeltere Beispiele zeigen ihn ohne; das ist
+        # fuer Chart 41.3.0 falsch und wird stillschweigend ignoriert, sodass
+        # HTTP dann einfach nicht umleitet.
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 192Mi
