@@ -1694,7 +1694,7 @@ Expected: die ersten Zeichen des echten Tokens, nicht `ENC[`.
 - Consumes: IngressClass, ClusterIssuer und Middlewares aus Task 6; das Image aus Task 2
 - Produces: Deployment `thomaszachmann` im Namespace `web-thomaszachmann` mit Label `app.kubernetes.io/name: thomaszachmann`. Der Image-Digest steht ausschließlich in `apps/prod/kustomization.yaml` unter `images[0].digest` — das ist die einzige Zeile, die Task 9 automatisiert schreibt.
 
-- [ ] **Step 1: Image einmalig manuell bauen und pushen**
+- [x] **Step 1: Image einmalig manuell bauen und pushen**
 
 Henne-Ei: Das Deployment braucht einen Digest, bevor die Pipeline existiert. Also einmal von Hand.
 
@@ -1724,7 +1724,7 @@ Expected: `linux/amd64`. Steht dort `linux/arm64`, wurde das Flag vergessen.
 
 Das Package anschließend im GitHub-UI auf **public** stellen (Repo → Packages → thomaszachmann → Package settings → Change visibility). Dadurch braucht der Cluster kein Pull-Secret — für eine öffentliche Website wäre eines Sicherheitstheater.
 
-- [ ] **Step 2: Namespace und NetworkPolicy**
+- [x] **Step 2: Namespace und NetworkPolicy**
 
 `apps/base/thomaszachmann/namespace.yaml`:
 
@@ -1790,7 +1790,7 @@ spec:
           protocol: TCP
 ```
 
-- [ ] **Step 3: Deployment**
+- [x] **Step 3: Deployment**
 
 `apps/base/thomaszachmann/deployment.yaml`:
 
@@ -1872,7 +1872,7 @@ spec:
           emptyDir: {}
 ```
 
-- [ ] **Step 4: Service**
+- [x] **Step 4: Service**
 
 `apps/base/thomaszachmann/service.yaml`:
 
@@ -1893,7 +1893,7 @@ spec:
       protocol: TCP
 ```
 
-- [ ] **Step 5: Certificate — zunächst gegen Staging**
+- [x] **Step 5: Certificate — zunächst gegen Staging**
 
 `apps/base/thomaszachmann/certificate.yaml`:
 
@@ -1916,7 +1916,7 @@ spec:
     - www.thomaszachmann.de
 ```
 
-- [ ] **Step 6: Ingress**
+- [x] **Step 6: Ingress**
 
 `apps/base/thomaszachmann/ingress.yaml`:
 
@@ -1961,7 +1961,7 @@ spec:
                   name: http
 ```
 
-- [ ] **Step 7: Kustomizations**
+- [x] **Step 7: Kustomizations**
 
 `apps/base/thomaszachmann/kustomization.yaml`:
 
@@ -1994,7 +1994,7 @@ images:
     digest: sha256:HIER-DEN-DIGEST-AUS-STEP-1
 ```
 
-- [ ] **Step 8: Ausrollen**
+- [x] **Step 8: Ausrollen**
 
 ```bash
 git add apps/
@@ -2010,7 +2010,7 @@ git push
 flux reconcile kustomization apps --with-source
 ```
 
-- [ ] **Step 9: Rollout prüfen**
+- [x] **Step 9: Rollout prüfen**
 
 ```bash
 kubectl -n web-thomaszachmann get pods,svc,ingress,certificate
@@ -2028,7 +2028,7 @@ kubectl -n web-thomaszachmann get certificaterequest,order,challenge
 kubectl -n web-thomaszachmann describe challenge
 ```
 
-- [ ] **Step 10: Härtung im laufenden Pod belegen**
+- [x] **Step 10: Härtung im laufenden Pod belegen**
 
 ```bash
 POD="$(kubectl -n web-thomaszachmann get pod -l app.kubernetes.io/name=thomaszachmann -o name | head -1)"
@@ -2047,7 +2047,7 @@ kubectl -n web-thomaszachmann auth can-i --list \
 
 Expected: nur `selfsubjectreviews` und `selfsubjectrulesreviews`. Taucht dort `secrets` oder `pods` auf, hängt ein RBAC-Binding, das nicht hierher gehört.
 
-- [ ] **Step 10b: NetworkPolicy mit Test-Pods belegen**
+- [x] **Step 10b: NetworkPolicy mit Test-Pods belegen**
 
 Eine NetworkPolicy, die man nicht getestet hat, ist eine Vermutung. Der erste Test kommt aus einem **fremden** Namespace und muss scheitern:
 
@@ -2073,7 +2073,7 @@ kubectl -n traefik run netpol-probe-allowed --rm -i --restart=Never \
 
 Expected: `200`. Erst beide Proben zusammen belegen etwas: die eine, dass geblockt wird, die andere, dass nicht alles geblockt wird.
 
-- [ ] **Step 11: HTTPS von außen — mit erwarteter Zertifikatswarnung**
+- [x] **Step 11: HTTPS von außen — mit erwarteter Zertifikatswarnung**
 
 ```bash
 curl -sSIk https://thomaszachmann.de/ | head -1
@@ -2100,7 +2100,7 @@ Expected: Issuer enthält `STAGING`.
 - Consumes: funktionierende Staging-Ausstellung aus Task 7
 - Produces: öffentlich vertrautes Zertifikat im Secret `thomaszachmann-tls`. Task 10 prüft es in der DR-Probe erneut.
 
-- [ ] **Step 1: Issuer umstellen**
+- [x] **Step 1: Issuer umstellen**
 
 In `apps/base/thomaszachmann/certificate.yaml` genau eine Zeile ändern:
 
@@ -2117,7 +2117,7 @@ Den Kommentar über `issuerRef` auf den neuen Stand bringen:
     # letsencrypt-staging wechseln — fuenf Ausstellungen pro Domain und Woche.
 ```
 
-- [ ] **Step 2: Committen und altes Secret entfernen**
+- [x] **Step 2: Committen und altes Secret entfernen**
 
 Das Secret muss weg, sonst sieht cert-manager ein gültiges Zertifikat und stellt nichts Neues aus.
 
@@ -2132,7 +2132,7 @@ flux reconcile kustomization apps --with-source
 kubectl -n web-thomaszachmann delete secret thomaszachmann-tls
 ```
 
-- [ ] **Step 3: Neuausstellung abwarten**
+- [x] **Step 3: Neuausstellung abwarten**
 
 ```bash
 kubectl -n web-thomaszachmann get certificate -w
@@ -2140,7 +2140,7 @@ kubectl -n web-thomaszachmann get certificate -w
 
 Expected: `READY: True` innerhalb weniger Minuten. Mit Strg-C beenden.
 
-- [ ] **Step 4: Die vollständige Abnahme von außen**
+- [x] **Step 4: Die vollständige Abnahme von außen**
 
 Das ist der Test, der belegt, dass Ziel 1 der Spec erreicht ist.
 
@@ -2181,7 +2181,7 @@ Expected:
 
 Fehlen die Header in Punkt 5, greift die Middleware-Annotation nicht — dann `kubectl -n web-thomaszachmann describe ingress thomaszachmann` prüfen und den Namespace-Prefix `traefik-` in der Annotation kontrollieren.
 
-- [ ] **Step 5: Im Browser gegenprüfen**
+- [x] **Step 5: Im Browser gegenprüfen**
 
 Die Seite in einem echten Browser öffnen. Zu prüfen: Schloss-Symbol ohne Warnung, und — das ist der Grund, warum dieser Schritt nicht durch `curl` ersetzbar ist — dass die Schrift wirklich Outfit ist und nicht der System-Fallback. Wenn die Seite nach Helvetica aussieht, wurden in Task 1 HTML-Fehlerseiten statt woff2-Dateien heruntergeladen.
 
@@ -2196,7 +2196,7 @@ Die Seite in einem echten Browser öffnen. Zu prüfen: Schloss-Symbol ohne Warnu
 - Consumes: `scripts/verify-assets.sh` (Task 1), `sites/thomaszachmann/Dockerfile` (Task 2), `apps/prod/kustomization.yaml` (Task 7)
 - Produces: Bei jedem Push auf `main`, der `sites/thomaszachmann/**` berührt, ein neues Image in GHCR und einen Bot-Commit, der `images[0].digest` aktualisiert. Der Workflow spricht **nie** mit dem Cluster.
 
-- [ ] **Step 1: Workflow schreiben**
+- [x] **Step 1: Workflow schreiben**
 
 `.github/workflows/build-site.yaml`:
 
@@ -2297,7 +2297,7 @@ jobs:
 
 **Wenn der GitHub-Owner nicht `thomaszachmann` ist:** In `apps/prod/kustomization.yaml` muss `images[0].name` denselben kleingeschriebenen Owner tragen wie der Tag im Workflow, sonst greift die Kustomize-Ersetzung ins Leere und das Deployment zieht weiter das Bootstrap-Image. Beide Stellen jetzt abgleichen.
 
-- [ ] **Step 2: Workflow committen und ersten Lauf beobachten**
+- [x] **Step 2: Workflow committen und ersten Lauf beobachten**
 
 ```bash
 git add .github/workflows/build-site.yaml
@@ -2314,7 +2314,7 @@ gh run watch
 
 Expected: Der Push berührt `.github/workflows/**` und triggert damit sich selbst. Alle Schritte grün, am Ende ein Bot-Commit auf `main`.
 
-- [ ] **Step 3: Prüfen, dass der Digest wirklich angekommen ist**
+- [x] **Step 3: Prüfen, dass der Digest wirklich angekommen ist**
 
 ```bash
 git pull
@@ -2323,7 +2323,7 @@ grep -A2 'images:' apps/prod/kustomization.yaml
 
 Expected: ein `digest: sha256:...`, der sich vom Bootstrap-Digest aus Task 7 unterscheidet.
 
-- [ ] **Step 4: Der Ende-zu-Ende-Test**
+- [x] **Step 4: Der Ende-zu-Ende-Test**
 
 Das ist der Test für Ziel 3 der Spec: ein Commit führt ohne manuellen Eingriff zum Rollout.
 
