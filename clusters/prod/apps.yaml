@@ -12,7 +12,19 @@ spec:
   timeout: 5m
   path: ./apps/prod
   prune: true
-  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Bewusst KEIN wait: true. Das wuerde Flux auch auf das Certificate warten
+  # lassen - und das haengt an Lets Encrypt, also an einem externen Dienst mit
+  # eigenem Tempo und eigenen Rate-Limits. Jeder Reconcile lief dadurch fuenf
+  # Minuten in den Timeout, und solange wurde nichts anderes angewendet.
+  #
+  # Gegated wird auf das, was Flux tatsaechlich kontrolliert: laeuft die Site.
+  # Der Zustand des Zertifikats ist ueber die Certificate-Ressource sichtbar,
+  # er muss nicht den Rollout blockieren.
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: thomaszachmann
+      namespace: web-thomaszachmann
