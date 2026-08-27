@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infra-configs
+  # Kurzes Intervall: das ist der Pfad, ueber den ein Deploy ankommt.
+  interval: 1m
+  retryInterval: 1m
+  timeout: 5m
+  path: ./apps/prod
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

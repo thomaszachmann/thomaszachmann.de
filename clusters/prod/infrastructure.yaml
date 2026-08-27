@@ -1,0 +1,44 @@
+# Getrennte Kustomizations statt einer einzigen, weil ein ClusterIssuer die
+# cert-manager-CRDs braucht. In einer gemeinsamen Kustomization waere das ein
+# Wettlauf, der beim ersten Reconcile zuverlaessig scheitert und sich erst beim
+# Retry faengt - laut, verwirrend und vermeidbar.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infra-controllers
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 10m
+  path: ./infrastructure/controllers
+  prune: true
+  # wait: erst fertig, wenn Traefik und cert-manager wirklich laufen.
+  # Ohne das wuerde infra-configs sofort starten und gegen fehlende CRDs laufen.
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infra-configs
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infra-controllers
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  path: ./infrastructure/configs
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # Nur hier, weil hier das einzige verschluesselte Secret liegt.
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
