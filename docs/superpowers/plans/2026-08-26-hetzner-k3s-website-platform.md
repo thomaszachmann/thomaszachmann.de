@@ -1077,7 +1077,7 @@ Ab hier entstehen Kosten. Der Task endet mit einem erreichbaren, leeren Cluster.
 - Consumes: alle Outputs aus Task 3
 - Produces: eine lokale `kubeconfig` im Repo-Wurzelverzeichnis (gitignored), die über den SSH-Tunnel funktioniert. Tasks 5–8 setzen `KUBECONFIG` darauf.
 
-- [ ] **Step 1: Anwenden**
+- [x] **Step 1: Anwenden**
 
 ```bash
 cd terraform
@@ -1086,7 +1086,7 @@ terraform apply tfplan
 
 Expected: `Apply complete! Resources: 10 added, 0 changed, 0 destroyed.` und die fünf Outputs.
 
-- [ ] **Step 2: Warten, bis cloud-init durch ist**
+- [x] **Step 2: Warten, bis cloud-init durch ist**
 
 Der Server antwortet auf SSH, bevor k3s läuft. Ohne Warten scheitert der nächste Schritt und man sucht den Fehler an der falschen Stelle.
 
@@ -1104,7 +1104,7 @@ Wenn `k3s-ready` fehlt, ist die Warteschleife in 60 Versuchen à 5 s nicht ferti
 ssh "$SSH_TARGET" 'sudo cat /var/log/cloud-init-output.log | tail -50; sudo systemctl status k3s --no-pager'
 ```
 
-- [ ] **Step 3: kubeconfig holen**
+- [x] **Step 3: kubeconfig holen**
 
 ```bash
 cd ..
@@ -1114,7 +1114,7 @@ ls -l kubeconfig
 
 Expected: Datei mit Rechten `600`.
 
-- [ ] **Step 4: Tunnel öffnen und Cluster prüfen**
+- [x] **Step 4: Tunnel öffnen und Cluster prüfen**
 
 Der Tunnel muss in einem **eigenen Terminal** offen bleiben — Port 6443 ist von außen zu.
 
@@ -1135,7 +1135,7 @@ Expected:
 
 Wenn ein Traefik-Pod auftaucht, hat das `--disable`-Flag nicht gegriffen. Dann ist die k3s-Installation zu wiederholen, nicht der Pod zu löschen — er käme wieder.
 
-- [ ] **Step 5: Firewall von außen gegenprüfen**
+- [x] **Step 5: Firewall von außen gegenprüfen**
 
 Das ist der Test für die sicherheitskritischste Entscheidung des Setups.
 
@@ -1147,7 +1147,7 @@ nc -z -w 5 "$IP" 22   && echo "OK: 22 von hier erreichbar" || echo "FEHLER: SSH 
 
 Expected: `OK: 6443 ist zu` und `OK: 22 von hier erreichbar`.
 
-- [ ] **Step 6: DNS-Auflösung prüfen**
+- [x] **Step 6: DNS-Auflösung prüfen**
 
 ```bash
 dig +short thomaszachmann.de A
@@ -1185,7 +1185,7 @@ cp terraform/terraform.tfstate ~/Dropbox/backup/tz-terraform.tfstate.$(date +%Y%
 - Consumes: erreichbarer Cluster aus Task 4, GitHub-Repo aus Task 1
 - Produces: drei Flux-Kustomizations mit fester Reihenfolge — `infra-controllers` → `infra-configs` → `apps`. Das Cluster-Secret `sops-age` in `flux-system` entschlüsselt alles unter `infrastructure/configs/`. Tasks 6 und 7 legen Dateien in die Pfade, die diese Kustomizations lesen.
 
-- [ ] **Step 1: age-Schlüsselpaar erzeugen**
+- [x] **Step 1: age-Schlüsselpaar erzeugen**
 
 ```bash
 age-keygen -o age.key
@@ -1196,7 +1196,7 @@ Der öffentliche Schlüssel (`age1...`) kommt ins Repo. Der private bleibt lokal
 
 **Sofort sichern:** Den Inhalt von `age.key` in den Passwortmanager kopieren. Er ist das einzige Artefakt dieses Setups, dessen Verlust nicht durch `terraform apply` heilbar ist — ohne ihn sind die verschlüsselten Secrets im Repo unbrauchbar.
 
-- [ ] **Step 2: .sops.yaml anlegen**
+- [x] **Step 2: .sops.yaml anlegen**
 
 `AGE_PUBLIC_KEY` durch den Wert aus Step 1 ersetzen.
 
@@ -1209,7 +1209,7 @@ creation_rules:
     age: AGE_PUBLIC_KEY
 ```
 
-- [ ] **Step 3: Privaten Schlüssel als Cluster-Secret hinterlegen**
+- [x] **Step 3: Privaten Schlüssel als Cluster-Secret hinterlegen**
 
 ```bash
 export KUBECONFIG="$PWD/kubeconfig"     # Tunnel muss offen sein
@@ -1226,7 +1226,7 @@ kubectl -n flux-system get secret sops-age -o jsonpath='{.data}' | tr ',' '\n' |
 
 Expected: `age.agekey`.
 
-- [ ] **Step 4: Flux bootstrappen**
+- [x] **Step 4: Flux bootstrappen**
 
 ```bash
 export GITHUB_TOKEN=...   # Scope: repo
@@ -1245,7 +1245,7 @@ Der Deploy-Key, den Flux anlegt, ist **read-only** — das ist der Default und g
 
 Expected: Am Ende `all components are healthy`.
 
-- [ ] **Step 5: Bootstrap verifizieren**
+- [x] **Step 5: Bootstrap verifizieren**
 
 ```bash
 flux check
@@ -1255,7 +1255,7 @@ git pull   # der Bootstrap hat nach main committet
 
 Expected: `source-controller`, `kustomize-controller`, `helm-controller`, `notification-controller` laufen. Im Repo liegt neu `clusters/prod/flux-system/`.
 
-- [ ] **Step 6: Die drei Kustomizations definieren**
+- [x] **Step 6: Die drei Kustomizations definieren**
 
 Getrennte Kustomizations statt einer einzigen, weil ein ClusterIssuer die cert-manager-CRDs braucht. In einer gemeinsamen Kustomization wäre das ein Wettlauf, der beim ersten Reconcile zuverlässig scheitert und sich erst beim Retry fängt — laut, verwirrend und vermeidbar.
 
@@ -1324,7 +1324,7 @@ spec:
     name: flux-system
 ```
 
-- [ ] **Step 7: Committen und beobachten, dass Flux die Pfade noch nicht findet**
+- [x] **Step 7: Committen und beobachten, dass Flux die Pfade noch nicht findet**
 
 ```bash
 git add .sops.yaml clusters/
