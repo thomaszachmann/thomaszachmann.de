@@ -1356,7 +1356,7 @@ Expected: `infra-controllers` meldet einen Fehler, weil `./infrastructure/contro
 - Consumes: die Kustomizations aus Task 5
 - Produces: IngressClass `traefik` (Default), ClusterIssuer `letsencrypt-staging` und `letsencrypt-prod`, sowie zwei Middlewares im Namespace `traefik`: `security-headers` und `www-redirect`. Task 7 referenziert sie über die Annotation `traefik.ingress.kubernetes.io/router.middlewares: traefik-security-headers@kubernetescrd,traefik-www-redirect@kubernetescrd`.
 
-- [ ] **Step 1: Traefik-HelmRelease**
+- [x] **Step 1: Traefik-HelmRelease**
 
 `infrastructure/controllers/traefik.yaml`. Der Values-Block ist absichtlich klein: `ingressClass.enabled`, `isDefaultClass`, `deployment.replicas: 1`, `service.spec.type: LoadBalancer` und `websecure.tls.enabled` sind im Chart 41.3.0 bereits Default und werden deshalb nicht wiederholt.
 
@@ -1424,7 +1424,7 @@ spec:
 
 **Achtung beim Redirect-Pfad:** Der Key liegt unter `ports.web.http.redirections.entryPoint` — mit dem `http`-Zwischenschritt. Ältere Beispiele und ein Changelog-Diff im Chart-Repo zeigen ihn ohne `http`; das ist für 41.3.0 falsch und wird stillschweigend ignoriert, sodass HTTP dann einfach nicht umleitet.
 
-- [ ] **Step 2: cert-manager-HelmRelease**
+- [x] **Step 2: cert-manager-HelmRelease**
 
 `infrastructure/controllers/cert-manager.yaml`:
 
@@ -1488,7 +1488,7 @@ resources:
   - cert-manager.yaml
 ```
 
-- [ ] **Step 3: Controller ausrollen und prüfen**
+- [x] **Step 3: Controller ausrollen und prüfen**
 
 ```bash
 git add infrastructure/controllers
@@ -1518,7 +1518,7 @@ curl -sI "http://$IP/" | head -3
 
 Expected: `HTTP/1.1 308 Permanent Redirect` mit `Location: https://...`. Kommt stattdessen `404`, ist der Redirect-Value-Pfad falsch geschrieben — siehe Warnung in Step 1.
 
-- [ ] **Step 4: Cloudflare-Token für cert-manager verschlüsselt ablegen**
+- [x] **Step 4: Cloudflare-Token für cert-manager verschlüsselt ablegen**
 
 Ein **zweites**, eigenes Token anlegen — nicht das aus Terraform wiederverwenden. Cloudflare-Dashboard → My Profile → API Tokens → Create Token → Custom, Permission `Zone / DNS / Edit`, Zone Resources auf genau diese Zone begrenzt. So hat ein kompromittierter Cluster nicht das Token, mit dem Terraform arbeitet.
 
@@ -1547,7 +1547,7 @@ Expected: mindestens ein `ENC[`-Treffer, und `api-token` ist unlesbar, während 
 
 **Nicht committen, bevor dieser Check grün ist.** Das Repo ist public — ein einmal gepushtes Klartext-Token ist kompromittiert, auch nach einem Force-Push.
 
-- [ ] **Step 5: ClusterIssuer**
+- [x] **Step 5: ClusterIssuer**
 
 `infrastructure/configs/cluster-issuers.yaml`. `E-MAIL-ADRESSE` durch die echte ACME-Kontaktadresse ersetzen.
 
@@ -1593,7 +1593,7 @@ spec:
               key: api-token
 ```
 
-- [ ] **Step 6: Middlewares**
+- [x] **Step 6: Middlewares**
 
 `infrastructure/configs/middlewares.yaml`. Zentral im Traefik-Namespace, damit Nyrvex später dieselben Regeln bekommt, ohne sie zu duplizieren.
 
@@ -1652,7 +1652,7 @@ resources:
   - middlewares.yaml
 ```
 
-- [ ] **Step 7: Ausrollen und Issuer-Bereitschaft prüfen**
+- [x] **Step 7: Ausrollen und Issuer-Bereitschaft prüfen**
 
 ```bash
 git add infrastructure/configs
