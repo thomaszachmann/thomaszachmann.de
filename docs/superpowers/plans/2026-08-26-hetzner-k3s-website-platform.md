@@ -101,7 +101,8 @@ Jede Datei hat genau eine Zuständigkeit. Was zusammen geändert wird, liegt zus
 
 | Datei | Zuständigkeit |
 |---|---|
-| `scripts/verify-assets.sh` | Prüft, dass jede lokal referenzierte Datei in den HTML-Seiten existiert. Einziger Test, der lokal und in CI identisch läuft. |
+| `scripts/verify-assets.sh` | Prüft, dass jede lokal referenzierte Datei in den HTML-Seiten existiert — inklusive CSS-`url()` aus inline `<style>`. Läuft lokal und in CI identisch. |
+| `scripts/verify-cloud-init.sh` | Rendert das cloud-init-Template und prüft das Ergebnis auf gültiges YAML und Vollständigkeit der k3s-Flags. Schließt die Lücke, die `terraform validate` offen lässt. |
 | `sites/thomaszachmann/public/` | Auslieferbarer Website-Inhalt. Nichts anderes. |
 | `sites/thomaszachmann/Dockerfile` | Verpackt `public/` in ein nicht-privilegiertes nginx-Image. |
 | `sites/thomaszachmann/nginx.conf` | Server-Block: Ports, Caching, Health-Endpoint. Keine Security-Header — die macht Traefik. |
@@ -138,7 +139,7 @@ Dies ist der einzige Task mit echtem Test-First-Zyklus: Wir schreiben den Prüfe
 - Consumes: nichts (erster Task)
 - Produces: `scripts/verify-assets.sh <verzeichnis>` — Exit 0 wenn alle Referenzen auflösen, Exit 1 mit Liste der fehlenden Dateien auf stderr, Exit 2 wenn das Verzeichnis nicht existiert. Task 2 und Task 9 rufen es mit `sites/thomaszachmann/public` auf.
 
-- [ ] **Step 1: Prüfskript schreiben**
+- [x] **Step 1: Prüfskript schreiben**
 
 `scripts/verify-assets.sh`:
 
@@ -201,14 +202,14 @@ echo "OK: alle lokalen Referenzen in $html_count HTML-Datei(en) aufgelöst."
 chmod +x scripts/verify-assets.sh
 ```
 
-- [ ] **Step 2: Struktur anlegen und index.html verschieben**
+- [x] **Step 2: Struktur anlegen und index.html verschieben**
 
 ```bash
 mkdir -p sites/thomaszachmann/public/fonts
 git mv index.html sites/thomaszachmann/public/index.html
 ```
 
-- [ ] **Step 3: Prüfskript laufen lassen und scheitern sehen**
+- [x] **Step 3: Prüfskript laufen lassen und scheitern sehen**
 
 Run: `./scripts/verify-assets.sh sites/thomaszachmann/public`
 
@@ -225,7 +226,7 @@ Wenn stattdessen Exit 0 kommt, findet das Skript die Referenzen nicht — dann i
 
 **Warum die CSS-Extraktion im Skript nicht optional ist:** Die beiden Fonts werden nicht über ein HTML-Attribut geladen, sondern über `src:url(fonts/outfit.woff2)` in einem `@font-face`-Block im inline-`<style>` (index.html:19-20). Ein Prüfer, der nur `href=` und `src=` liest, meldet hier bloß zwei statt vier fehlender Dateien — und übersieht ausgerechnet die, die den optischen Eindruck der Seite bestimmen.
 
-- [ ] **Step 4: Fonts von den offiziellen Quellen holen**
+- [x] **Step 4: Fonts von den offiziellen Quellen holen**
 
 Beide Familien liegen upstream bereits als variables woff2 bereit — keine Konvertierung nötig. Beide sind OFL-1.1-lizenziert, Self-Hosting ist ausdrücklich erlaubt. Die Dateinamen werden auf die in `index.html:19-20` erwarteten umbenannt.
 
@@ -252,7 +253,7 @@ ls -l sites/thomaszachmann/public/fonts/
 
 Expected: beide als `Web Open Font Format (Version 2)` erkannt, Größen ~45 KB und ~114 KB. Eine Datei von wenigen KB mit `HTML` im `file`-Output bedeutet, der Pfad ist umgezogen — dann den echten Pfad über die GitHub-API suchen statt zu raten.
 
-- [ ] **Step 5: Rechtstexte als Gerüst anlegen**
+- [x] **Step 5: Rechtstexte als Gerüst anlegen**
 
 Der Inhalt ist bewusst mit Platzhaltern versehen und rechtlich vom Betreiber zu verantworten. Das Gerüst übernimmt Struktur und Styling-Anmutung der Hauptseite, damit später nur Text ersetzt werden muss.
 
@@ -378,13 +379,13 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 
 **Wichtig:** Alle `PLATZHALTER`-Stellen müssen vor dem Livegang durch echte Angaben ersetzt werden. Sie sind absichtlich so auffällig geschrieben, dass sie in einem Review nicht übersehen werden.
 
-- [ ] **Step 6: Prüfskript laufen lassen und grün sehen**
+- [x] **Step 6: Prüfskript laufen lassen und grün sehen**
 
 Run: `./scripts/verify-assets.sh sites/thomaszachmann/public`
 
 Expected: **Exit 0**, Ausgabe `OK: alle lokalen Referenzen in 3 HTML-Datei(en) aufgelöst.`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -400,7 +401,7 @@ verify-assets.sh prueft jede lokale href/src-Referenz gegen das
 Dateisystem und laeuft lokal wie in CI identisch."
 ```
 
-- [ ] **Step 8: GitHub-Repo anlegen und pushen**
+- [x] **Step 8: GitHub-Repo anlegen und pushen**
 
 Alle folgenden Tasks brauchen ein erreichbares Remote — Flux liest daraus, Actions schreibt hinein.
 
@@ -432,7 +433,7 @@ Expected: `<owner>/thomaszachmann.de PUBLIC main`. Den tatsächlichen Owner noti
 - Consumes: `sites/thomaszachmann/public/` und `scripts/verify-assets.sh` aus Task 1
 - Produces: Ein Image, das auf Port **8080** als UID **101** lauscht, `/healthz` mit `200 ok` beantwortet und mit `readOnlyRootFilesystem` läuft, sofern `/tmp` und `/var/cache/nginx` beschreibbar gemountet sind. Task 7 baut darauf den Deployment-securityContext auf, Task 9 den Build-Job.
 
-- [ ] **Step 1: nginx.conf schreiben**
+- [x] **Step 1: nginx.conf schreiben**
 
 `sites/thomaszachmann/nginx.conf` — nur der Server-Block. Security-Header setzt bewusst Traefik, damit sie an einer Stelle für alle Sites gelten:
 
@@ -479,7 +480,7 @@ server {
 }
 ```
 
-- [ ] **Step 2: Dockerfile und .dockerignore schreiben**
+- [x] **Step 2: Dockerfile und .dockerignore schreiben**
 
 `sites/thomaszachmann/Dockerfile`:
 
@@ -504,7 +505,7 @@ Dockerfile
 .dockerignore
 ```
 
-- [ ] **Step 3: Image bauen**
+- [x] **Step 3: Image bauen**
 
 ```bash
 docker build -t tz-site:dev sites/thomaszachmann
@@ -514,7 +515,7 @@ Hier bewusst **ohne** `--platform`: der lokale Test läuft nativ und damit schne
 
 Expected: Build erfolgreich. Bei `failed to solve: nginxinc/nginx-unprivileged:1.31.4-alpine: not found` ist der Tag zurückgezogen worden — dann die verfügbaren Tags prüfen (`curl -s 'https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags?page_size=100&name=alpine'`) und die nächsthöhere Patch-Version des 1.31er-Zweigs pinnen. Nicht auf `alpine` ausweichen.
 
-- [ ] **Step 4: Container starten und alle Endpunkte prüfen**
+- [x] **Step 4: Container starten und alle Endpunkte prüfen**
 
 Der Test läuft bewusst mit `--read-only`, damit die Härtung aus Task 7 hier schon belegt ist und nicht erst im Cluster auffällt.
 
@@ -551,7 +552,7 @@ curl -sI http://localhost:8081/                     | grep -iE '^(cache-control|
 
 Expected: beide Zählungen `1`, HTML mit `no-cache`, und `Server: nginx` **ohne** Versionsnummer (`server_tokens off` wirkt).
 
-- [ ] **Step 5: Aufräumen und committen**
+- [x] **Step 5: Aufräumen und committen**
 
 ```bash
 docker rm -f tz-site-test
@@ -576,13 +577,15 @@ git push
 Dieser Task erzeugt Kosten von null. Er endet mit einem gelesenen `plan`, nicht mit laufender Infrastruktur, damit ein Reviewer die Firewall vor dem ersten Byte Traffic ablehnen kann.
 
 **Files:**
-- Create: `terraform/providers.tf`, `terraform/variables.tf`, `terraform/main.tf`, `terraform/firewall.tf`, `terraform/dns.tf`, `terraform/outputs.tf`, `terraform/cloud-init.yaml.tftpl`, `terraform/terraform.tfvars.example`
+- Create: `terraform/providers.tf`, `terraform/variables.tf`, `terraform/main.tf`, `terraform/firewall.tf`, `terraform/dns.tf`, `terraform/outputs.tf`, `terraform/cloud-init.yaml.tftpl`, `terraform/terraform.tfvars.example`, `terraform/.tflint.hcl`
+- Create: `scripts/verify-cloud-init.sh`
+- Commit: `terraform/.terraform.lock.hcl` — der Lockfile pinnt die Provider-Hashes und gehoert ins Repo, nicht in die .gitignore
 
 **Interfaces:**
 - Consumes: nichts aus vorherigen Tasks
 - Produces: Outputs `ipv4`, `ipv6`, `ssh_command`, `kube_tunnel_command`, `fetch_kubeconfig_command`. Task 4 verwendet sie. Der Node heißt `tz-web-01`, der Admin-Benutzer kommt aus `var.node_user` (Default `tz`).
 
-- [ ] **Step 1: providers.tf**
+- [x] **Step 1: providers.tf**
 
 ```hcl
 terraform {
@@ -608,7 +611,7 @@ provider "hcloud" {}
 provider "cloudflare" {}
 ```
 
-- [ ] **Step 2: variables.tf**
+- [x] **Step 2: variables.tf**
 
 ```hcl
 variable "domain" {
@@ -672,9 +675,17 @@ variable "k3s_version" {
   type        = string
   default     = "v1.36.3+k3s1"
 }
+
+variable "node_name" {
+  description = "Name des Servers und des Kubernetes-Nodes. Muss zu --node-name im cloud-init passen."
+  type        = string
+  default     = "tz-web-01"
+}
 ```
 
-- [ ] **Step 3: main.tf**
+Die Validierungsbloecke sind nicht Zierde. `admin_ip_cidrs` ohne Praefixlaenge (also `203.0.113.7` statt `203.0.113.7/32`) nimmt der Provider stillschweigend an und die Regel greift dann nicht wie erwartet; und eine Cloudflare-**Account**-ID anstelle der **Zone**-ID ist eine Verwechslung, die man sonst erst am fehlgeschlagenen Apply merkt. Beide werden deshalb hier abgefangen.
+
+- [x] **Step 3: main.tf**
 
 ```hcl
 resource "hcloud_ssh_key" "admin" {
@@ -687,10 +698,9 @@ resource "hcloud_ssh_key" "admin" {
 # weggeworfen und neu gebaut werden, ohne dass sich die IP aendert.
 # delete_protection verhindert, dass ein unbedachtes destroy den Anker mitnimmt.
 resource "hcloud_primary_ip" "v4" {
-  name              = "tz-web-v4"
+  name              = "${var.node_name}-v4"
   type              = "ipv4"
   location          = var.location
-  assignee_type     = "server"
   auto_delete       = false
   delete_protection = true
 
@@ -698,10 +708,9 @@ resource "hcloud_primary_ip" "v4" {
 }
 
 resource "hcloud_primary_ip" "v6" {
-  name              = "tz-web-v6"
+  name              = "${var.node_name}-v6"
   type              = "ipv6"
   location          = var.location
-  assignee_type     = "server"
   auto_delete       = false
   delete_protection = true
 
@@ -746,7 +755,7 @@ resource "hcloud_server" "web" {
 }
 ```
 
-- [ ] **Step 4: firewall.tf**
+- [x] **Step 4: firewall.tf**
 
 ```hcl
 # Die Firewall laeuft auf Hetzner-Ebene, ausserhalb der VM. Zwei Gruende:
@@ -801,7 +810,7 @@ resource "hcloud_firewall_attachment" "web" {
 }
 ```
 
-- [ ] **Step 5: dns.tf**
+- [x] **Step 5: dns.tf**
 
 ```hcl
 locals {
@@ -844,7 +853,7 @@ resource "cloudflare_dns_record" "aaaa" {
 }
 ```
 
-- [ ] **Step 6: cloud-init.yaml.tftpl**
+- [x] **Step 6: cloud-init.yaml.tftpl**
 
 Vorsicht beim Bearbeiten: Die Datei wird durch `templatefile` gerendert. `${...}` und `%{...}` sind Interpolationen. Literale Dollar-Klammern müssten als `$${...}` geschrieben werden — deshalb benutzen die Shell-Schnipsel unten `$(...)` und `$i`, nie `${i}`.
 
@@ -910,7 +919,7 @@ runcmd:
     done
 ```
 
-- [ ] **Step 7: outputs.tf**
+- [x] **Step 7: outputs.tf**
 
 ```hcl
 output "ipv4" {
@@ -939,7 +948,7 @@ output "fetch_kubeconfig_command" {
 }
 ```
 
-- [ ] **Step 8: terraform.tfvars.example**
+- [x] **Step 8: terraform.tfvars.example**
 
 ```hcl
 # Kopieren nach terraform.tfvars (gitignored) und ausfuellen.
@@ -955,7 +964,7 @@ admin_ip_cidrs = ["203.0.113.7/32"]
 ssh_public_key_path = "~/.ssh/id_ed25519.pub"
 ```
 
-- [ ] **Step 9: Formatierung und Validierung**
+- [x] **Step 9: Formatierung und Validierung**
 
 ```bash
 cd terraform
@@ -986,6 +995,22 @@ tflint
 Expected: keine Findings. Meldet `tflint` etwas, ist es zu beheben und nicht zu unterdrücken.
 
 Häufigster Fehlschlag hier: ein Attribut aus einem v4-Cloudflare-Beispiel (`value` statt `content`, fehlendes `ttl`, `name = "@"`). Die Meldung nennt die Zeile.
+
+- [x] **Step 9b: cloud-init-Template tatsaechlich rendern**
+
+`terraform validate` prueft HCL-Syntax, rendert `templatefile()` aber **nie**. Ein unescaptes Dollar-Zeichen im Template faellt damit erst bei `plan` auf — ein Einrueckungsfehler sogar erst, wenn der Server bootet und cloud-init die Datei stillschweigend verwirft. Beides sind teure Zeitpunkte.
+
+Deshalb ein eigener Pruefer, `scripts/verify-cloud-init.sh`. Er rendert das Template mit Dummy-Werten, prueft dass das Ergebnis mit `#cloud-config` beginnt und gueltiges YAML ist, und stellt sicher, dass alle fuenf k3s-Flags sowie die sshd-Haertung im gerenderten Ergebnis stehen.
+
+```bash
+./scripts/verify-cloud-init.sh terraform
+```
+
+Expected: `OK: cloud-init rendert zu gueltigem YAML, alle k3s-Flags und die sshd-Haertung sind enthalten.`
+
+**Eine Falle, die genau hier zuschlaegt:** Der Template-Parser kennt keine YAML-Kommentare. Eine Dollar-Klammer in einer Kommentarzeile — etwa in einem gut gemeinten Hinweis "nicht so schreiben: DOLLAR-Klammer-i" — wird als Interpolation gelesen und bricht mit `There is no variable named "i"` ab. Im Template darf diese Schreibweise deshalb nirgends vorkommen, auch nicht erklaerend.
+
+Zweite Falle: `terraform console` wertet **zeilenweise** aus. Der `templatefile()`-Aufruf muss einzeilig sein, sonst kommt `Expected the start of an expression, but found the end of the file`.
 
 - [ ] **Step 10: Plan lesen — nicht anwenden**
 

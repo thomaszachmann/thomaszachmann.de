@@ -1,0 +1,14 @@
+# Kopieren nach terraform.tfvars (gitignored) und ausfuellen.
+#
+# Tokens gehoeren NICHT hierher, sondern in die Umgebung:
+#   export HCLOUD_TOKEN=...
+#   export CLOUDFLARE_API_TOKEN=...   # Scope: Zone:DNS:Edit auf genau diese Zone
+
+# Cloudflare-Dashboard -> Zone thomaszachmann.de -> Uebersicht -> rechte Spalte
+cloudflare_zone_id = "00000000000000000000000000000000"
+
+# Eigene oeffentliche IP ermitteln: curl -s https://ifconfig.me
+# Achtung: mit Praefixlaenge, also /32 - nicht die nackte IP.
+admin_ip_cidrs = ["203.0.113.7/32"]
+
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"

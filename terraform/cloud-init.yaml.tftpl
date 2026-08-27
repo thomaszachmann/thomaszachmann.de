@@ -1,0 +1,76 @@
+#cloud-config
+#
+# Wird von Terraform durch templatefile() gerendert.
+#
+# ACHTUNG: Der Template-Parser kennt keine YAML-Kommentare. Eine Dollar- oder
+# Prozent-Klammer wird auch in einer Kommentarzeile als Interpolation gelesen
+# und laesst terraform plan mit einem Parse-Fehler abbrechen. Deshalb steht in
+# dieser Datei kein einziges Beispiel dieser Schreibweise - auch nicht als
+# Erklaerung.
+#
+# Fuer Shell-Code heisst das: $(...) und $i sind unbedenklich, die geklammerte
+# Variablenform dagegen muss verdoppelt werden.
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - unattended-upgrades
+  - curl
+  - ca-certificates
+
+users:
+  - name: ${node_user}
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    ssh_authorized_keys:
+      - ${ssh_pubkey}
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/99-hardening.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin prohibit-password
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    permissions: "0644"
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+
+runcmd:
+  - systemctl restart ssh || systemctl restart sshd
+
+  # k3s-Installation.
+  #
+  # --disable=traefik, weil Traefik von Flux kommt: sonst laege ein Teil des
+  #   Cluster-Zustands in einer HelmChartConfig auf dem Node und Git waere
+  #   nicht mehr die ganze Wahrheit.
+  # --secrets-encryption verschluesselt Secrets at rest statt sie nur zu
+  #   base64-kodieren.
+  # --write-kubeconfig-mode=0600, damit die kubeconfig nicht world-readable ist.
+  # --tls-san, damit das apiserver-Zertifikat auch fuer die oeffentliche IP gilt.
+  - |
+    curl -sfL https://get.k3s.io \
+      | INSTALL_K3S_VERSION="${k3s_version}" sh -s - server \
+          --disable=traefik \
+          --secrets-encryption \
+          --write-kubeconfig-mode=0600 \
+          --tls-san=${tls_san} \
+          --node-name=${node_name}
+
+  # Bewusst begrenzt warten statt endlos: ein haengendes cloud-init ist
+  # schwerer zu diagnostizieren als ein sichtbar fehlgeschlagenes.
+  # 60 Versuche a 5 Sekunden = 5 Minuten Obergrenze.
+  - |
+    for i in $(seq 1 60); do
+      if k3s kubectl get node --no-headers 2>/dev/null | grep -q ' Ready '; then
+        touch /var/lib/cloud/k3s-ready
+        break
+      fi
+      sleep 5
+    done
