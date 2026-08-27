@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base/thomaszachmann
+
+# Diesen Digest schreibt ausschliesslich GitHub Actions. Digest statt Tag, weil
+# ein Tag verschiebbar ist: so steht im Repo exakt das, was laeuft.
+#
+# Der Wert unten ist ein Platzhalter aus Nullen - syntaktisch gueltig, aber
+# garantiert nicht existent. Bis der erste Pipeline-Lauf ihn ersetzt, kann der
+# Pod das Image nicht ziehen. Das ist kein Rueckschritt: apps war vorher
+# ohnehin nicht bereit, und die Website ist noch nicht live.
+images:
+  - name: ghcr.io/thomaszachmann/thomaszachmann
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000

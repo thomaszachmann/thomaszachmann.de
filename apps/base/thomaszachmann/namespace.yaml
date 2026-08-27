@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web-thomaszachmann
+  labels:
+    # Wird von der NetworkPolicy als namespaceSelector gebraucht. Kubernetes
+    # setzt dieses Label zwar automatisch, aber explizit ist es dokumentiert.
+    kubernetes.io/metadata.name: web-thomaszachmann

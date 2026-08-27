@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thomaszachmann
+  namespace: web-thomaszachmann
+  annotations:
+    # Namespace-Prefix und @kubernetescrd sind Pflicht. Funktioniert nur, weil
+    # Traefik mit providers.kubernetesCRD.allowCrossNamespace: true laeuft.
+    traefik.ingress.kubernetes.io/router.middlewares: >-
+      traefik-security-headers@kubernetescrd,traefik-www-redirect@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - thomaszachmann.de
+        - www.thomaszachmann.de
+      secretName: thomaszachmann-tls
+  rules:
+    - host: thomaszachmann.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: thomaszachmann
+                port:
+                  name: http
+    - host: www.thomaszachmann.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: thomaszachmann
+                port:
+                  name: http
