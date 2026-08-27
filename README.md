@@ -99,6 +99,27 @@ flux get kustomizations
 | Deploy kommt nicht an | `flux get kustomizations`, dann `flux logs --level=error` |
 | Pipeline rot | `gh run view --log-failed` |
 
+**`flux reconcile` braucht `--with-source`, sonst luegt es.** Ohne das Flag
+wendet Flux die zwischengespeicherte Git-Revision erneut an, statt neu zu
+holen — und meldet Erfolg. Ein anschliessendes `kubectl rollout status` meldet
+ebenfalls Erfolg, weil das *alte* Deployment ja ausgerollt ist. Man hat dann
+zwei gruene Meldungen und trotzdem den alten Stand live:
+
+```bash
+flux reconcile kustomization apps --with-source     # richtig
+```
+
+Gegenprobe, die nicht luegt — laeuft das Image, das im Repo steht?
+
+```bash
+grep 'digest:' apps/prod/kustomization.yaml
+kubectl -n web-thomaszachmann get pod -l app.kubernetes.io/name=thomaszachmann \
+  -o jsonpath='{.items[0].spec.containers[0].image}'
+```
+
+Ohne Eingriff loest sich das ohnehin: `apps` reconciled jede Minute. Das Flag
+braucht man nur, wenn man nicht warten will.
+
 **Nicht `flux reconcile` auf eine Kustomization aufrufen, die absichtlich nicht
 bereit werden kann** — der Befehl wartet auf Readiness und hängt bis zum
 Timeout. Zustand stattdessen abfragen:
