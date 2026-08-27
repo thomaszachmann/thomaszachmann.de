@@ -2388,7 +2388,7 @@ Expected: `0`.
 - Consumes: alles Vorherige
 - Produces: nichts, was spätere Tasks brauchen. Dies ist der Abschluss.
 
-- [ ] **Step 1: README schreiben**
+- [x] **Step 1: README schreiben**
 
 `README.md`:
 
@@ -2475,7 +2475,7 @@ primaere IPv4. Cloudflare DNS, GHCR und GitHub Actions sind bei einem
 oeffentlichen Repo kostenlos.
 ````
 
-- [ ] **Step 2: README committen**
+- [x] **Step 2: README committen**
 
 ```bash
 git add README.md
@@ -2487,7 +2487,7 @@ ausgesperrt haben."
 git push
 ```
 
-- [ ] **Step 3: Branch Protection einrichten — mit Bypass für den Bot**
+- [x] **Step 3: Branch Protection einrichten — mit Bypass für den Bot**
 
 Reihenfolge ist wichtig: erst jetzt, nachdem Task 9 nachweislich läuft.
 
