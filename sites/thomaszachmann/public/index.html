@@ -178,6 +178,11 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
 .foot-cols li a{color:var(--text-2)}
 .foot-cols li a:hover{color:var(--text)}
 .foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
+/* Technik-Hinweis: bewusst leiser als die Copyright-Zeile */
+.foot-tech{display:flex;align-items:flex-start;gap:.6rem;margin:.5rem 0 0;color:var(--text-3);font-size:.8125rem;line-height:1.55}
+.foot-tech img{flex:none;width:17px;height:17px;margin-top:.12rem}
+.foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.foot-tech a:hover{color:var(--accent)}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -525,8 +530,16 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
       </div>
     </div>
     <p class="foot-bottom">
-      © 2026 Thomas Zachmann · Hamburg
-      <!-- TODO: Vollständige Anschrift wie im Impressum ergänzen — erhöht die Glaubwürdigkeit spürbar. -->
+      © 2026 Thomas Zachmann · Ohlendiekskamp 54 · 22399 Hamburg
+    </p>
+    <p class="foot-tech">
+      <!-- Logo als eigene Datei, nicht als data:-URI: haelt das HTML schlank,
+           wird gecacht und vom Asset-Pruefer erfasst. Offizielle Marke aus dem
+           CNCF-Artwork-Repo. -->
+      <img src="img/kubernetes.svg" alt="" width="17" height="17" aria-hidden="true">
+      <span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in
+      Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux.
+      <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span>
     </p>
   </div>
 </footer>

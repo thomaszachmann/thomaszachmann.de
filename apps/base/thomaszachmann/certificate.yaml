@@ -7,10 +7,11 @@ spec:
   secretName: thomaszachmann-tls
   issuerRef:
     kind: ClusterIssuer
-    # Zunaechst Staging. Task 8 stellt auf letsencrypt-prod um. Vorher nicht
-    # aendern: das Rate-Limit von fuenf Zertifikaten pro Domain und Woche
-    # ist echt.
-    name: letsencrypt-staging
+    # Produktivzertifikat. Die Staging-Ausstellung hat am 2026-08-27
+    # funktioniert, damit ist die DNS-01-Kette ueber die Cloudflare-API belegt.
+    # Vor Aenderungen an den dnsNames wieder auf letsencrypt-staging wechseln -
+    # fuenf Ausstellungen pro Domain und Woche.
+    name: letsencrypt-prod
   commonName: thomaszachmann.de
   dnsNames:
     - thomaszachmann.de
