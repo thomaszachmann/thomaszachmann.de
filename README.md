@@ -151,9 +151,33 @@ Firewall vorbeigeht.
 
 ## Noch offen
 
-- **Vier `PLATZHALTER`** in `impressum.html` und `datenschutz.html`: USt-Situation,
-  Berufsbezeichnung, Log-Aufbewahrungsdauer, zuständige Aufsichtsbehörde. Stehen
-  live auf der Seite und sind in Deutschland abmahnfähig.
+- **Zwei `PLATZHALTER`** in `datenschutz.html`: Log-Aufbewahrungsdauer und
+  zuständige Aufsichtsbehörde. Stehen live auf der Seite.
+
+### Umsatzsteuer im Impressum
+
+Der Abschnitt fehlt derzeit bewusst. § 5 Abs. 1 Nr. 6 DDG verlangt die
+USt-IdNr. nur **sofern vorhanden** — wer keine hat, lässt ihn weg. Das
+Impressum ist damit vollständig.
+
+Falls eine USt-IdNr. erteilt ist, in `impressum.html` vor „Redaktionell
+verantwortlich" einfügen:
+
+```html
+  <h2>Umsatzsteuer-Identifikationsnummer</h2>
+  <p>DE123456789</p>
+```
+
+Bei Kleinunternehmerregelung stattdessen:
+
+```html
+  <h2>Umsatzsteuer</h2>
+  <p>Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>
+```
+
+**Die Steuernummer gehört nicht hierher** — sie ist nicht vorgeschrieben und
+sollte nicht veröffentlicht werden. Nur die USt-IdNr. (Format `DE` plus neun
+Ziffern) ist eine Impressumsangabe.
 - **Force-Push-Schutz** ist konfiguriert, aber nicht verifiziert: der einzige
   belastbare Test waere ein echter Force-Push.
 
