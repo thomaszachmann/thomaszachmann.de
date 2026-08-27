@@ -3,8 +3,18 @@
 Website und Plattform. Ein k3s-Single-Node bei Hetzner Cloud, per Terraform
 provisioniert, per Flux verwaltet. Live seit 2026-08-27.
 
-- **Design:** [`docs/superpowers/specs/2026-08-26-hetzner-k3s-website-platform-design.md`](docs/superpowers/specs/2026-08-26-hetzner-k3s-website-platform-design.md)
-- **Implementierungsplan:** [`docs/superpowers/plans/2026-08-26-hetzner-k3s-website-platform.md`](docs/superpowers/plans/2026-08-26-hetzner-k3s-website-platform.md)
+**Runbooks — hier fängst du an:**
+
+- [Feature deployen](docs/runbooks/feature-deployen.md) — Inhalt ändern,
+  Cluster-Konfiguration ändern, Infrastruktur ändern, neue Site hinzufügen,
+  zurückrollen
+- [Cluster neu aufsetzen](docs/runbooks/cluster-neu-aufsetzen.md) — Server neu
+  bauen (~6 min) oder komplett bei Null, alle Kommandos
+
+**Hintergrund:**
+
+- [Design](docs/superpowers/specs/2026-08-26-hetzner-k3s-website-platform-design.md) — welche Entscheidungen warum
+- [Implementierungsplan](docs/superpowers/plans/2026-08-26-hetzner-k3s-website-platform.md) — wie es gebaut wurde
 
 ## Betriebsmodell
 
