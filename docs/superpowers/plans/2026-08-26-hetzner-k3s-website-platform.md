@@ -1021,7 +1021,7 @@ Expected: `OK: cloud-init rendert zu gueltigem YAML, alle k3s-Flags und die sshd
 
 Zweite Falle: `terraform console` wertet **zeilenweise** aus. Der `templatefile()`-Aufruf muss einzeilig sein, sonst kommt `Expected the start of an expression, but found the end of the file`.
 
-- [ ] **Step 10: Plan lesen — nicht anwenden**
+- [x] **Step 10: Plan lesen — nicht anwenden**
 
 ```bash
 export HCLOUD_TOKEN=...
@@ -1045,7 +1045,7 @@ done
 
 Belegt sein duerfen `tz-web-01`, `tz-web`, `tz-web-01-v4` und `tz-web-01-v6` nicht.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 cd ..

@@ -4,6 +4,9 @@
 # Terraform
 **/.terraform/*
 *.tfstate
+# Gespeicherte Plaene enthalten gerenderte user_data und aufgeloeste Werte
+tfplan
+*.tfplan
 *.tfstate.*
 *.tfvars
 !*.tfvars.example
