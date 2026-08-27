@@ -2491,7 +2491,27 @@ git push
 
 Reihenfolge ist wichtig: erst jetzt, nachdem Task 9 nachweislich läuft.
 
-Ein Ruleset mit Pflicht-Review würde den Bot-Commit aus Task 9 blockieren und die Pipeline dauerhaft rot färben. Der Bot braucht deshalb einen Bypass.
+**Umgesetzt am 2026-08-27, bewusst anders als hier beschrieben.** Ein Ruleset mit Pflicht-Review würde den Bot-Commit aus Task 9 blockieren, und der Bypass müsste über die App-ID der Actions-Integration konfiguriert werden — leicht falsch gesetzt, und wenn er falsch ist, färbt er die Pipeline dauerhaft rot.
+
+Der Schutz, der gegen die tatsächlich schmerzhaften Unfälle wirkt, braucht gar keinen Bypass:
+
+```bash
+gh api -X POST repos/<owner>/<repo>/rulesets --input - <<'JSON'
+{
+  "name": "main-protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "rules": [ { "type": "deletion" }, { "type": "non_fast_forward" } ]
+}
+JSON
+```
+
+`deletion` verhindert das Löschen des Branches, `non_fast_forward` das Überschreiben der Historie per Force-Push. Beides sind Fehler, die man nicht zurücknehmen kann. Ein normaler Fast-Forward-Push — der Weg, den sowohl du als auch der Bot gehen — bleibt unberührt.
+
+Pflicht-Reviews sind bei einem Solo-Repo ohnehin Theater: Man reviewt sich selbst. Sobald ein zweiter Mensch mitarbeitet, ist das der Moment, sie einzuschalten — dann aber mit einem Bypass, der vorher getestet wurde.
+
+Der ursprünglich geplante Weg, zur Nachvollziehbarkeit:
 
 Im GitHub-UI: Repo → Settings → Rules → Rulesets → New branch ruleset
 
