@@ -29,3 +29,7 @@ age.key
 
 # macOS
 .DS_Store
+
+# Profil- und Marktanalysen sowie daraus abgeleitete Notizen. Enthalten
+# Tagessatz-Korridor und Schwaechen im Profil — das Repo ist public.
+books/
