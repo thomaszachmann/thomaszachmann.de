@@ -13,4 +13,4 @@ resources:
 # ohnehin nicht bereit, und die Website ist noch nicht live.
 images:
   - name: ghcr.io/thomaszachmann/thomaszachmann
-    digest: sha256:71bbc35c8da09b6b9a70e1d7edc2e822a7f5e9ef1353e704070e4d5fee198751
+    digest: sha256:e81ad590ba86d041136835211ffa5682e6a99205a9ba0d49e038a463f13613f7
