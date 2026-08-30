@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thomas Zachmann — Kubernetes-Plattformen für regulierte Umgebungen</title>
-<meta name="description" content="Freiberuflicher Plattform-Architekt aus Hamburg. Kubernetes On-Prem, Bare-Metal und auf europäischen Clouds — für Banken, Behörden und Sicherheitstechnologie, dort wo BSI IT-Grundschutz und ISO 27001 den Prüfmaßstab setzen. CKS, CKA, CKAD.">
+<title>Thomas Zachmann — Enterprise-Plattformen für Kubernetes, Cloud und AI</title>
+<meta name="description" content="Freiberuflicher Platform Engineer aus Hamburg. Ich baue Enterprise-Plattformen für Kubernetes, Cloud und AI-Workloads — On-Premises und in der Cloud, von Identity und Secrets über CI/CD und GitOps bis Observability. CKS, CKA, CKAD.">
 <meta name="author" content="Thomas Zachmann">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Thomas Zachmann — Kubernetes-Plattformen für regulierte Umgebungen">
-<meta property="og:description" content="Freiberuflicher Plattform-Architekt aus Hamburg. Kubernetes On-Prem, Bare-Metal und europäische Clouds — dort, wo BSI IT-Grundschutz und ISO 27001 den Prüfmaßstab setzen. CKS, CKA, CKAD.">
+<meta property="og:title" content="Thomas Zachmann — Enterprise-Plattformen für Kubernetes, Cloud und AI">
+<meta property="og:description" content="Freiberuflicher Platform Engineer aus Hamburg. Von On-Premises Kubernetes über Developer Platforms bis zur Infrastruktur für Enterprise AI. CKS, CKA, CKAD.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thomaszachmann.de">
 <meta property="og:locale" content="de_DE">
@@ -92,7 +92,7 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 
 /* ---------- Hero ---------- */
 .hero{padding:104px 0 80px}
-.hero h1{margin-bottom:22px;max-width:17ch}
+.hero h1{margin-bottom:22px;max-width:21ch;text-wrap:balance}
 .hero .lead{font-size:1.1875rem;color:var(--text-2);max-width:60ch;margin-bottom:30px}
 .status{
   display:inline-flex;align-items:center;gap:9px;
@@ -131,6 +131,11 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 .skills dt{font-weight:500;font-size:.9375rem;margin:0}
 .skills dd{margin:0;color:var(--text-2);font-size:.9375rem}
 .secondary-skills{margin-top:26px;color:var(--text-3);font-size:.875rem;max-width:80ch}
+/* Bewusst als abgesetzte Karte, nicht als weitere Tabellenzeile: was hier steht,
+   ist Labor und keine Projekterfahrung - das muss man auf einen Blick sehen. */
+.lab{margin-top:32px;padding:20px 22px;max-width:80ch;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius)}
+.lab h3{margin-bottom:7px}
+.lab p{margin:0;color:var(--text-2);font-size:.9375rem}
 
 /* ---------- Projekte ---------- */
 .projects{margin-top:34px;border-top:1px solid var(--border)}
@@ -210,12 +215,12 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
   <section class="hero">
     <div class="wrap">
       <p class="status"><span class="dot" aria-hidden="true"></span>Verfügbar für neue Projekte</p>
-      <h1>Kubernetes-Plattformen für regulierte Umgebungen</h1>
+      <h1>Enterprise-Plattformen für Kubernetes, Cloud und AI</h1>
       <p class="lead">
-        Freiberuflicher Plattform-Architekt aus Hamburg. Ich baue und härte Container-Plattformen
-        dort, wo Nachweisbarkeit die Anforderung ist und nicht die Kür — On-Prem, auf
-        Bare-Metal und auf europäischen Cloud-Plattformen, mit BSI IT-Grundschutz und
-        ISO 27001 als Prüfmaßstab.
+        Freiberuflicher Platform Engineer aus Hamburg. Ich baue die Plattform, auf der
+        Entwickler Anwendungen und AI-Workloads sicher betreiben können — von Compute und
+        Kubernetes über Identity, Secrets Management und Container Registry bis zu CI/CD,
+        GitOps und Observability. On-Premises wie in der Cloud.
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#kontakt">Projekt besprechen</a>
@@ -229,17 +234,21 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
     <div class="wrap split">
       <div>
         <p class="eyebrow">Profil</p>
-        <h2>Regulierte Umfelder sind der Normalfall, nicht die Ausnahme</h2>
+        <h2>Nicht einzelne Cluster — die Plattform darunter</h2>
         <div class="prose" style="margin-top:20px">
           <p>
-            Behördennahe IT, Sicherheitstechnologie und Banken — Umgebungen, in denen eine
-            Plattform nicht nur laufen, sondern auch belegen muss, dass sie richtig läuft.
-            Den Rahmen setzen dort BSI IT-Grundschutz, ISO 27001 und BAIT; NIS2, DORA
-            und der Cyber Resilience Act kommen gerade dazu. Ich baue die technischen
-            Kontrollen, die in diesen Prüfungen nachgewiesen werden.
-            Mein Schwerpunkt liegt auf dem Teil, den die meisten Plattformen auslassen:
-            Policy Enforcement, Secrets Management, Mandantentrennung, Supply-Chain-Nachweise
-            und die Dokumentation, die im Audit standhält.
+            Kubernetes, Identity und SSO, Container Registry, Secrets Management, CI/CD,
+            GitOps, Monitoring, Storage und Netzwerk sind selten das Problem, wenn man sie
+            einzeln betrachtet. Schwierig wird der Teil dazwischen: dass sie als ein Stück
+            zusammenpassen, reproduzierbar ausgerollt werden und Entwickler damit ohne
+            Ticket-Umweg arbeiten können. Genau dort setze ich an — beim Aufbau
+            vollständiger Plattformen statt einzelner Komponenten.
+          </p>
+          <p>
+            Gebaut habe ich das On-Premises auf Bare-Metal und virtualisierter Infrastruktur
+            ebenso wie auf AWS, Azure, Google Cloud, der Open Telekom Cloud und der IONOS
+            Cloud. Der Cloud-Anbieter ist dabei ein Deployment-Target, keine eigene
+            Disziplin — die Plattformarchitektur bleibt dieselbe.
           </p>
           <p>
             Der Hintergrund davor ist Software-Engineering, unter anderem fünf Jahre bei SAP an
@@ -256,7 +265,7 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
         <div><dt>Standort</dt><dd>Hamburg</dd></div>
         <div><dt>Einsatz</dt><dd>Remote · vor Ort nach Absprache</dd></div>
         <div><dt>Sprachen</dt><dd>Deutsch · Dänisch · Englisch</dd></div>
-        <div><dt>Branchen</dt><dd>Banken, Behörden, Security</dd></div>
+        <div><dt>Umfelder</dt><dd>Banken, Behörden, Security</dd></div>
       </dl>
     </div>
   </section>
@@ -270,28 +279,16 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
 
         <article>
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3 4 7v5c0 4.4 3.4 8.2 8 9 4.6-.8 8-4.6 8-9V7l-8-4Z"/>
-            <path d="m9 12 2 2 4-4"/>
+            <path d="m12 2.5 9 4.75-9 4.75-9-4.75 9-4.75Z"/>
+            <path d="m3 12 9 4.75L21 12"/>
+            <path d="m3 16.75 9 4.75 9-4.75"/>
           </svg>
-          <h3>Audit-feste Plattform On-Prem</h3>
+          <h3>Private Cloud &amp; Kubernetes</h3>
           <p>
-            Aufbau oder Härtung bestehender Cluster: Policy Enforcement mit Kyverno,
-            Secrets über Vault, Mandantentrennung, Supply-Chain-Nachweise — inklusive
-            der Nachweisdokumentation.
-          </p>
-        </article>
-
-        <article>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="6" rx="1.5"/>
-            <rect x="3" y="14" width="18" height="6" rx="1.5"/>
-            <path d="M7 7h.01M7 17h.01"/>
-          </svg>
-          <h3>Migration weg von VMware</h3>
-          <p>
-            Überführung virtualisierter Workloads nach Kubernetes beziehungsweise
-            KubeVirt und OpenShift Virtualization — oder auf europäische Anbieter,
-            mit Betriebskonzept und Wissenstransfer.
+            Produktionsnahe Kubernetes- und Private-Cloud-Plattformen: GitOps, Keycloak
+            und OIDC, Harbor, Vault beziehungsweise OpenBao, CI/CD, Prometheus-Stack,
+            Storage und Ingress — On-Premises oder bei europäischen Anbietern und
+            Hyperscalern.
           </p>
         </article>
 
@@ -301,11 +298,26 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
             <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
             <path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>
           </svg>
-          <h3>Sichere ML- und KI-Plattform</h3>
+          <h3>Enterprise AI Infrastructure</h3>
           <p>
-            GPU-Betrieb, Inferenz und Modell-Workloads in regulierten Clustern:
-            Mandantentrennung, Nachvollziehbarkeit und Zugriffskontrolle —
-            damit interne KI-Nutzung auch im Audit trägt.
+            Die Plattform unter AI-Workloads ist dieselbe, die ich seit Jahren baue:
+            Kubernetes, Identity, Secrets, Observability und Kostensteuerung. Dazu
+            kommen GPU-Scheduling, Model Serving und der kontrollierte Zugang zu
+            internen wie externen Modellen.
+          </p>
+        </article>
+
+        <article>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="6" rx="1.5"/>
+            <rect x="3" y="14" width="18" height="6" rx="1.5"/>
+            <path d="M7 7h.01M7 17h.01"/>
+          </svg>
+          <h3>Infrastructure Modernization</h3>
+          <p>
+            Weg von VMware und vSphere — nach Kubernetes, Proxmox, OpenStack oder in die
+            Cloud. Nicht als reiner Hypervisor-Tausch, sondern als Aufbau einer Plattform,
+            mit der Entwickler danach schneller arbeiten.
           </p>
         </article>
 
@@ -325,19 +337,15 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
       <dl class="skills">
         <div>
           <dt>Kubernetes</dt>
-          <dd>On-Prem und Bare-Metal (RKE2, Kubespray, OpenShift, Rancher), Managed (EKS), MetalLB, Istio, Helm, Kustomize</dd>
+          <dd>On-Prem und Bare-Metal (RKE2, Kubespray, OpenShift, Rancher, k3s), Managed (EKS), Helm, Kustomize, Istio, MetalLB, Ingress und Storage</dd>
         </div>
         <div>
-          <dt>Security &amp; Policy</dt>
-          <dd>Kyverno, HashiCorp Vault, Keycloak, Trivy, Harbor, Dependency Track, cert-manager</dd>
+          <dt>Identity &amp; Zugriff</dt>
+          <dd>Keycloak, OIDC und SSO, RBAC, Mandantentrennung, cert-manager</dd>
         </div>
         <div>
-          <dt>Auditierbarkeit</dt>
-          <dd>Policy-Nachweise, Mandantentrennung, Zugriffskontrolle, Supply-Chain-Belege, Nachweisdokumentation für Audits</dd>
-        </div>
-        <div>
-          <dt>Automatisierung &amp; IaC</dt>
-          <dd>Ansible, Terraform, Crossplane, Go, Python</dd>
+          <dt>Secrets &amp; Registry</dt>
+          <dd>HashiCorp Vault, OpenBao, Harbor, Trivy, Dependency Track, Kyverno</dd>
         </div>
         <div>
           <dt>GitOps &amp; CI/CD</dt>
@@ -348,19 +356,36 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
           <dd>Prometheus, Grafana, Loki, Tempo, Elastic</dd>
         </div>
         <div>
-          <dt>ML- &amp; KI-Workloads</dt>
-          <dd>Kubeflow, Posit Workbench, Istio — ML-Workloads über GitOps in regulierte Cluster integriert</dd>
+          <dt>ML-Workloads</dt>
+          <dd>Kubeflow, Posit Workbench — über GitOps in Produktionscluster integriert</dd>
         </div>
         <div>
-          <dt>Souveräne Plattformen</dt>
-          <dd>IONOS Cloud, Open Telekom Cloud, On-Prem-Virtualisierung</dd>
+          <dt>Virtualisierung &amp; Migration</dt>
+          <dd>VMware und vSphere, Proxmox, OpenStack, KubeVirt, OpenShift Virtualization</dd>
+        </div>
+        <div>
+          <dt>Automatisierung &amp; IaC</dt>
+          <dd>Ansible, Terraform, Crossplane, Go, Python</dd>
+        </div>
+        <div>
+          <dt>Deployment-Targets</dt>
+          <dd>On-Premises, Open Telekom Cloud, IONOS Cloud, AWS, Azure, Google Cloud</dd>
         </div>
       </dl>
 
       <p class="secondary-skills">
-        Außerdem im Einsatz: AWS, Google Cloud, Azure, Docker, Podman, Amazon ECS,
-        PostgreSQL, MariaDB, Cassandra, MongoDB sowie C/C++, Rust, C#, Perl und Bash.
+        Außerdem im Einsatz: Docker, Podman, Amazon ECS, PostgreSQL, MariaDB, Cassandra,
+        MongoDB sowie C/C++, Rust, C#, Perl und Bash.
       </p>
+
+      <div class="lab">
+        <h3>Im Aufbau</h3>
+        <p>
+          Woran ich derzeit im eigenen Labor arbeite, bevor ich es jemandem in Rechnung
+          stelle: GPU-Knoten unter Kubernetes, Model Serving und Inference, LLM-Gateways
+          und Model Routing. Steht bewusst hier und nicht in der Tabelle darüber.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -522,8 +547,8 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
       <div>
         <h4>Thomas Zachmann</h4>
         <p>
-          Freiberuflicher Plattform-Architekt.<br>
-          Kubernetes in regulierten und souveränen Umgebungen.
+          Freiberuflicher Platform Engineer.<br>
+          Enterprise-Plattformen für Kubernetes, Cloud und AI.
         </p>
       </div>
       <div>
