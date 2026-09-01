@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private Cloud &amp; Kubernetes — Plattformaufbau und Beratung</title>
+<meta name="description" content="Aufbau vollständiger Kubernetes-Plattformen On-Premises und in europäischen Clouds: Cluster-Lifecycle, Identity und SSO, Secrets, Registry, GitOps, Observability, Storage und Policy. Freiberuflicher Platform Engineer aus Hamburg, CKS/CKA/CKAD.">
+<meta name="author" content="Thomas Zachmann">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thomaszachmann.de/private-cloud-kubernetes">
+<meta property="og:title" content="Private Cloud &amp; Kubernetes — Plattformaufbau und Beratung">
+<meta property="og:description" content="Nicht einzelne Cluster, sondern die Plattform darunter — aufgebaut, automatisiert und so übergeben, dass das interne Team sie ohne mich betreibt.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thomaszachmann.de/private-cloud-kubernetes">
+<meta property="og:locale" content="de_DE">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+
+<style>
+/* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
+
+/* ---------- Quiet Blue: identisch zur Startseite ---------- */
+:root{
+  --bg:#ffffff;
+  --surface:#f8fafc;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --text-2:#475569;
+  --text-3:#64748b;
+  --accent:#1d4ed8;
+  --accent-hover:#1e40af;
+  --radius:6px;
+  --wrap:1120px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Outfit',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;font-weight:350;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
+h1,h2,h3,p,dd,li{overflow-wrap:break-word;hyphens:auto}
+h1{font-size:clamp(1.75rem,5.4vw,2.75rem);letter-spacing:-.025em}
+h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
+h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
+p{margin:0 0 1.1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.prose{max-width:66ch}
+section{padding:76px 0}
+.tinted{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);margin:0 0 14px;
+}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:100;background:#fff;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius)}
+
+/* ---------- Nav ---------- */
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border)}
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{color:var(--text);font-weight:550;letter-spacing:-.02em;font-size:1.0625rem}
+.brand:hover{text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:30px;font-size:.9375rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-links a.btn-primary,.nav-links a.btn-primary:hover{color:#fff}
+@media(max-width:820px){.nav-links a:not(.btn){display:none}}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 18px;border-radius:var(--radius);
+  font-size:.9375rem;font-weight:500;line-height:1;
+  border:1px solid transparent;cursor:pointer;
+  transition:background-color .15s ease,border-color .15s ease;
+}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:#cbd5e1;background:var(--surface)}
+
+/* ---------- Kopf ---------- */
+.head{padding:64px 0 72px}
+.head h1{margin-bottom:20px;max-width:20ch;text-wrap:balance}
+.head .lead{font-size:1.1875rem;color:var(--text-2);max-width:62ch;margin-bottom:28px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ---------- Ausgangslagen ---------- */
+.cases{border-top:1px solid var(--border);margin-top:34px;max-width:92ch}
+.cases > div{
+  display:grid;grid-template-columns:1fr;gap:6px;
+  padding:20px 0;border-bottom:1px solid var(--border);
+}
+.cases h3{margin-bottom:2px}
+.cases .said{
+  color:var(--text-3);font-size:.9375rem;font-style:italic;margin:0 0 8px;
+}
+.cases p{color:var(--text-2);font-size:.9375rem;margin:0}
+
+/* ---------- Plattformschichten ---------- */
+.layers{border-top:1px solid var(--border);margin-top:34px;max-width:92ch}
+.layers > div{
+  display:grid;grid-template-columns:230px 1fr;gap:28px;
+  padding:15px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.layers > div{grid-template-columns:1fr;gap:5px}}
+.layers dt{font-weight:500;font-size:.9375rem;margin:0}
+.layers dd{margin:0;color:var(--text-2);font-size:.9375rem}
+
+/* ---------- Die zwei Leistungen ---------- */
+.offers{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px}
+@media(max-width:880px){.offers{grid-template-columns:1fr;gap:0}}
+.offers article{padding-top:22px;border-top:2px solid var(--text)}
+@media(max-width:880px){
+  .offers article{border-top:1px solid var(--border);padding:22px 0}
+  .offers article:first-child{border-top:2px solid var(--text)}
+}
+.offers h3{margin-bottom:10px}
+.offers p{color:var(--text-2);font-size:.9375rem;margin:0 0 12px}
+.offers ul{margin:0;padding-left:1.1rem;color:var(--text-2);font-size:.9375rem}
+.offers li{margin-bottom:5px}
+
+/* ---------- Hervorgehobene Aussage ---------- */
+.point{
+  margin-top:30px;padding:22px 26px;max-width:80ch;
+  background:var(--bg);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:var(--radius);
+}
+.point p{margin:0;color:var(--text-2);font-size:.9375rem}
+.point p + p{margin-top:.8rem}
+.point strong{color:var(--text);font-weight:550}
+
+/* ---------- Belege ---------- */
+.evidence{border-top:1px solid var(--border);margin-top:34px}
+.evidence > div{
+  display:grid;grid-template-columns:180px 1fr;gap:28px;
+  padding:16px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.evidence > div{grid-template-columns:1fr;gap:5px}}
+.evidence dt{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.8125rem;color:var(--text-3);margin:.15rem 0 0;
+}
+.evidence dd{margin:0;color:var(--text-2);font-size:.9375rem}
+.evidence dd strong{color:var(--text);font-weight:550}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
+.foot-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+@media(max-width:760px){.foot-cols{grid-template-columns:1fr 1fr;gap:32px}}
+.foot-cols p{color:var(--text-2);margin:0}
+.foot-cols h4{font-size:.9375rem;font-weight:550;margin:0 0 11px}
+.foot-cols ul{list-style:none;margin:0;padding:0}
+.foot-cols li{margin-bottom:7px}
+.foot-cols li a{color:var(--text-2)}
+.foot-cols li a:hover{color:var(--text)}
+.foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
+.foot-tech{display:flex;align-items:flex-start;gap:.6rem;margin:.5rem 0 0;color:var(--text-3);font-size:.8125rem;line-height:1.55}
+.foot-tech img{flex:none;width:17px;height:17px;margin-top:.12rem}
+.foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.foot-tech a:hover{color:var(--accent)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header>
+  <nav class="wrap">
+    <a class="brand" href="/">Thomas Zachmann</a>
+    <div class="nav-links">
+      <a href="/#profil">Profil</a>
+      <a href="/#schwerpunkte">Schwerpunkte</a>
+      <a href="/#buch">Buch</a>
+      <a href="/#kompetenz">Kompetenz</a>
+      <a href="/#projekte">Projekte</a>
+      <a class="btn btn-primary" href="/#kontakt">Kontakt</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= KOPF ================= -->
+  <section class="head">
+    <div class="wrap">
+      <p class="eyebrow">Private Cloud &amp; Kubernetes</p>
+      <!-- Bewusst nicht "Nicht einzelne Cluster - die Plattform darunter": das ist
+           die Profil-Ueberschrift der Startseite. Zwei Seiten mit derselben
+           Formulierung konkurrieren miteinander und lesen sich kopiert. -->
+      <h1>Plattformen, die ohne mich weiterlaufen</h1>
+      <p class="lead">
+        Kubernetes, Identity, Secrets, Registry, CI/CD, GitOps, Observability,
+        Storage und Netzwerk als ein Stück: reproduzierbar ausgerollt, automatisiert
+        betreibbar und so übergeben, dass das interne Team danach ohne mich
+        weiterarbeitet. On-Premises auf Bare-Metal ebenso wie bei europäischen
+        Anbietern und Hyperscalern.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/#kontakt">Projekt besprechen</a>
+        <a class="btn btn-secondary" href="/#projekte">Referenzen ansehen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= AUSGANGSLAGEN ================= -->
+  <section id="ausgangslage" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Ausgangslage</p>
+      <h2>Drei Sätze, die ich regelmäßig höre</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Die einzelnen Komponenten sind selten das Problem. Schwierig wird der Teil
+        dazwischen — dass sie zusammenpassen, sich reproduzieren lassen und
+        Entwickler damit ohne Ticket-Umweg arbeiten können.
+      </p>
+
+      <div class="cases">
+        <div>
+          <h3>Cluster ja, Plattform nein</h3>
+          <p class="said">„Kubernetes läuft. Aber jeder Cluster ist anders, und keiner weiß mehr, warum.“</p>
+          <p>
+            Handgebaute Cluster, undokumentierte Sonderwege, Upgrades, die niemand
+            anfassen will. Was fehlt, ist nicht ein weiteres Werkzeug, sondern ein
+            automatisierter Lebenszyklus vom Bootstrap bis zum Upgrade — und die
+            Schichten darüber, die aus einem Cluster eine Plattform machen.
+          </p>
+        </div>
+        <div>
+          <h3>Plattform ja, Betrieb nein</h3>
+          <p class="said">„Der Kollege, der das gebaut hat, ist weg.“</p>
+          <p>
+            Die Plattform läuft, aber das Wissen darüber steckt in ein bis zwei
+            Köpfen. Kein Betriebsprozess, keine nachvollziehbaren Änderungen, keine
+            Übergabe. Hier geht es um GitOps als Betriebsmodell statt als Werkzeug,
+            um Dokumentation, die dem Zustand entspricht, und um die Verankerung im
+            Team.
+          </p>
+        </div>
+        <div>
+          <h3>Anforderungen von außen</h3>
+          <p class="said">„Das muss im Haus bleiben, und es muss nachweisbar sein.“</p>
+          <p>
+            Datenklassen, die das Rechenzentrum nicht verlassen dürfen, Prüfungen,
+            die Nachvollziehbarkeit verlangen, Lieferketten, die belegt werden
+            müssen. Das entscheidet über Architektur: Identity, erzwungene
+            Richtlinien statt vereinbarter, Protokollierung und Supply-Chain-Prüfung
+            gehören dann von Anfang an hinein.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCHICHTEN ================= -->
+  <section id="schichten">
+    <div class="wrap">
+      <p class="eyebrow">Umfang</p>
+      <h2>Was zu einer vollständigen Plattform gehört</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Nicht jedes Vorhaben braucht alle Schichten auf einmal. Aber jede fehlende
+        Schicht taucht später als Ticket, als Sonderweg oder als Prüfungsfeststellung
+        wieder auf.
+      </p>
+
+      <dl class="layers">
+        <div>
+          <dt>Cluster-Lifecycle</dt>
+          <dd>RKE2, OpenShift, Kubespray — Bootstrap, Skalierung und Upgrade
+          vollständig mit Ansible automatisiert, ohne manuellen Eingriff</dd>
+        </div>
+        <div>
+          <dt>Identity und SSO</dt>
+          <dd>Keycloak, OIDC-Anbindung von Cluster, Registry, CI/CD und
+          Observability an dieselbe Quelle</dd>
+        </div>
+        <div>
+          <dt>Secrets</dt>
+          <dd>Vault beziehungsweise OpenBao, Rotation, Zustellung in Workloads ohne
+          Secrets im Repository</dd>
+        </div>
+        <div>
+          <dt>Container Registry</dt>
+          <dd>Harbor, Spiegelung für abgeschottete Netze, Signaturen und
+          Schwachstellenprüfung</dd>
+        </div>
+        <div>
+          <dt>CI/CD und GitOps</dt>
+          <dd>Argo CD oder Flux als Betriebsmodell — der Zustand des Clusters steht
+          im Repository, nicht im Gedächtnis</dd>
+        </div>
+        <div>
+          <dt>Policy Enforcement</dt>
+          <dd>Kyverno clusterweit — Richtlinien, die erzwungen werden, statt
+          Richtlinien, die vereinbart sind</dd>
+        </div>
+        <div>
+          <dt>Observability</dt>
+          <dd>Prometheus, Grafana, Loki, Tempo, Elasticsearch — Metriken, Logs und
+          Traces als ein Stück, nicht als drei Insellösungen</dd>
+        </div>
+        <div>
+          <dt>Netzwerk und Ingress</dt>
+          <dd>MetalLB für Bare-Metal, Ingress-Architektur, Zertifikate,
+          Netzwerksegmentierung</dd>
+        </div>
+        <div>
+          <dt>Storage und Backup</dt>
+          <dd>Persistenz für zustandsbehaftete Workloads, Sicherung und geprobte
+          Wiederherstellung</dd>
+        </div>
+        <div>
+          <dt>Automatisierung</dt>
+          <dd>Ansible und Terraform — geschrieben, versioniert und wiederholbar,
+          nicht zusammengeklickt</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= LEISTUNGEN ================= -->
+  <section id="leistungen" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Zusammenarbeit</p>
+      <h2>Zwei Arten, mit mir zu arbeiten</h2>
+
+      <div class="offers">
+        <article>
+          <h3>Beratungstage</h3>
+          <p>
+            Ein Tag mit einer Entscheidung am Ende. Typische Anlässe:
+          </p>
+          <ul>
+            <li>Bestandsaufnahme einer gewachsenen Cluster-Landschaft</li>
+            <li>Review einer geplanten Plattformarchitektur</li>
+            <li>Zweitmeinung vor einer Distributions- oder Anbieterentscheidung</li>
+            <li>Bewertung des Betriebsrisikos: Was passiert, wenn der Einzige geht?</li>
+            <li>Aufwandsschätzung für einen Plattformaufbau</li>
+          </ul>
+        </article>
+
+        <article>
+          <h3>Aufbauprojekte</h3>
+          <p>
+            Die Plattform bauen und übergeben. Umfang nach Ausgangslage, in aller
+            Regel:
+          </p>
+          <ul>
+            <li>Automatisierter Cluster-Lifecycle statt handgebauter Cluster</li>
+            <li>Identity, Secrets und Registry als gemeinsame Grundlage</li>
+            <li>GitOps-Auslieferung für Plattform und Anwendungen</li>
+            <li>Observability-Stack und Alarmierung</li>
+            <li>Betriebsdokumentation und Einarbeitung des internen Teams</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="point">
+        <p>
+          <strong>Das Ziel eines Aufbauprojekts ist, dass Sie mich danach nicht mehr
+          brauchen.</strong> Deshalb ist die Automatisierung geschrieben und nicht
+          zusammengeklickt, deshalb steht der Zustand im Repository, und deshalb
+          gehören Übergabe und Einarbeitung zum Projekt und nicht in ein
+          Folgeangebot.
+        </p>
+        <p>
+          Das ist auch der Grund, warum in einem meiner Projekte Workshops zur
+          Verankerung des Betriebswissens Teil der Leistung waren: Eine Plattform,
+          die nur der Externe bedienen kann, hat das Problem nicht gelöst, sondern
+          verschoben.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BELEGE ================= -->
+  <section id="belege">
+    <div class="wrap">
+      <p class="eyebrow">Belege</p>
+      <h2>Wo ich das gebaut habe</h2>
+
+      <dl class="evidence">
+        <div>
+          <dt>Umfelder</dt>
+          <dd><strong>Banken, Behörden, Sicherheitstechnologie, Logistik</strong> —
+          überwiegend reguliert, mehrfach im Hochsicherheits- und
+          sicherheitssensitiven Umfeld</dd>
+        </div>
+        <div>
+          <dt>On-Premises</dt>
+          <dd>Bare-Metal und virtualisierte Infrastruktur: RKE2 mit vollständig
+          automatisiertem Cluster-Lifecycle, OpenShift auf virtualisierter
+          Infrastruktur, hochverfügbare Cluster mit Kubespray und MetalLB</dd>
+        </div>
+        <div>
+          <dt>Cloud</dt>
+          <dd>Open Telekom Cloud, IONOS Cloud, AWS, Azure, Google Cloud — als
+          Deployment-Target, nicht als eigene Disziplin</dd>
+        </div>
+        <div>
+          <dt>Zertifikate</dt>
+          <dd>CKS, CKA, CKAD</dd>
+        </div>
+        <div>
+          <dt>Hintergrund</dt>
+          <dd>Über 20 Jahre IT, davor Software-Engineering — unter anderem fünf
+          Jahre bei SAP an C/C++-Laufzeitsystemen</dd>
+        </div>
+      </dl>
+
+      <p class="prose" style="margin-top:34px;color:var(--text-2)">
+        Die einzelnen Projekte mit Zeitraum, Auftraggeber und Inhalt stehen auf der
+        <a href="/#projekte">Startseite unter Referenzen</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= KONTAKT ================= -->
+  <section id="kontakt-cta" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Kontakt</p>
+      <h2>Wo stehen Sie gerade?</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Wenn Sie sich in einer der drei Ausgangslagen wiedererkennen: Schreiben Sie
+        mir, in welcher. Das erspart uns beiden das halbe Erstgespräch.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/#kontakt">Projekt besprechen</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Thomas Zachmann</h4>
+        <p>
+          Freiberuflicher Platform Engineer.<br>
+          Enterprise-Plattformen für Kubernetes, Cloud und AI.
+        </p>
+      </div>
+      <div>
+        <h4>Seite</h4>
+        <ul>
+          <li><a href="/#profil">Profil</a></li>
+          <li><a href="/private-cloud-kubernetes">Private Cloud &amp; Kubernetes</a></li>
+          <li><a href="/enterprise-ai">Enterprise AI</a></li>
+          <li><a href="/buch">Buch</a></li>
+          <li><a href="/#projekte">Projekte</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="mailto:thomas@zachmann.work">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-bottom">
+      © 2026 Thomas Zachmann · Ohlendiekskamp 54 · 22399 Hamburg
+    </p>
+    <p class="foot-tech">
+      <img src="img/kubernetes.svg" alt="" width="17" height="17" aria-hidden="true">
+      <span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in
+      Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux.
+      <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span>
+    </p>
+  </div>
+</footer>
+</body>
+</html>
