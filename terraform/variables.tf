@@ -80,3 +80,22 @@ variable "node_name" {
   type        = string
   default     = "tz-web-01"
 }
+
+variable "additional_domains" {
+  description = <<-EOT
+    Weitere Domains, die auf denselben Node zeigen, als Abbildung
+    Domain => Cloudflare-Zone-ID. Bewusst additiv statt einer Umstellung von
+    var.domain auf eine Liste: eine geaenderte Variablenform haette die
+    vorhandene terraform.tfvars ungueltig gemacht.
+
+    Beispiel:
+      additional_domains = { "nyrvex.com" = "0123456789abcdef0123456789abcdef" }
+  EOT
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition     = alltrue([for z in values(var.additional_domains) : can(regex("^[0-9a-f]{32}$", z))])
+    error_message = "Jede Zone-ID besteht aus 32 Hex-Zeichen. Vermutlich wurde eine Account-ID oder ein Token eingetragen."
+  }
+}

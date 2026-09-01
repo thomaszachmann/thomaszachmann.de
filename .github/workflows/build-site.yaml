@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'sites/thomaszachmann/**'
+      # Bewusst 'sites/**' statt einer Liste je Site: eine neue Site soll nicht
+      # daran scheitern, dass jemand vergisst, hier eine Zeile zu ergaenzen.
+      # Dass dabei auch die jeweils andere Site neu gebaut wird, kostet nichts:
+      # bei unveraendertem Inhalt kommt derselbe Digest heraus, und der
+      # Rueckschreibe-Schritt committet dann nicht.
+      - 'sites/**'
       - 'scripts/verify-assets.sh'
       - '.github/workflows/build-site.yaml'
   workflow_dispatch:
@@ -24,6 +29,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      # Zwingend 1. Die Matrix-Jobs schreiben beide einen Digest-Commit nach
+      # main; parallel wuerde der zweite Push als non-fast-forward abgewiesen.
+      # Die concurrency-Gruppe oben serialisiert nur Workflow-Laeufe
+      # untereinander, nicht die Jobs innerhalb eines Laufs.
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        site: [thomaszachmann, nyrvex]
+
     steps:
       - name: Repo auschecken
         uses: actions/checkout@v5
@@ -31,7 +46,7 @@ jobs:
       # Der erste Schritt ist der Test, nicht der Build: ein fehlender Font
       # soll die Pipeline stoppen, bevor irgendetwas gebaut oder gepusht wird.
       - name: Referenzierte Assets pruefen
-        run: ./scripts/verify-assets.sh sites/thomaszachmann/public
+        run: ./scripts/verify-assets.sh sites/${{ matrix.site }}/public
 
       # GHCR akzeptiert nur kleingeschriebene Pfade. Ein Owner mit
       # Grossbuchstaben laesst den Push sonst mit einer irrefuehrenden
@@ -54,16 +69,20 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: sites/thomaszachmann
+          context: sites/${{ matrix.site }}
           # ubuntu-latest ist amd64, genau wie der CX33. Kein --platform noetig.
           push: true
-          tags: ghcr.io/${{ steps.owner.outputs.lc }}/thomaszachmann:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ghcr.io/${{ steps.owner.outputs.lc }}/${{ matrix.site }}:${{ github.sha }}
+          # Cache je Site trennen, sonst ueberschreiben sich die beiden Laeufe
+          # gegenseitig und keiner trifft je einen Treffer.
+          cache-from: type=gha,scope=${{ matrix.site }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.site }}
 
       - name: Digest ins Repo zurueckschreiben
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
+          IMAGE: ghcr.io/${{ steps.owner.outputs.lc }}/${{ matrix.site }}
+          SITE: ${{ matrix.site }}
         run: |
           set -euo pipefail
 
@@ -71,13 +90,30 @@ jobs:
             echo "Kein Digest vom Build-Schritt erhalten." >&2
             exit 1
           fi
+          echo "Image:  ${IMAGE}"
           echo "Digest: ${DIGEST}"
 
-          sed -i -E "s|^([[:space:]]*digest:[[:space:]]).*|\1${DIGEST}|" \
-            apps/prod/kustomization.yaml
+          # Frueher stand hier ein sed auf die erste digest-Zeile. Mit zwei
+          # Images haette das beide Eintraege ueberschrieben und die jeweils
+          # andere Site auf ein falsches Image gezeigt. Deshalb wird jetzt der
+          # zum Image gehoerende name-Eintrag gesucht und genau die digest-Zeile
+          # darunter ersetzt - Kommentarzeilen dazwischen eingeschlossen.
+          python3 - "${IMAGE}" "${DIGEST}" <<'PY'
+          import re, sys
+          image, digest = sys.argv[1], sys.argv[2]
+          path = "apps/prod/kustomization.yaml"
+          text = open(path, encoding="utf-8").read()
+          pattern = re.compile(
+              r"(- name: " + re.escape(image) + r"\n(?:[ \t]*#[^\n]*\n)*[ \t]*digest: )\S+"
+          )
+          new, count = pattern.subn(lambda m: m.group(1) + digest, text, count=1)
+          if count != 1:
+              sys.exit(f"Kein digest-Eintrag fuer {image} in {path} gefunden.")
+          open(path, "w", encoding="utf-8").write(new)
+          PY
 
-          echo "--- neue Zeile ---"
-          grep -n 'digest:' apps/prod/kustomization.yaml
+          echo "--- aktuelle Eintraege ---"
+          grep -n -A1 'name: ghcr.io' apps/prod/kustomization.yaml
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -90,5 +126,10 @@ jobs:
 
           # [skip ci] ist Guertel und Hosentraeger: der paths-Filter oben wuerde
           # diesen Commit ohnehin nicht triggern, weil er nur apps/ beruehrt.
-          git commit -m "chore(deploy): thomaszachmann auf ${DIGEST} [skip ci]"
+          git commit -m "chore(deploy): ${SITE} auf ${DIGEST} [skip ci]"
+
+          # Noetig seit der Matrix: der zweite Job hat ausgecheckt, bevor der
+          # erste seinen Digest-Commit gepusht hat. Ohne Rebase scheitert sein
+          # Push als non-fast-forward.
+          git pull --rebase origin main
           git push

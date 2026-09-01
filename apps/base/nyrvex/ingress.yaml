@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nyrvex
+  namespace: web-nyrvex
+  annotations:
+    # Namespace-Prefix und @kubernetescrd sind Pflicht. Funktioniert nur, weil
+    # Traefik mit providers.kubernetesCRD.allowCrossNamespace: true laeuft.
+    #
+    # security-headers wird geteilt: die CSP dort erlaubt zusaetzlich
+    # connect-src und form-action auf formcarry.com. Diese Seite nutzt beides
+    # nicht - eine Erlaubnis, von der kein Gebrauch gemacht wird, oeffnet
+    # nichts. Eine eigene, engere Middleware waere sauberer und ist als
+    # Folgearbeit notiert.
+    traefik.ingress.kubernetes.io/router.middlewares: >-
+      traefik-security-headers@kubernetescrd,traefik-www-redirect@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - nyrvex.com
+        - www.nyrvex.com
+      secretName: nyrvex-tls
+  rules:
+    - host: nyrvex.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nyrvex
+                port:
+                  name: http
+    - host: www.nyrvex.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nyrvex
+                port:
+                  name: http

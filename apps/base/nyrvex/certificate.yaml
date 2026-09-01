@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nyrvex-tls
+  namespace: web-nyrvex
+spec:
+  secretName: nyrvex-tls
+  issuerRef:
+    kind: ClusterIssuer
+    # Produktivzertifikat. Die DNS-01-Kette ueber die Cloudflare-API ist seit
+    # 2026-08-27 fuer thomaszachmann.de belegt; fuer nyrvex.com muss der
+    # API-Token zusaetzlich Zugriff auf diese Zone haben. Schlaegt die
+    # Ausstellung fehl, hier auf letsencrypt-staging wechseln und erst nach
+    # erfolgreicher Probe zurueck - fuenf Ausstellungen pro Domain und Woche.
+    name: letsencrypt-prod
+  commonName: nyrvex.com
+  dnsNames:
+    - nyrvex.com
+    - www.nyrvex.com

@@ -15,3 +15,9 @@ admin_ip_cidrs = ["203.0.113.7/32"]
 # Auflisten: curl -s -H "Authorization: Bearer $HCLOUD_TOKEN" \
 #              https://api.hetzner.cloud/v1/ssh_keys | jq -r '.ssh_keys[].name'
 ssh_key_name = "dein-key-name"
+
+# Weitere Domains auf demselben Node, je Domain die Zone-ID.
+# Der CLOUDFLARE_API_TOKEN braucht Zone:DNS:Edit auch auf diese Zonen.
+additional_domains = {
+  "nyrvex.com" = "00000000000000000000000000000000"
+}

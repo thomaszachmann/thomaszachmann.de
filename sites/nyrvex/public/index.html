@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In Practice — hands-on lab guides for infrastructure engineers</title>
+<meta name="description" content="In Practice is a series of hands-on lab guides for platform, infrastructure and security engineers. Every chapter ends in a lab that runs on your own machine.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://nyrvex.com/">
+<meta property="og:title" content="In Practice — hands-on lab guides for infrastructure engineers">
+<meta property="og:description" content="Lab guides that end in something running on your own machine. Book One: Vault in Practice.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nyrvex.com/">
+<meta property="og:image" content="https://nyrvex.com/img/vault-in-practice.webp">
+<meta name="theme-color" content="#f5f1e8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f5f1e8'/><rect y='2' width='32' height='7' fill='%238c2f24'/><text x='16' y='26' font-family='Georgia,serif' font-size='17' fill='%231a1a18' text-anchor='middle'>N</text></svg>">
+
+<style>
+/* ============================================================
+   Nyrvex — Reihe "In Practice"
+
+   Bewusst KEIN gemeinsames Design mit thomaszachmann.de. Die Palette
+   stammt aus den Umschlaegen selbst (front-cover.svg): cremefarbener
+   Grund, ein Oxblood-Band, Kupferstich-Motiv, leise Typografie.
+
+   Ebenso bewusst KEINE Webfonts. Ein Verlagsauftritt mit vier Seiten
+   braucht keinen Ladezustand ohne Text und keinen Font-Request. Die
+   Serifenschrift kommt vom System — das laedt sofort, sieht auf jeder
+   Plattform nach Buch aus und ist datenschutzrechtlich ein Nichtthema.
+   ============================================================ */
+:root{
+  --paper:#f5f1e8;
+  --ink:#1a1a18;
+  --ink-2:#4a4a45;
+  --ink-3:#8a8378;
+  --rule:#c9c0ad;
+  --accent:#8c2f24;
+  --measure:41rem;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;
+  font-size:18px;line-height:1.66;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.18}
+h1,h2,h3,p,li{overflow-wrap:break-word}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,36,.35)}
+a:hover{border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* Kleinkapitälchen-Label: das einzige Sans auf der Seite, wie auf dem Umschlag */
+.label{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 1rem;
+}
+
+.wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:10;background:var(--paper);padding:10px 16px;border:1px solid var(--rule)}
+
+/* ---------- Reihenband, direkt vom Umschlag ---------- */
+.band{
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
+  text-align:center;padding:11px 24px 10px;
+}
+
+/* ---------- Impressum-Zeile oben ---------- */
+.masthead{padding:38px 0 0;text-align:center}
+.masthead .name{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ink);
+}
+.masthead .name a{color:inherit;border:0}
+
+/* ---------- Einleitung ---------- */
+.intro{padding:52px 0 8px;text-align:center}
+.intro h1{
+  font-size:clamp(1.9rem,5vw,2.7rem);letter-spacing:-.01em;
+  margin-bottom:1.1rem;text-wrap:balance;
+}
+.intro p{color:var(--ink-2);text-align:left}
+.intro .first{font-size:1.125rem}
+
+/* ---------- Trennregel im Buchsatz ---------- */
+.rule{border:0;border-top:1px solid var(--rule);margin:60px auto;max-width:var(--measure)}
+.rule-mark{
+  text-align:center;color:var(--ink-3);letter-spacing:.7em;
+  margin:56px 0;font-size:.8rem;
+}
+
+/* ---------- Ein Buch ---------- */
+.book{padding:8px 0}
+.book .cover{
+  display:block;width:100%;max-width:290px;height:auto;margin:0 auto 34px;
+  border:1px solid var(--rule);
+}
+.book h2{font-size:clamp(1.5rem,3.6vw,2rem);margin-bottom:.35rem;text-align:center}
+.book .sub{
+  text-align:center;color:var(--ink-2);font-style:italic;
+  margin:0 0 1.6rem;font-size:1.0625rem;
+}
+.book .meta{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;margin:0 0 2rem;
+}
+.book p{color:var(--ink-2)}
+.buy{text-align:center;margin-top:2rem}
+.btn{
+  display:inline-block;border:1px solid var(--accent);border-radius:2px;
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.875rem;font-weight:600;letter-spacing:.06em;
+  padding:13px 26px;
+}
+.btn:hover{background:#75271e;border-color:#75271e}
+.btn-quiet{background:transparent;color:var(--accent)}
+.btn-quiet:hover{background:rgba(140,47,36,.06);border-color:var(--accent);color:var(--accent)}
+.buy .note{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
+}
+
+/* ---------- Angekündigt ---------- */
+.forthcoming{opacity:.85}
+.forthcoming .cover-placeholder{
+  width:100%;max-width:200px;aspect-ratio:2250/2775;margin:0 auto 30px;
+  border:1px dashed var(--rule);display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);
+}
+
+/* ---------- Autor ---------- */
+.author p{color:var(--ink-2)}
+
+/* ---------- Fuss ---------- */
+footer{
+  border-top:1px solid var(--rule);margin-top:70px;padding:30px 0 46px;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);text-align:center;
+}
+footer a{color:var(--ink-3);border-bottom-color:rgba(138,131,120,.4)}
+footer a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+footer .links{margin:0 0 .6rem}
+footer .links a{margin:0 .55rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="band">In Practice</div>
+
+<div class="masthead">
+  <p class="name"><a href="/">Nyrvex</a></p>
+</div>
+
+<main id="main">
+
+  <section class="intro">
+    <div class="wrap">
+      <h1>Lab guides that end in something running</h1>
+      <p class="first">
+        <em>In Practice</em> is a series of hands-on books for the people who
+        operate infrastructure rather than evaluate it. Every chapter closes with
+        a lab that runs on your own machine — no cloud account, no spare server —
+        and with the error messages you will actually meet, their causes and their
+        fixes.
+      </p>
+      <p>
+        The gap these books address is not conceptual. Engineers understand what a
+        tool does within an hour, then spend months learning what the defaults will
+        cost them and what happens at three in the morning. That second part is what
+        gets written down here.
+      </p>
+    </div>
+  </section>
+
+  <p class="rule-mark" aria-hidden="true">· · ·</p>
+
+  <!-- ================= BOOK ONE ================= -->
+  <section class="book">
+    <div class="wrap">
+      <p class="label">Book One — available</p>
+      <a href="/vault-in-practice" aria-label="Vault in Practice">
+        <img class="cover" src="img/vault-in-practice.webp" width="720" height="889"
+             alt="Cover of Vault in Practice by Thomas Zachmann">
+      </a>
+      <h2>Vault in Practice</h2>
+      <p class="sub">A Hands-On Lab Guide to HashiCorp Vault and OpenBao</p>
+      <p class="meta">598 pages · 24 chapters · 24 labs · PDF and EPUB</p>
+
+      <p>
+        Follow a fictional logistics company from passwords-in-Git to a
+        production-shaped installation. Split an encryption key with Shamir and
+        then lose it on purpose. Write policies that fail, and find out why in one
+        command. Issue database credentials that did not exist until they were
+        asked for. Break a Raft cluster's quorum, and put it back together.
+      </p>
+      <p>
+        Five chapters ask you to destroy your own setup, because nobody who has
+        recovered a sealed cluster under pressure learned how from a reference
+        manual. The book covers the Vault Associate exam objectives in full and
+        ends with a practice exam.
+      </p>
+
+      <div class="buy">
+        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
+        <a class="btn btn-quiet" href="https://leanpub.com/vault-in-practice#sample" rel="noopener">Read a sample</a>
+        <p class="note">PDF and EPUB · free updates for every future edition</p>
+        <p class="note"><a href="/vault-in-practice">What is in the book</a></p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================= BOOK TWO ================= -->
+  <section class="book forthcoming">
+    <div class="wrap">
+      <p class="label">Book Two — in preparation</p>
+      <div class="cover-placeholder" aria-hidden="true">In Practice</div>
+      <h2>Enterprise AI Platform</h2>
+      <p class="sub">GPU infrastructure, model serving and running an AI platform in-house</p>
+
+      <p>
+        The platform underneath the models: GPUs under Kubernetes, inference
+        servers, an AI gateway with identity and quotas, governance, observability
+        and the cost per thousand requests. Written for platform engineers, not for
+        data scientists.
+      </p>
+      <p>
+        A German edition is finished and
+        <a href="https://thomaszachmann.de/buch">available free of charge</a>. The
+        English edition for this series is in preparation.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================= AUTHOR ================= -->
+  <section class="author">
+    <div class="wrap">
+      <p class="label">The author</p>
+      <p>
+        <strong>Thomas Zachmann</strong> has spent more than twenty years building
+        systems, most recently Kubernetes platforms for organisations where security
+        and auditability are the requirement rather than the aspiration:
+        on-premises, on bare metal, in air-gapped networks and in European sovereign
+        clouds. CKS, CKA, CKAD.
+      </p>
+      <p>
+        He works as an independent platform engineer from Hamburg, Germany —
+        <a href="https://thomaszachmann.de">thomaszachmann.de</a>.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="/imprint">Impressum</a>
+      <a href="/privacy">Datenschutz</a>
+      <a href="mailto:thomas@zachmann.work">Contact</a>
+    </p>
+    <p>© 2026 Thomas Zachmann · Nyrvex</p>
+  </div>
+</footer>
+</body>
+</html>

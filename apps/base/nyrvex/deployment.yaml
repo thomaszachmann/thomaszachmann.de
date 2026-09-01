@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nyrvex
+  namespace: web-nyrvex
+  labels:
+    app.kubernetes.io/name: nyrvex
+spec:
+  # Zwei Replicas auf einem Node: nicht fuer Ausfallsicherheit, sondern damit
+  # ein Rollout ohne Luecke durchlaeuft.
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nyrvex
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nyrvex
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          # Wird von apps/prod/kustomization.yaml auf einen Digest gepinnt.
+          image: ghcr.io/thomaszachmann/nyrvex
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              # Bewusst kein CPU-Limit: es wuerde nur throtteln, ohne dass es
+              # auf diesem Node etwas zu schuetzen gaebe.
+              memory: 64Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          volumeMounts:
+            # Notwendig wegen readOnlyRootFilesystem: nginx-unprivileged legt
+            # seine PID und temporaere Bodies unter /tmp ab.
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /var/cache/nginx
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}

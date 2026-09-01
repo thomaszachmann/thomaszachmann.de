@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault in Practice — a hands-on lab guide to HashiCorp Vault and OpenBao</title>
+<meta name="description" content="598 pages, 24 chapters, 24 labs that run on your laptop in Docker. Covers the Vault Associate exam objectives in full, with a practice exam. For platform engineers, SREs and security engineers.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://nyrvex.com/vault-in-practice">
+<meta property="og:title" content="Vault in Practice — a hands-on lab guide to HashiCorp Vault and OpenBao">
+<meta property="og:description" content="24 chapters, 24 labs, and three that ask you to break things. Covers the Vault Associate exam objectives in full.">
+<meta property="og:type" content="book">
+<meta property="og:url" content="https://nyrvex.com/vault-in-practice">
+<meta property="og:image" content="https://nyrvex.com/img/vault-in-practice.webp">
+<meta name="theme-color" content="#f5f1e8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f5f1e8'/><rect y='2' width='32' height='7' fill='%238c2f24'/><text x='16' y='26' font-family='Georgia,serif' font-size='17' fill='%231a1a18' text-anchor='middle'>N</text></svg>">
+
+<style>
+/* Palette und Haltung wie index.html: Umschlagfarben, Systemschriften,
+   keine Webfonts. Eigener Style-Block je Seite, wie im Schwesterprojekt. */
+:root{
+  --paper:#f5f1e8;
+  --ink:#1a1a18;
+  --ink-2:#4a4a45;
+  --ink-3:#8a8378;
+  --rule:#c9c0ad;
+  --accent:#8c2f24;
+  --measure:41rem;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;
+  font-size:18px;line-height:1.66;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.18}
+h1,h2,h3,p,li,dd,dt{overflow-wrap:break-word}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,36,.35)}
+a:hover{border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.label{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 1rem;
+}
+.wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:10;background:var(--paper);padding:10px 16px;border:1px solid var(--rule)}
+
+.band{
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
+  text-align:center;padding:11px 24px 10px;
+}
+.masthead{padding:38px 0 0;text-align:center}
+.masthead .name{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ink);
+}
+.masthead .name a{color:inherit;border:0}
+
+.rule{border:0;border-top:1px solid var(--rule);margin:56px auto;max-width:var(--measure)}
+
+/* ---------- Buchkopf ---------- */
+.head{padding:50px 0 0;text-align:center}
+.head .cover{
+  display:block;width:100%;max-width:320px;height:auto;margin:0 auto 36px;
+  border:1px solid var(--rule);
+}
+.head h1{font-size:clamp(1.8rem,4.6vw,2.5rem);margin-bottom:.4rem}
+.head .sub{color:var(--ink-2);font-style:italic;margin:0 0 1.5rem;font-size:1.0625rem}
+.head .meta{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 2rem;
+}
+.buy{margin-top:1.6rem}
+.btn{
+  display:inline-block;border:1px solid var(--accent);border-radius:2px;
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.875rem;font-weight:600;letter-spacing:.06em;padding:13px 26px;
+}
+.btn:hover{background:#75271e;border-color:#75271e}
+.btn-quiet{background:transparent;color:var(--accent);margin-left:.5rem}
+.btn-quiet:hover{background:rgba(140,47,36,.06);border-color:var(--accent);color:var(--accent)}
+.buy .note{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
+}
+
+/* ---------- Fliesstext ---------- */
+.prose{padding:8px 0}
+.prose p{color:var(--ink-2)}
+.prose h2{font-size:1.5rem;margin:0 0 1rem}
+
+/* ---------- Aufzaehlung der Labs ---------- */
+.does{margin:1.4rem 0 0;padding:0;list-style:none}
+.does li{
+  color:var(--ink-2);padding:.5rem 0 .5rem 1.5rem;position:relative;
+  border-bottom:1px solid var(--rule);
+}
+.does li:first-child{border-top:1px solid var(--rule)}
+.does li::before{
+  content:"—";position:absolute;left:0;color:var(--ink-3);
+}
+
+/* ---------- Inhaltsverzeichnis ---------- */
+.toc{margin:1.4rem 0 0;padding:0;list-style:none;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.9375rem}
+.toc li{display:flex;gap:1rem;padding:.4rem 0;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+.toc li span{color:var(--ink-3);flex:none;width:2.2rem;text-align:right}
+.toc-note{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);margin:1rem 0 0;
+}
+
+footer{
+  border-top:1px solid var(--rule);margin-top:66px;padding:30px 0 46px;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);text-align:center;
+}
+footer a{color:var(--ink-3);border-bottom-color:rgba(138,131,120,.4)}
+footer a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+footer .links{margin:0 0 .6rem}
+footer .links a{margin:0 .55rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="band">In Practice · Book One</div>
+
+<div class="masthead">
+  <p class="name"><a href="/">Nyrvex</a></p>
+</div>
+
+<main id="main">
+
+  <section class="head">
+    <div class="wrap">
+      <!-- Raster statt der vorhandenen front-cover.svg: die SVG setzt
+           font-family "Avenir Next", das es nur auf macOS gibt. Auf Linux
+           und Windows faellt der Umschlag auf eine Ersatzschrift zurueck
+           und sieht dann anders aus als das gedruckte Buch. -->
+      <img class="cover" src="img/vault-in-practice.webp" width="720" height="889"
+           alt="Cover of Vault in Practice by Thomas Zachmann">
+      <h1>Vault in Practice</h1>
+      <p class="sub">A Hands-On Lab Guide to HashiCorp Vault and OpenBao</p>
+      <p class="meta">598 pages · 24 chapters · 24 labs · 12 appendices · PDF and EPUB</p>
+      <div class="buy">
+        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
+        <a class="btn btn-quiet" href="https://leanpub.com/vault-in-practice#sample" rel="noopener">Read a sample</a>
+        <p class="note">PDF and EPUB · free updates for every future edition</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Why this book</p>
+      <h2>The gap is not conceptual</h2>
+      <p>
+        Engineers understand what Vault does within an hour, then spend months
+        learning what the error messages mean, which defaults will hurt, and what
+        happens at three in the morning when a cluster comes back sealed and nobody
+        can find the third unseal key.
+      </p>
+      <p>
+        Twenty-four chapters, each ending in a working lab that runs on your laptop
+        in Docker. No cloud account. No spare server. The book follows a fictional
+        logistics company from passwords-in-Git to a production-shaped installation.
+      </p>
+    </div>
+  </section>
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">What you will do</p>
+      <ul class="does">
+        <li>Split an encryption key with Shamir, then lose it on purpose</li>
+        <li>Write policies that fail, and find out why in one command</li>
+        <li>Issue database credentials that did not exist until asked for</li>
+        <li>Run a certificate authority with 24-hour certificates</li>
+        <li>Encrypt data without the application ever holding a key</li>
+        <li>Break a Raft cluster's quorum, and put it back together</li>
+        <li>Deliver secrets into Kubernetes four different ways</li>
+        <li>Deploy OpenBao, and answer the licence question honestly</li>
+      </ul>
+      <p style="margin-top:1.6rem">
+        Every chapter ends with the real error messages, their causes and their
+        fixes. Five chapters ask you to destroy your own setup, because nobody who
+        has recovered a sealed cluster under pressure learned how from a reference
+        manual.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Contents</p>
+      <h2>Twenty-four chapters</h2>
+      <ul class="toc">
+        <li><span>1</span>The Problem With Secrets</li>
+        <li><span>2</span>Building Your Lab</li>
+        <li><span>3</span>Initialise, Seal, Unseal</li>
+        <li><span>4</span>The CLI, the API, and the UI</li>
+        <li><span>5</span>Tokens</li>
+        <li><span>6</span>Policies</li>
+        <li><span>7</span>Authentication Methods</li>
+        <li><span>8</span>Identity, Entities, and Groups</li>
+        <li><span>9</span>Key/Value Secrets</li>
+        <li><span>10</span>Dynamic Database Credentials</li>
+        <li><span>11</span>Leases, Renewal, and Revocation</li>
+        <li><span>12</span>Encryption as a Service</li>
+        <li><span>13</span>Running Your Own CA</li>
+        <li><span>14</span>Response Wrapping and Secret Zero</li>
+        <li><span>15</span>Vault Agent</li>
+        <li><span>16</span>Kubernetes Foundations</li>
+        <li><span>17</span>Delivering Secrets into Pods</li>
+        <li><span>18</span>OpenBao</li>
+        <li><span>19</span>SSH, Cloud, and Other Engines</li>
+        <li><span>20</span>Storage Backends</li>
+        <li><span>21</span>High Availability and Raft</li>
+        <li><span>22</span>Auto-Unseal</li>
+        <li><span>23</span>Audit and Operations</li>
+        <li><span>24</span>Production Checklist</li>
+      </ul>
+      <p class="toc-note">
+        Twelve appendices follow, among them a command reference, a troubleshooting
+        guide, an exam objective map, a practice exam, a production readiness review
+        and a chapter on migrating an existing estate.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Who it is for</p>
+      <p>
+        Platform engineers, SREs and security engineers who will be responsible for
+        a Vault installation — not for evaluating one. The book assumes you are
+        comfortable on a Linux command line and with containers; it does not assume
+        you have used Vault before.
+      </p>
+      <p>
+        It covers the Vault Associate exam objectives in full and ends with a
+        practice exam, so it doubles as preparation without being written as a
+        cram guide.
+      </p>
+      <div class="buy" style="text-align:center">
+        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
+        <p class="note">
+          HashiCorp and Vault are trademarks of HashiCorp, Inc.
+          This book is an independent publication and is not affiliated with,
+          authorized by, sponsored by, or otherwise approved by HashiCorp, Inc.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="/">All books</a>
+      <a href="/imprint">Impressum</a>
+      <a href="/privacy">Datenschutz</a>
+      <a href="mailto:thomas@zachmann.work">Contact</a>
+    </p>
+    <p>© 2026 Thomas Zachmann · Nyrvex</p>
+  </div>
+</footer>
+</body>
+</html>
