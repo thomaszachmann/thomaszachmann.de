@@ -4,11 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      # Bewusst 'sites/**' statt einer Liste je Site: eine neue Site soll nicht
-      # daran scheitern, dass jemand vergisst, hier eine Zeile zu ergaenzen.
-      # Dass dabei auch die jeweils andere Site neu gebaut wird, kostet nichts:
-      # bei unveraendertem Inhalt kommt derselbe Digest heraus, und der
-      # Rueckschreibe-Schritt committet dann nicht.
+      # 'sites/**' statt einer Liste je Site: eine neue Site soll nicht daran
+      # scheitern, dass jemand vergisst, hier eine Zeile zu ergaenzen. Welche
+      # Site dann tatsaechlich gebaut wird, entscheidet der Job "changed".
       - 'sites/**'
       - 'scripts/verify-assets.sh'
       - '.github/workflows/build-site.yaml'
@@ -27,7 +25,82 @@ permissions:
   # Flux, und Flux liest das Repo mit einem read-only Deploy-Key.
 
 jobs:
+  # Ermittelt, welche Sites gebaut werden muessen.
+  #
+  # Ohne diesen Schritt baut die Matrix immer alle Sites. Das erzeugt auch fuer
+  # die unveraenderte Site einen neuen Digest - ein Docker-Build ist nicht
+  # bit-reproduzierbar - und damit einen ueberfluessigen Rollout. Beobachtet am
+  # 2026-09-01: ein Push, der nur nyrvex betraf, hat thomaszachmann.de von
+  # 048cb6a7 auf d1f6e357 gehoben, ohne dass sich an der Seite etwas geaendert
+  # hatte.
+  #
+  # Bewusst ohne dorny/paths-filter: der Workflow kommt sonst mit
+  # actions/checkout und den offiziellen docker/*-Actions aus, und die paar
+  # Zeilen Shell sind leichter zu pruefen als eine weitere fremde Action.
+  changed:
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.detect.outputs.sites }}
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v5
+        with:
+          # Vollstaendige Historie: der Vergleichspunkt aus github.event.before
+          # liegt in einem flachen Clone sonst nicht vor.
+          fetch-depth: 0
+
+      - name: Geaenderte Sites ermitteln
+        id: detect
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          alle() {
+            # Liste aus dem Dateisystem, nicht aus einer gepflegten Konstante.
+            # Bewusst kein "find -printf": das ist GNU-spezifisch und liesse
+            # sich lokal auf macOS nicht gegenpruefen.
+            for d in sites/*/; do basename "$d"; done | sort | jq -R . | jq -s -c .
+          }
+
+          if [ "${GITHUB_EVENT_NAME}" != "push" ]; then
+            echo "Kein push-Event (${GITHUB_EVENT_NAME}) - alle Sites bauen."
+            SITES="$(alle)"
+          elif [ -z "${BEFORE}" ] || [ "${BEFORE}" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            # Erster Push auf den Branch, Force-Push oder ein Vergleichspunkt,
+            # den es nicht mehr gibt. Im Zweifel alles bauen.
+            echo "Vergleichspunkt '${BEFORE}' nicht verwendbar - alle Sites bauen."
+            SITES="$(alle)"
+          else
+            CHANGED="$(git diff --name-only "${BEFORE}" "${GITHUB_SHA}")"
+            echo "--- geaenderte Dateien ---"
+            echo "${CHANGED}"
+
+            if echo "${CHANGED}" | grep -qE '^(scripts/verify-assets\.sh|\.github/workflows/build-site\.yaml)$'; then
+              # Beides betrifft jede Site: der Pruefer entscheidet ueber jeden
+              # Build, und eine Aenderung am Workflow soll sich sofort auf allen
+              # Sites zeigen und nicht erst beim naechsten Inhaltsupdate.
+              echo "Pruefskript oder Workflow geaendert - alle Sites bauen."
+              SITES="$(alle)"
+            else
+              # Nur Verzeichnisse, die es noch gibt: eine geloeschte Site darf
+              # keinen Build ausloesen, der dann am fehlenden Kontext scheitert.
+              SITES="$(echo "${CHANGED}" \
+                | sed -nE 's|^sites/([^/]+)/.*|\1|p' \
+                | sort -u \
+                | while read -r s; do [ -d "sites/${s}" ] && echo "${s}"; done \
+                | jq -R . | jq -s -c .)"
+            fi
+          fi
+
+          echo "sites=${SITES}" >> "$GITHUB_OUTPUT"
+          echo "Zu bauen: ${SITES}"
+
   build:
+    needs: changed
+    # Leere Matrix ist bei GitHub Actions ein Fehler, kein No-op.
+    if: needs.changed.outputs.sites != '[]' && needs.changed.outputs.sites != ''
     runs-on: ubuntu-latest
     strategy:
       # Zwingend 1. Die Matrix-Jobs schreiben beide einen Digest-Commit nach
@@ -37,7 +110,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        site: [thomaszachmann, nyrvex]
+        site: ${{ fromJSON(needs.changed.outputs.sites) }}
 
     steps:
       - name: Repo auschecken
@@ -73,8 +146,7 @@ jobs:
           # ubuntu-latest ist amd64, genau wie der CX33. Kein --platform noetig.
           push: true
           tags: ghcr.io/${{ steps.owner.outputs.lc }}/${{ matrix.site }}:${{ github.sha }}
-          # Cache je Site trennen, sonst ueberschreiben sich die beiden Laeufe
-          # gegenseitig und keiner trifft je einen Treffer.
+          # Cache je Site trennen, sonst verdraengen sich die Laeufe gegenseitig.
           cache-from: type=gha,scope=${{ matrix.site }}
           cache-to: type=gha,mode=max,scope=${{ matrix.site }}
 
@@ -128,8 +200,8 @@ jobs:
           # diesen Commit ohnehin nicht triggern, weil er nur apps/ beruehrt.
           git commit -m "chore(deploy): ${SITE} auf ${DIGEST} [skip ci]"
 
-          # Noetig seit der Matrix: der zweite Job hat ausgecheckt, bevor der
-          # erste seinen Digest-Commit gepusht hat. Ohne Rebase scheitert sein
-          # Push als non-fast-forward.
+          # Noetig seit der Matrix: laeuft mehr als eine Site, hat die zweite
+          # ausgecheckt, bevor die erste ihren Digest-Commit gepusht hat. Ohne
+          # Rebase scheitert deren Push als non-fast-forward.
           git pull --rebase origin main
           git push
