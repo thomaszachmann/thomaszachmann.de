@@ -9,7 +9,7 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://thomaszachmann.de/enterprise-ai">
 <meta property="og:title" content="Enterprise AI Infrastructure — Beratung und Aufbauprojekte">
-<meta property="og:description" content="Vier Reifegrade, drei Größenordnungen, durchgerechnete Kosten. Die Plattform unter AI-Workloads — als Beratungstag oder als Aufbauprojekt.">
+<meta property="og:description" content="Vier Reifegrade zur Einordnung der eigenen Lage. Die Plattform unter AI-Workloads — als Beratungstag oder als Aufbauprojekt.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thomaszachmann.de/enterprise-ai">
 <meta property="og:locale" content="de_DE">
@@ -44,7 +44,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
-h1,h2,h3,p,dd,li,td,th{overflow-wrap:break-word;hyphens:auto}
+h1,h2,h3,p,dd,li{overflow-wrap:break-word;hyphens:auto}
 h1{font-size:clamp(1.75rem,5.4vw,2.75rem);letter-spacing:-.025em}
 h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
 h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
@@ -123,36 +123,6 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 .offers p{color:var(--text-2);font-size:.9375rem;margin:0 0 12px}
 .offers ul{margin:0;padding-left:1.1rem;color:var(--text-2);font-size:.9375rem}
 .offers li{margin-bottom:5px}
-
-/* ---------- Kostentabelle ---------- */
-/* Breite Tabelle: scrollt in ihrem eigenen Kasten, damit die Seite selbst
-   auf schmalen Viewports nie waagerecht scrollt. */
-.scroller{overflow-x:auto;margin-top:34px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9375rem}
-caption{text-align:left;color:var(--text-3);font-size:.875rem;padding-bottom:12px}
-th,td{padding:11px 14px 11px 0;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
-th:first-child,td:first-child{text-align:left;white-space:normal;min-width:190px}
-thead th{
-  font-family:'JetBrains Mono',ui-monospace,monospace;
-  font-size:.75rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--text-3);border-bottom:1px solid var(--text);
-}
-/* th mitnehmen: die erste Zelle jeder Zeile ist ein th, sonst bleibt unter der
-   letzten Zeile ein Linienstummel ueber die halbe Tabellenbreite stehen. */
-tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
-tr.sum td{font-weight:550;border-top:1px solid var(--text)}
-tr.key td{color:var(--accent);font-weight:550}
-.table-note{margin:16px 0 0;font-size:.875rem;color:var(--text-3);max-width:70ch}
-
-/* ---------- Hervorgehobene Aussage ---------- */
-.point{
-  margin-top:34px;padding:22px 26px;max-width:80ch;
-  background:var(--bg);border:1px solid var(--border);
-  border-left:3px solid var(--accent);border-radius:var(--radius);
-}
-.point p{margin:0;color:var(--text-2);font-size:.9375rem}
-.point p + p{margin-top:.8rem}
-.point strong{color:var(--text);font-weight:550}
 
 /* ---------- Beleg: Buch ---------- */
 .proof{
@@ -316,79 +286,19 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
     </div>
   </section>
 
-  <!-- ================= GROESSENORDNUNGEN ================= -->
-  <section id="groessenordnungen" class="tinted">
-    <div class="wrap">
-      <p class="eyebrow">Größenordnungen</p>
-      <h2>Was das ungefähr kostet</h2>
-      <p class="prose" style="margin-top:16px;color:var(--text-2)">
-        Drei Architekturen, durchgerechnet. Die Zahlen sind Beispielwerte, deren
-        Größenordnung stimmt — für ein konkretes Vorhaben gehören die eigenen Werte
-        eingesetzt. Sie stehen hier, damit ein erstes Gespräch nicht damit anfängt,
-        die Dimension zu erraten.
-      </p>
-
-      <div class="scroller">
-        <table>
-          <caption>Betriebskosten je Monat, ohne Projektaufwand für den Aufbau</caption>
-          <thead>
-            <tr>
-              <th scope="col">Position</th>
-              <th scope="col">Klein</th>
-              <th scope="col">Mittel</th>
-              <th scope="col">Groß</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row" style="font-weight:400">Nutzer</th><td>50</td><td>500</td><td>5 000</td></tr>
-            <tr><th scope="row" style="font-weight:400">Anfragen je Tag</th><td>ca. 600</td><td>ca. 6 000</td><td>ca. 60 000</td></tr>
-            <tr><th scope="row" style="font-weight:400">Externe Modellnutzung</th><td>ca. 400 €</td><td>ca. 900 €</td><td>ca. 4 000 €</td></tr>
-            <tr><th scope="row" style="font-weight:400">GPU-Hardware, abgeschrieben</th><td>—</td><td>ca. 1 400 €</td><td>ca. 5 600 €</td></tr>
-            <tr><th scope="row" style="font-weight:400">Strom und Rechenzentrum</th><td>—</td><td>ca. 560 €</td><td>ca. 2 240 €</td></tr>
-            <tr><th scope="row" style="font-weight:400">CPU-Knoten für Plattformdienste</th><td>ca. 150 €</td><td>ca. 300 €</td><td>ca. 700 €</td></tr>
-            <tr><th scope="row" style="font-weight:400">Betriebsaufwand</th><td>ca. 1 600 €</td><td>ca. 4 000 €</td><td>ca. 14 000 €</td></tr>
-            <tr class="sum"><th scope="row">Summe je Monat</th><td>ca. 2 150 €</td><td>ca. 7 160 €</td><td>ca. 26 540 €</td></tr>
-            <tr class="key"><th scope="row">Kosten je 1 000 Anfragen</th><td>ca. 179 €</td><td>ca. 60 €</td><td>ca. 22 €</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="point">
-        <p>
-          <strong>Die letzte Zeile ist die aussagekräftigste und wird selten
-          gebildet.</strong> Die Kosten je Anfrage sinken mit der Größe erheblich —
-          und zwar nicht wegen der Hardware, sondern wegen des Betriebsaufwands. Er
-          ist in allen drei Fällen der größte Einzelposten und wächst deutlich
-          langsamer als die Nutzung.
-        </p>
-        <p>
-          Daraus folgt ein Argument, das früh gehört: Zwei getrennte Plattformen für
-          zwei Geschäftsbereiche kosten deutlich mehr als eine gemeinsame — und
-          solche Trennungen sind später schwer rückgängig zu machen.
-        </p>
-      </div>
-
-      <p class="table-note">
-        Wer eine Plattform mit Hardwarekosten begründet und den Betrieb als „machen
-        wir nebenbei“ einplant, unterschätzt das Vorhaben um den Faktor zwei bis
-        drei. Modellversionen, Serverupdates, Treiber, Rotation, Prüfsätze,
-        Neuaufbauten, Katalogpflege — nicht dringend, bis sie es plötzlich sind.
-      </p>
-    </div>
-  </section>
-
   <!-- ================= REIHENFOLGE ================= -->
-  <section id="reihenfolge">
+  <section id="reihenfolge" class="tinted">
     <div class="wrap">
       <p class="eyebrow">Reihenfolge</p>
       <h2>Oben anfangen, nach unten weiterbauen</h2>
       <div class="prose" style="margin-top:16px;color:var(--text-2)">
         <p>
-          Der Wechsel von einer Größenordnung in die nächste erfordert keinen Umbau.
-          Das Gateway bleibt dasselbe, die Identität bleibt dieselbe, GitOps und
-          Monitoring bleiben. Ergänzt wird jeweils eine Schicht darunter — GPU-Knoten
-          beim Schritt von Klein nach Mittel, getrennte Pools nach Lastprofil beim
-          Schritt von Mittel nach Groß.
+          Eine Plattform wächst in Stufen, und der Wechsel von einer in die nächste
+          erfordert keinen Umbau. Das Gateway bleibt dasselbe, die Identität bleibt
+          dieselbe, GitOps und Monitoring bleiben. Ergänzt wird jeweils eine Schicht
+          darunter — eigene GPU-Knoten, sobald eine Datenklasse das Haus nicht
+          verlassen darf; getrennte Pools nach Lastprofil, sobald ein zweiter
+          Anwendungsfall mit unvereinbarem Profil dazukommt.
         </p>
         <p style="margin-bottom:0">
           Das gilt allerdings nur in einer Richtung. Wer oben beginnt — beim Gateway
@@ -403,7 +313,7 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
   </section>
 
   <!-- ================= BELEG UND KONTAKT ================= -->
-  <section id="kontakt-cta" class="tinted">
+  <section id="kontakt-cta">
     <div class="wrap">
       <p class="eyebrow">Grundlage</p>
       <h2>Alles hier steht ausführlich im Buch</h2>
@@ -416,9 +326,10 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
         <div>
           <p>
             <strong>Enterprise AI Platform — Lab Guide.</strong> 398 Seiten, kostenlos
-            und ohne Anmeldung. Die Reifegrade, die Größenordnungen und die Rechnung
-            oben sind daraus — mitsamt der Herleitung, die auf dieser Seite keinen
-            Platz hat. <a href="/buch">Zum Buch</a>
+            und ohne Anmeldung. Die Reifegrade und die Reihenfolge oben stammen
+            daraus — zusammen mit den Referenzarchitekturen, der Kapazitätsplanung
+            und den durchgerechneten Betriebskosten, die auf dieser Seite keinen
+            Platz haben. <a href="/buch">Zum Buch</a>
           </p>
         </div>
       </div>
