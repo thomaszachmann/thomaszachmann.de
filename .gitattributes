@@ -1,0 +1,7 @@
+# git erkennt Binaerdateien an NUL-Bytes am Dateianfang. Die von Typst erzeugte
+# PDF hat dort keine, wird deshalb als Text eingestuft und beim Commit mit
+# 345.000 Zeilen gediffed. Schlimmer: eine Arbeitskopie mit core.autocrlf=true
+# wuerde die Zeilenenden umschreiben und die Datei damit unbrauchbar machen.
+*.pdf   binary
+*.webp  binary
+*.woff2 binary

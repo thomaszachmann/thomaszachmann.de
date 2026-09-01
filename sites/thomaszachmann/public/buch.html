@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise AI Platform — Lab Guide · kostenlos als PDF</title>
+<meta name="description" content="Kostenloses Fachbuch, 395 Seiten: GPU-Infrastruktur, Model Serving und der Betrieb einer KI-Plattform im Unternehmen. Für Platform Engineers mit Kubernetes-Erfahrung. PDF, ohne Anmeldung.">
+<meta name="author" content="Thomas Zachmann">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thomaszachmann.de/buch">
+<meta property="og:title" content="Enterprise AI Platform — Lab Guide">
+<meta property="og:description" content="395 Seiten über GPU-Infrastruktur, Model Serving und den Betrieb einer KI-Plattform im Unternehmen. Kostenlos als PDF, ohne Anmeldung.">
+<meta property="og:type" content="book">
+<meta property="og:url" content="https://thomaszachmann.de/buch">
+<meta property="og:image" content="https://thomaszachmann.de/img/buch-cover.webp">
+<meta property="og:locale" content="de_DE">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+
+<style>
+/* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
+
+/* ---------- Quiet Blue: identisch zur Startseite ---------- */
+:root{
+  --bg:#ffffff;
+  --surface:#f8fafc;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --text-2:#475569;
+  --text-3:#64748b;
+  --accent:#1d4ed8;
+  --accent-hover:#1e40af;
+  --radius:6px;
+  --wrap:1120px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Outfit',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;font-weight:350;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
+h1,h2,h3,p,dd,li{overflow-wrap:break-word;hyphens:auto}
+h1{font-size:clamp(1.75rem,5.4vw,2.75rem);letter-spacing:-.025em}
+h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
+h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
+p{margin:0 0 1.1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.prose{max-width:66ch}
+section{padding:76px 0}
+.tinted{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);margin:0 0 14px;
+}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:100;background:#fff;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius)}
+
+/* ---------- Nav ---------- */
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border)}
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{color:var(--text);font-weight:550;letter-spacing:-.02em;font-size:1.0625rem}
+.brand:hover{text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:30px;font-size:.9375rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-links a[aria-current="page"]{color:var(--text)}
+.nav-links a.btn-primary,.nav-links a.btn-primary:hover{color:#fff}
+@media(max-width:820px){.nav-links a:not(.btn){display:none}}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 18px;border-radius:var(--radius);
+  font-size:.9375rem;font-weight:500;line-height:1;
+  border:1px solid transparent;cursor:pointer;
+  transition:background-color .15s ease,border-color .15s ease;
+}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:#cbd5e1;background:var(--surface)}
+.btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- Kopf der Buchseite ---------- */
+.book-hero{padding:56px 0 72px}
+.book-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:64px;align-items:start}
+@media(max-width:880px){.book-grid{grid-template-columns:1fr;gap:44px}}
+.book-hero h1{margin-bottom:18px;max-width:18ch;text-wrap:balance}
+.book-hero .lead{font-size:1.1875rem;color:var(--text-2);max-width:52ch;margin-bottom:26px}
+/* Der Umschlag hat selbst einen fast weissen Grund. Ohne Rahmen zerfliesst er
+   auf der weissen Seite, deshalb eine duenne Kante statt eines Schattens. */
+.cover{
+  display:block;width:100%;max-width:340px;height:auto;
+  border:1px solid var(--border);border-radius:var(--radius);
+}
+@media(max-width:880px){.cover{max-width:260px}}
+.book-facts{border-top:1px solid var(--border);margin:0 0 28px;max-width:52ch}
+.book-facts div{display:flex;justify-content:space-between;gap:20px;padding:11px 0;border-bottom:1px solid var(--border);font-size:.9375rem}
+.book-facts dt{color:var(--text-3);margin:0;flex:none}
+.book-facts dd{margin:0;text-align:right;color:var(--text)}
+.dl-note{font-size:.875rem;color:var(--text-3);margin:14px 0 0;max-width:46ch}
+
+/* ---------- Inhalt: Teile und Anhaenge ---------- */
+.parts{border-top:1px solid var(--border);margin-top:34px;max-width:92ch}
+.parts > div{
+  display:grid;grid-template-columns:96px 1fr;gap:28px;
+  padding:18px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.parts > div{grid-template-columns:1fr;gap:6px;padding:16px 0}}
+.parts dt{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.8125rem;color:var(--text-3);margin:.2rem 0 0;white-space:nowrap;
+}
+.parts dd{margin:0}
+.parts dd strong{font-weight:550}
+.parts dd span{display:block;color:var(--text-2);font-size:.9375rem;margin-top:3px}
+
+/* ---------- "Was es nicht ist" ---------- */
+.nots{margin-top:30px;max-width:72ch;list-style:none;padding:0}
+.nots li{padding:13px 0;border-bottom:1px solid var(--border);font-size:.9375rem;color:var(--text-2)}
+.nots li:first-child{border-top:1px solid var(--border)}
+.nots strong{color:var(--text);font-weight:550}
+/* Weisser Grund, nicht --surface: der Abschnitt ist selbst getoent, sonst
+   verschwindet das Kommando in seinem Hintergrund. */
+.nots code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.8125rem;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 5px}
+
+/* ---------- Abschluss ---------- */
+.closing{text-align:left}
+.closing .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
+.foot-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+@media(max-width:760px){.foot-cols{grid-template-columns:1fr 1fr;gap:32px}}
+.foot-cols p{color:var(--text-2);margin:0}
+.foot-cols h4{font-size:.9375rem;font-weight:550;margin:0 0 11px}
+.foot-cols ul{list-style:none;margin:0;padding:0}
+.foot-cols li{margin-bottom:7px}
+.foot-cols li a{color:var(--text-2)}
+.foot-cols li a:hover{color:var(--text)}
+.foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
+.foot-tech{display:flex;align-items:flex-start;gap:.6rem;margin:.5rem 0 0;color:var(--text-3);font-size:.8125rem;line-height:1.55}
+.foot-tech img{flex:none;width:17px;height:17px;margin-top:.12rem}
+.foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.foot-tech a:hover{color:var(--accent)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header>
+  <nav class="wrap">
+    <a class="brand" href="/">Thomas Zachmann</a>
+    <div class="nav-links">
+      <a href="/#profil">Profil</a>
+      <a href="/#schwerpunkte">Schwerpunkte</a>
+      <a href="/buch" aria-current="page">Buch</a>
+      <a href="/#kompetenz">Kompetenz</a>
+      <a href="/#projekte">Projekte</a>
+      <a class="btn btn-primary" href="/#kontakt">Kontakt</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= KOPF ================= -->
+  <section class="book-hero">
+    <div class="wrap book-grid">
+      <div>
+        <p class="eyebrow">Buch · Kostenlos</p>
+        <h1>Enterprise AI Platform</h1>
+        <p class="lead">
+          Ein Lab Guide über GPU-Infrastruktur, Model Serving und den Betrieb einer
+          KI-Plattform im Unternehmen. Geschrieben für Leute, die diese Plattform
+          bauen und danach betreiben müssen.
+        </p>
+
+        <dl class="book-facts">
+          <div><dt>Umfang</dt><dd>395 Seiten · 17 Kapitel · 4 Anhänge</dd></div>
+          <div><dt>Format</dt><dd>PDF, A4 · 7,4 MB</dd></div>
+          <div><dt>Stand</dt><dd>September 2026</dd></div>
+          <div><dt>Preis</dt><dd>kostenlos</dd></div>
+        </dl>
+
+        <a class="btn btn-primary" href="/enterprise-ai-platform-lab-guide.pdf" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/>
+          </svg>
+          PDF herunterladen
+        </a>
+        <p class="dl-note">
+          Kein Formular, keine E-Mail-Adresse, kein Newsletter. Der Link lädt die
+          Datei direkt.
+        </p>
+      </div>
+
+      <div>
+        <img class="cover" src="img/buch-cover.webp" width="720" height="1018"
+             alt="Umschlag des Lab Guide „Enterprise AI Platform“ von Thomas Zachmann">
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORUM ES GEHT ================= -->
+  <section id="worum" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Worum es geht</p>
+      <h2>Die Plattform unter den Modellen</h2>
+      <div class="prose" style="margin-top:18px;color:var(--text-2)">
+        <p>
+          Die Aufgabe stellt sich derzeit in vielen Organisationen gleichzeitig, und sie
+          stellt sich meistens ungeplant. Entwickler benutzen längst ChatGPT und Claude,
+          oft über private Accounts. Fachabteilungen haben Proof-of-Concepts gebaut, die
+          niemand betreibt. Der Datenschutzbeauftragte hat Fragen. Der Einkauf hat eine
+          Rechnung gesehen, die niemand einem Team zuordnen kann. Und irgendwo steht ein
+          Server mit zwei GPUs, für den es keinen Betriebsprozess gibt.
+        </p>
+        <p>
+          Wer daraus eine betreibbare Plattform machen soll, braucht ein anderes Wissen
+          als der Data Scientist, der Modelle auswählt, und ein anderes als der
+          Anwendungsentwickler, der gegen eine API programmiert. Gebraucht wird Wissen
+          über GPUs im Cluster, über die Mechanik von Inferenz-Servern, über
+          Zugriffskontrolle auf Modelle, über Kostenzuordnung — und über die Frage,
+          welche Daten welches Modell erreichen dürfen. Genau dieses Wissen versammelt
+          das Buch.
+        </p>
+        <p style="margin-bottom:0">
+          Vorausgesetzt wird Produktionserfahrung mit Kubernetes, GitOps,
+          Identity-Providern, Secret-Verwaltung und Monitoring. Wer die mitbringt,
+          findet hier den Teil, der bei AI-Workloads anders ist — und das ist eine
+          ganze Menge.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INHALT ================= -->
+  <section id="inhalt">
+    <div class="wrap">
+      <p class="eyebrow">Inhalt</p>
+      <h2>Sechs Teile, von der GPU bis zur Referenzarchitektur</h2>
+
+      <dl class="parts">
+        <div>
+          <dt>Teil I</dt>
+          <dd>
+            <strong>Grundlagen der LLM-Inferenz</strong>
+            <span>Was auf der Karte tatsächlich passiert: Prefill und Decode, der
+            KV-Cache, die VRAM-Bilanz, Batching als zentraler Hebel, Modellformate
+            und Quantisierung.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Teil II</dt>
+          <dd>
+            <strong>GPU-Infrastruktur</strong>
+            <span>Wie aus einer Karte eine Plattform-Ressource wird: NVIDIA-Software-Stack,
+            GPUs unter Kubernetes, GPU-Sharing und Multi-Tenancy.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Teil III</dt>
+          <dd>
+            <strong>Model Serving</strong>
+            <span>vLLM von der Architektur bis in den Produktionsbetrieb, Distributed
+            Inference, KServe und das übrige Serving-Ökosystem.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Teil IV</dt>
+          <dd>
+            <strong>Der Enterprise-Layer</strong>
+            <span>AI Gateway mit LiteLLM, Identity, Autorisierung und Secrets,
+            AI Security, Governance und Compliance.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Teil V</dt>
+          <dd>
+            <strong>Betrieb</strong>
+            <span>Observability und FinOps, RAG-Infrastruktur betreiben, Model
+            Lifecycle, GitOps und Delivery.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Teil VI</dt>
+          <dd>
+            <strong>Synthese</strong>
+            <span>Referenzarchitekturen und Kapazitätsplanung in drei Größenordnungen —
+            durchgerechnet, von unter hundert bis zu mehreren tausend Nutzern.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Anhänge</dt>
+          <dd>
+            <strong>A – D</strong>
+            <span>Interview- und Whiteboard-Training, das Referenz-Repository,
+            Kommando- und Konfigurationsreferenz, Glossar und Sachregister.</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= ABGRENZUNG ================= -->
+  <section id="abgrenzung" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Abgrenzung</p>
+      <h2>Was das Buch nicht ist</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Das bestimmt den Inhalt stärker als jede Kapitelliste — deshalb steht es hier
+        und nicht im Kleingedruckten.
+      </p>
+
+      <ul class="nots">
+        <li>
+          <strong>Kein Kubernetes-Buch.</strong> Pods, Deployments, Services und
+          Scheduler werden nicht erklärt. Es geht ausschließlich um das, was für
+          GPU- und Inferenz-Workloads anders ist.
+        </li>
+        <li>
+          <strong>Kein DevOps-Grundlagenbuch.</strong> CI/CD, GitOps, Container und
+          Observability werden vorausgesetzt und tauchen nur in ihrer AI-spezifischen
+          Ausprägung auf — Argo CD nicht als Werkzeug erklärt, sondern in der Frage,
+          wie man ein 16 Gigabyte großes Modellartefakt durch eine GitOps-Pipeline
+          bewegt.
+        </li>
+        <li>
+          <strong>Kein Machine-Learning-Buch.</strong> Kein Transformer, keine
+          Attention-Mathematik, kein Training und kein Finetuning. Die Innenansicht
+          des Modells interessiert nur so weit, wie sie Betriebsentscheidungen
+          bestimmt.
+        </li>
+        <li>
+          <strong>Kein Tutorial.</strong> Ein Tutorial ist nach einmaligem
+          Durchlaufen verbraucht. Nützlich wird dieses Buch beim zwölften Mal, wenn
+          man um 23 Uhr nachschlägt, warum ein Pod mit
+          <code>nvidia.com/gpu: 1</code> auf <code>Pending</code> hängt.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= ABSCHLUSS ================= -->
+  <section id="download">
+    <div class="wrap closing">
+      <p class="eyebrow">Download</p>
+      <h2>395 Seiten, kostenlos</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Wenn Ihnen beim Lesen auffällt, dass Sie genau diese Plattform gerade bauen
+        müssen: Ich mache das beruflich.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/enterprise-ai-platform-lab-guide.pdf" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/>
+          </svg>
+          PDF herunterladen
+        </a>
+        <a class="btn btn-secondary" href="/#kontakt">Projekt besprechen</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Thomas Zachmann</h4>
+        <p>
+          Freiberuflicher Platform Engineer.<br>
+          Enterprise-Plattformen für Kubernetes, Cloud und AI.
+        </p>
+      </div>
+      <div>
+        <h4>Seite</h4>
+        <ul>
+          <li><a href="/#profil">Profil</a></li>
+          <li><a href="/#schwerpunkte">Schwerpunkte</a></li>
+          <li><a href="/buch">Buch</a></li>
+          <li><a href="/#kompetenz">Kompetenz</a></li>
+          <li><a href="/#projekte">Projekte</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="mailto:thomas@zachmann.work">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-bottom">
+      © 2026 Thomas Zachmann · Ohlendiekskamp 54 · 22399 Hamburg
+    </p>
+    <p class="foot-tech">
+      <img src="img/kubernetes.svg" alt="" width="17" height="17" aria-hidden="true">
+      <span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in
+      Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux.
+      <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span>
+    </p>
+  </div>
+</footer>
+</body>
+</html>

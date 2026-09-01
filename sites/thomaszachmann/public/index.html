@@ -121,6 +121,26 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 .focus p{color:var(--text-2);font-size:.9375rem;margin:0}
 .icon{width:20px;height:20px;stroke:var(--accent);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-bottom:13px;display:block}
 
+/* ---------- Buch-Teaser ---------- */
+/* Bewusst als Karte auf getoentem Grund statt als eigener .tinted-Abschnitt:
+   der naechste Abschnitt ist selbst getoent, zwei davon nebeneinander erzeugen
+   eine doppelte Trennlinie ohne sichtbaren Wechsel. */
+.book{
+  display:grid;grid-template-columns:168px 1fr;gap:36px;align-items:center;
+  margin-top:34px;padding:28px 32px;max-width:88ch;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+}
+@media(max-width:760px){.book{grid-template-columns:1fr;gap:24px;padding:24px}}
+.book .cover{display:block;width:100%;max-width:168px;height:auto;border:1px solid var(--border);border-radius:4px}
+.book p{color:var(--text-2);font-size:.9375rem;margin:0 0 10px}
+.book .meta{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-3);margin:0 0 18px;
+}
+.book .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.book .btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
 /* ---------- Kompetenz-Tabelle ---------- */
 .skills{border-top:1px solid var(--border);margin-top:34px}
 .skills > div{
@@ -202,6 +222,7 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
     <div class="nav-links">
       <a href="#profil">Profil</a>
       <a href="#schwerpunkte">Schwerpunkte</a>
+      <a href="#buch">Buch</a>
       <a href="#kompetenz">Kompetenz</a>
       <a href="#projekte">Projekte</a>
       <a class="btn btn-primary" href="#kontakt">Kontakt</a>
@@ -321,6 +342,40 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
           </p>
         </article>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BUCH ================= -->
+  <section id="buch">
+    <div class="wrap">
+      <p class="eyebrow">Buch</p>
+      <h2>395 Seiten über die Plattform unter den Modellen</h2>
+
+      <div class="book">
+        <a href="/buch" aria-label="Zur Buchseite">
+          <img class="cover" src="img/buch-cover.webp" width="720" height="1018"
+               alt="Umschlag des Lab Guide „Enterprise AI Platform“">
+        </a>
+        <div>
+          <p>
+            <strong>Enterprise AI Platform — Lab Guide.</strong> GPU-Infrastruktur,
+            Model Serving, AI Gateway, Governance und FinOps: das, was zwischen einem
+            Proof-of-Concept und einer KI-Plattform liegt, die man im Unternehmen
+            tatsächlich betreiben kann. Geschrieben für Platform Engineers, nicht für
+            Data Scientists.
+          </p>
+          <p class="meta">395 Seiten · 17 Kapitel · PDF · kostenlos</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="/enterprise-ai-platform-lab-guide.pdf" download>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/>
+              </svg>
+              PDF herunterladen
+            </a>
+            <a class="btn btn-secondary" href="/buch">Mehr zum Buch</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -556,6 +611,7 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
         <ul>
           <li><a href="#profil">Profil</a></li>
           <li><a href="#schwerpunkte">Schwerpunkte</a></li>
+          <li><a href="/buch">Buch</a></li>
           <li><a href="#kompetenz">Kompetenz</a></li>
           <li><a href="#projekte">Projekte</a></li>
         </ul>

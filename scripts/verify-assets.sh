@@ -29,7 +29,13 @@ while IFS= read -r -d '' html; do
       /*) target="$ROOT/${ref#/}" ;;                 # wurzelrelativ
       *)  target="$(dirname "$html")/$ref" ;;        # dokumentrelativ
     esac
-    [ -e "$target" ] || printf '%s\t%s\n' "${html#./}" "$ref" >>"$missing"
+    # Dieselbe Reihenfolge wie try_files in der nginx.conf: $uri, $uri.html,
+    # $uri/. Ohne den mittleren Schritt meldet der Pruefer endungslose Links
+    # wie /buch als fehlend, obwohl buch.html ausgeliefert wird. Der Test
+    # bleibt scharf: /buch besteht ihn nur, weil buch.html existiert.
+    if [ ! -e "$target" ] && [ ! -e "$target.html" ] && [ ! -e "$target/index.html" ]; then
+      printf '%s\t%s\n' "${html#./}" "$ref" >>"$missing"
+    fi
   done < <(
     {
       # HTML-Attribute
