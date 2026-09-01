@@ -119,6 +119,10 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 }
 .focus h3{margin-bottom:9px}
 .focus p{color:var(--text-2);font-size:.9375rem;margin:0}
+/* Vertiefungslink einer Schwerpunkt-Karte. Bewusst hier und nicht in der
+   Navigation: sonst bekaeme AI im Menue ein Gewicht, das die Reihenfolge
+   Kubernetes-zuerst umdreht. */
+.focus .more{margin-top:12px;font-size:.9375rem}
 .icon{width:20px;height:20px;stroke:var(--accent);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-bottom:13px;display:block}
 
 /* ---------- Buch-Teaser ---------- */
@@ -321,6 +325,7 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
             kommen GPU-Scheduling, Model Serving und der kontrollierte Zugang zu
             internen wie externen Modellen.
           </p>
+          <p class="more"><a href="/enterprise-ai">Leistungen und Größenordnungen &rarr;</a></p>
         </article>
 
         <article>

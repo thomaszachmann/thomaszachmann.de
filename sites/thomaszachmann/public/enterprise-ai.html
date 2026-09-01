@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise AI Infrastructure — Beratung und Aufbauprojekte</title>
+<meta name="description" content="Aufbau der Plattform unter AI-Workloads: GPU-Knoten, Model Serving, AI Gateway, Identity, Observability und Kostenzuordnung. Beratungstage und Aufbauprojekte von einem freiberuflichen Platform Engineer aus Hamburg.">
+<meta name="author" content="Thomas Zachmann">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thomaszachmann.de/enterprise-ai">
+<meta property="og:title" content="Enterprise AI Infrastructure — Beratung und Aufbauprojekte">
+<meta property="og:description" content="Vier Reifegrade, drei Größenordnungen, durchgerechnete Kosten. Die Plattform unter AI-Workloads — als Beratungstag oder als Aufbauprojekt.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thomaszachmann.de/enterprise-ai">
+<meta property="og:locale" content="de_DE">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+
+<style>
+/* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
+
+/* ---------- Quiet Blue: identisch zur Startseite ---------- */
+:root{
+  --bg:#ffffff;
+  --surface:#f8fafc;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --text-2:#475569;
+  --text-3:#64748b;
+  --accent:#1d4ed8;
+  --accent-hover:#1e40af;
+  --radius:6px;
+  --wrap:1120px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Outfit',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;font-weight:350;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
+h1,h2,h3,p,dd,li,td,th{overflow-wrap:break-word;hyphens:auto}
+h1{font-size:clamp(1.75rem,5.4vw,2.75rem);letter-spacing:-.025em}
+h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
+h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
+p{margin:0 0 1.1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.prose{max-width:66ch}
+section{padding:76px 0}
+.tinted{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);margin:0 0 14px;
+}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:100;background:#fff;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius)}
+
+/* ---------- Nav ---------- */
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border)}
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{color:var(--text);font-weight:550;letter-spacing:-.02em;font-size:1.0625rem}
+.brand:hover{text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:30px;font-size:.9375rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-links a.btn-primary,.nav-links a.btn-primary:hover{color:#fff}
+@media(max-width:820px){.nav-links a:not(.btn){display:none}}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 18px;border-radius:var(--radius);
+  font-size:.9375rem;font-weight:500;line-height:1;
+  border:1px solid transparent;cursor:pointer;
+  transition:background-color .15s ease,border-color .15s ease;
+}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:#cbd5e1;background:var(--surface)}
+
+/* ---------- Kopf ---------- */
+.head{padding:64px 0 72px}
+.head h1{margin-bottom:20px;max-width:20ch;text-wrap:balance}
+.head .lead{font-size:1.1875rem;color:var(--text-2);max-width:62ch;margin-bottom:28px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ---------- Reifegrade ---------- */
+.stages{border-top:1px solid var(--border);margin-top:34px;max-width:92ch}
+.stages > div{
+  display:grid;grid-template-columns:150px 1fr;gap:28px;
+  padding:18px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.stages > div{grid-template-columns:1fr;gap:6px;padding:16px 0}}
+.stages dt{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.8125rem;color:var(--text-3);margin:.2rem 0 0;
+}
+.stages dd{margin:0}
+.stages dd strong{font-weight:550;display:block}
+.stages dd span{display:block;color:var(--text-2);font-size:.9375rem;margin-top:3px}
+
+/* ---------- Die zwei Leistungen ---------- */
+.offers{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px}
+@media(max-width:880px){.offers{grid-template-columns:1fr;gap:0}}
+.offers article{padding-top:22px;border-top:2px solid var(--text)}
+@media(max-width:880px){
+  .offers article{border-top:1px solid var(--border);padding:22px 0}
+  .offers article:first-child{border-top:2px solid var(--text)}
+}
+.offers h3{margin-bottom:10px}
+.offers p{color:var(--text-2);font-size:.9375rem;margin:0 0 12px}
+.offers ul{margin:0;padding-left:1.1rem;color:var(--text-2);font-size:.9375rem}
+.offers li{margin-bottom:5px}
+
+/* ---------- Kostentabelle ---------- */
+/* Breite Tabelle: scrollt in ihrem eigenen Kasten, damit die Seite selbst
+   auf schmalen Viewports nie waagerecht scrollt. */
+.scroller{overflow-x:auto;margin-top:34px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9375rem}
+caption{text-align:left;color:var(--text-3);font-size:.875rem;padding-bottom:12px}
+th,td{padding:11px 14px 11px 0;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:190px}
+thead th{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.75rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-3);border-bottom:1px solid var(--text);
+}
+/* th mitnehmen: die erste Zelle jeder Zeile ist ein th, sonst bleibt unter der
+   letzten Zeile ein Linienstummel ueber die halbe Tabellenbreite stehen. */
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+tr.sum td{font-weight:550;border-top:1px solid var(--text)}
+tr.key td{color:var(--accent);font-weight:550}
+.table-note{margin:16px 0 0;font-size:.875rem;color:var(--text-3);max-width:70ch}
+
+/* ---------- Hervorgehobene Aussage ---------- */
+.point{
+  margin-top:34px;padding:22px 26px;max-width:80ch;
+  background:var(--bg);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:var(--radius);
+}
+.point p{margin:0;color:var(--text-2);font-size:.9375rem}
+.point p + p{margin-top:.8rem}
+.point strong{color:var(--text);font-weight:550}
+
+/* ---------- Beleg: Buch ---------- */
+.proof{
+  display:grid;grid-template-columns:110px 1fr;gap:28px;align-items:center;
+  margin-top:30px;padding:24px 28px;max-width:80ch;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+}
+@media(max-width:640px){.proof{grid-template-columns:1fr;gap:20px}}
+.proof img{display:block;width:100%;max-width:110px;height:auto;border:1px solid var(--border);border-radius:4px}
+.proof p{margin:0;color:var(--text-2);font-size:.9375rem}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
+.foot-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+@media(max-width:760px){.foot-cols{grid-template-columns:1fr 1fr;gap:32px}}
+.foot-cols p{color:var(--text-2);margin:0}
+.foot-cols h4{font-size:.9375rem;font-weight:550;margin:0 0 11px}
+.foot-cols ul{list-style:none;margin:0;padding:0}
+.foot-cols li{margin-bottom:7px}
+.foot-cols li a{color:var(--text-2)}
+.foot-cols li a:hover{color:var(--text)}
+.foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
+.foot-tech{display:flex;align-items:flex-start;gap:.6rem;margin:.5rem 0 0;color:var(--text-3);font-size:.8125rem;line-height:1.55}
+.foot-tech img{flex:none;width:17px;height:17px;margin-top:.12rem}
+.foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.foot-tech a:hover{color:var(--accent)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header>
+  <nav class="wrap">
+    <a class="brand" href="/">Thomas Zachmann</a>
+    <div class="nav-links">
+      <a href="/#profil">Profil</a>
+      <a href="/#schwerpunkte">Schwerpunkte</a>
+      <a href="/#buch">Buch</a>
+      <a href="/#kompetenz">Kompetenz</a>
+      <a href="/#projekte">Projekte</a>
+      <a class="btn btn-primary" href="/#kontakt">Kontakt</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= KOPF ================= -->
+  <section class="head">
+    <div class="wrap">
+      <p class="eyebrow">Enterprise AI Infrastructure</p>
+      <h1>Die Plattform, bevor das erste Modell produktiv geht</h1>
+      <p class="lead">
+        GPU-Knoten, Model Serving, AI Gateway, Identity, Observability und
+        Kostenzuordnung — die Schicht, auf der interne AI-Anwendungen betrieben
+        werden können, statt einzeln gegen die API eines Anbieters zu laufen.
+        Als Beratungstag oder als Aufbauprojekt.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/#kontakt">Projekt besprechen</a>
+        <a class="btn btn-secondary" href="/buch">Das Buch dazu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REIFEGRADE ================= -->
+  <section id="reifegrad" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Ausgangslage</p>
+      <h2>Wo Sie stehen</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Organisationen kommen nicht in einem Schritt zu einer Plattform. Vier Stufen
+        lassen sich unterscheiden, und jede legt eine andere nächste Maßnahme nahe.
+        Die ehrliche Einordnung ist der schnellste Weg von „wir wollen etwas mit KI
+        machen“ zu einer Aufgabe, über die man reden kann.
+      </p>
+
+      <dl class="stages">
+        <div>
+          <dt>Stufe 0</dt>
+          <dd>
+            <strong>Schatten-KI</strong>
+            <span>Es gibt keine Plattform. Nutzung findet statt, aber unsichtbar —
+            über private oder team-eigene Zugänge. Kein Inventar, kein Audit-Log,
+            keine Kostenzuordnung. Niemand kann sagen, wie viele Menschen im Haus
+            KI tatsächlich nutzen.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Stufe 1</dt>
+          <dd>
+            <strong>Zentraler Zugang</strong>
+            <span>Ein AI-Gateway bündelt den Zugriff. Identität, Kontingente und
+            Protokollierung existieren, die Modelle laufen noch vollständig bei
+            externen Anbietern. Hier entsteht Sichtbarkeit — und damit erstmals
+            belastbare Zahlen für jede weitere Entscheidung.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Stufe 2</dt>
+          <dd>
+            <strong>Hybrid</strong>
+            <span>Zusätzlich laufen eigene Modelle auf eigenen GPUs, und das Gateway
+            entscheidet, welche Anfrage wohin geht. Ab hier braucht es den vollen
+            GPU- und Serving-Stack. Meist erzwungen durch eine Datenklasse, die das
+            Haus nicht verlassen darf.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Stufe 3</dt>
+          <dd>
+            <strong>Plattform mit Governance</strong>
+            <span>Mehrere Teams nutzen dieselbe Plattform: Mandantentrennung,
+            erzwungene Richtlinien, Kostenzuordnung je Team und nachvollziehbare
+            Protokollierung dessen, welche Daten welches Modell erreichen.</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= LEISTUNGEN ================= -->
+  <section id="leistungen">
+    <div class="wrap">
+      <p class="eyebrow">Zusammenarbeit</p>
+      <h2>Zwei Arten, mit mir zu arbeiten</h2>
+
+      <div class="offers">
+        <article>
+          <h3>Beratungstage</h3>
+          <p>
+            Ein Tag, an dessen Ende eine Entscheidung steht — nicht ein Angebot für
+            das nächste Gespräch. Typische Anlässe:
+          </p>
+          <ul>
+            <li>Einordnung der eigenen Lage und die begründete nächste Maßnahme</li>
+            <li>Review einer geplanten Architektur, bevor Hardware bestellt wird</li>
+            <li>Kapazitäts- und Kostenrechnung für eine konkrete Nutzerzahl</li>
+            <li>Zweitmeinung zu einem laufenden Vorhaben</li>
+            <li>Make-or-Buy: eigene GPUs gegen externe Modellnutzung</li>
+          </ul>
+        </article>
+
+        <article>
+          <h3>Aufbauprojekte</h3>
+          <p>
+            Die Plattform bauen und an ein Team übergeben, das sie danach ohne mich
+            betreibt. Umfang je nach Stufe und Größenordnung:
+          </p>
+          <ul>
+            <li>AI Gateway mit Identity, Kontingenten und Protokollierung</li>
+            <li>GPU-Knoten unter Kubernetes, Scheduling und Multi-Tenancy</li>
+            <li>Model Serving und Modellkatalog</li>
+            <li>Secrets, Observability, Kostenzuordnung je Team</li>
+            <li>GitOps-Auslieferung und Betriebsdokumentation</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GROESSENORDNUNGEN ================= -->
+  <section id="groessenordnungen" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Größenordnungen</p>
+      <h2>Was das ungefähr kostet</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Drei Architekturen, durchgerechnet. Die Zahlen sind Beispielwerte, deren
+        Größenordnung stimmt — für ein konkretes Vorhaben gehören die eigenen Werte
+        eingesetzt. Sie stehen hier, damit ein erstes Gespräch nicht damit anfängt,
+        die Dimension zu erraten.
+      </p>
+
+      <div class="scroller">
+        <table>
+          <caption>Betriebskosten je Monat, ohne Projektaufwand für den Aufbau</caption>
+          <thead>
+            <tr>
+              <th scope="col">Position</th>
+              <th scope="col">Klein</th>
+              <th scope="col">Mittel</th>
+              <th scope="col">Groß</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row" style="font-weight:400">Nutzer</th><td>50</td><td>500</td><td>5 000</td></tr>
+            <tr><th scope="row" style="font-weight:400">Anfragen je Tag</th><td>ca. 600</td><td>ca. 6 000</td><td>ca. 60 000</td></tr>
+            <tr><th scope="row" style="font-weight:400">Externe Modellnutzung</th><td>ca. 400 €</td><td>ca. 900 €</td><td>ca. 4 000 €</td></tr>
+            <tr><th scope="row" style="font-weight:400">GPU-Hardware, abgeschrieben</th><td>—</td><td>ca. 1 400 €</td><td>ca. 5 600 €</td></tr>
+            <tr><th scope="row" style="font-weight:400">Strom und Rechenzentrum</th><td>—</td><td>ca. 560 €</td><td>ca. 2 240 €</td></tr>
+            <tr><th scope="row" style="font-weight:400">CPU-Knoten für Plattformdienste</th><td>ca. 150 €</td><td>ca. 300 €</td><td>ca. 700 €</td></tr>
+            <tr><th scope="row" style="font-weight:400">Betriebsaufwand</th><td>ca. 1 600 €</td><td>ca. 4 000 €</td><td>ca. 14 000 €</td></tr>
+            <tr class="sum"><th scope="row">Summe je Monat</th><td>ca. 2 150 €</td><td>ca. 7 160 €</td><td>ca. 26 540 €</td></tr>
+            <tr class="key"><th scope="row">Kosten je 1 000 Anfragen</th><td>ca. 179 €</td><td>ca. 60 €</td><td>ca. 22 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="point">
+        <p>
+          <strong>Die letzte Zeile ist die aussagekräftigste und wird selten
+          gebildet.</strong> Die Kosten je Anfrage sinken mit der Größe erheblich —
+          und zwar nicht wegen der Hardware, sondern wegen des Betriebsaufwands. Er
+          ist in allen drei Fällen der größte Einzelposten und wächst deutlich
+          langsamer als die Nutzung.
+        </p>
+        <p>
+          Daraus folgt ein Argument, das früh gehört: Zwei getrennte Plattformen für
+          zwei Geschäftsbereiche kosten deutlich mehr als eine gemeinsame — und
+          solche Trennungen sind später schwer rückgängig zu machen.
+        </p>
+      </div>
+
+      <p class="table-note">
+        Wer eine Plattform mit Hardwarekosten begründet und den Betrieb als „machen
+        wir nebenbei“ einplant, unterschätzt das Vorhaben um den Faktor zwei bis
+        drei. Modellversionen, Serverupdates, Treiber, Rotation, Prüfsätze,
+        Neuaufbauten, Katalogpflege — nicht dringend, bis sie es plötzlich sind.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= REIHENFOLGE ================= -->
+  <section id="reihenfolge">
+    <div class="wrap">
+      <p class="eyebrow">Reihenfolge</p>
+      <h2>Oben anfangen, nach unten weiterbauen</h2>
+      <div class="prose" style="margin-top:16px;color:var(--text-2)">
+        <p>
+          Der Wechsel von einer Größenordnung in die nächste erfordert keinen Umbau.
+          Das Gateway bleibt dasselbe, die Identität bleibt dieselbe, GitOps und
+          Monitoring bleiben. Ergänzt wird jeweils eine Schicht darunter — GPU-Knoten
+          beim Schritt von Klein nach Mittel, getrennte Pools nach Lastprofil beim
+          Schritt von Mittel nach Groß.
+        </p>
+        <p style="margin-bottom:0">
+          Das gilt allerdings nur in einer Richtung. Wer oben beginnt — beim Gateway
+          —, baut nach unten weiter. Wer unten beginnt — bei den GPUs —, muss die
+          Zugriffsschicht nachträglich einziehen, während bereits Anwendungen direkt
+          auf die Modelle zugreifen. Das ist der teuerste vermeidbare Fehler in
+          diesem Feld, und er wird fast immer aus Begeisterung für die Hardware
+          gemacht.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BELEG UND KONTAKT ================= -->
+  <section id="kontakt-cta" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Grundlage</p>
+      <h2>Alles hier steht ausführlich im Buch</h2>
+
+      <div class="proof">
+        <a href="/buch" aria-label="Zur Buchseite">
+          <img src="img/buch-cover.webp" width="720" height="1018"
+               alt="Umschlag des Lab Guide „Enterprise AI Platform“">
+        </a>
+        <div>
+          <p>
+            <strong>Enterprise AI Platform — Lab Guide.</strong> 397 Seiten, kostenlos
+            und ohne Anmeldung. Die Reifegrade, die Größenordnungen und die Rechnung
+            oben sind daraus — mitsamt der Herleitung, die auf dieser Seite keinen
+            Platz hat. <a href="/buch">Zum Buch</a>
+          </p>
+        </div>
+      </div>
+
+      <p class="prose" style="margin-top:40px;color:var(--text-2)">
+        Wenn Sie sich in einer der Stufen wiedererkennen: Schreiben Sie mir, in welcher
+        — das ist der schnellste Einstieg in ein sinnvolles erstes Gespräch.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/#kontakt">Projekt besprechen</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Thomas Zachmann</h4>
+        <p>
+          Freiberuflicher Platform Engineer.<br>
+          Enterprise-Plattformen für Kubernetes, Cloud und AI.
+        </p>
+      </div>
+      <div>
+        <h4>Seite</h4>
+        <ul>
+          <li><a href="/#profil">Profil</a></li>
+          <li><a href="/#schwerpunkte">Schwerpunkte</a></li>
+          <li><a href="/enterprise-ai">Enterprise AI</a></li>
+          <li><a href="/buch">Buch</a></li>
+          <li><a href="/#projekte">Projekte</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="mailto:thomas@zachmann.work">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-bottom">
+      © 2026 Thomas Zachmann · Ohlendiekskamp 54 · 22399 Hamburg
+    </p>
+    <p class="foot-tech">
+      <img src="img/kubernetes.svg" alt="" width="17" height="17" aria-hidden="true">
+      <span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in
+      Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux.
+      <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span>
+    </p>
+  </div>
+</footer>
+</body>
+</html>
