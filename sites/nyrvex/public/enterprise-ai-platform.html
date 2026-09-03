@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise AI Platform — a hands-on lab guide to GPU infrastructure and model serving</title>
+<meta name="description" content="386 pages, 17 chapters, 23 labs on a reference lab you can rebuild: GPUs under Kubernetes, vLLM, KServe, an AI gateway with identity and budgets, observability and cost. For platform engineers.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://nyrvex.com/enterprise-ai-platform">
+<meta property="og:title" content="Enterprise AI Platform — a hands-on lab guide to GPU infrastructure and model serving">
+<meta property="og:description" content="17 chapters, 23 labs. The platform underneath the models — written for the people who have to operate it.">
+<meta property="og:type" content="book">
+<meta property="og:url" content="https://nyrvex.com/enterprise-ai-platform">
+<meta property="og:image" content="https://nyrvex.com/img/enterprise-ai-platform.webp">
+<meta name="theme-color" content="#f5f1e8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f5f1e8'/><rect y='2' width='32' height='7' fill='%238c2f24'/><text x='16' y='26' font-family='Georgia,serif' font-size='17' fill='%231a1a18' text-anchor='middle'>N</text></svg>">
+
+<style>
+/* Palette und Haltung wie index.html: Umschlagfarben, Systemschriften,
+   keine Webfonts. Eigener Style-Block je Seite, wie im Schwesterprojekt. */
+:root{
+  --paper:#f5f1e8;
+  --ink:#1a1a18;
+  --ink-2:#4a4a45;
+  --ink-3:#8a8378;
+  --rule:#c9c0ad;
+  --accent:#8c2f24;
+  --measure:41rem;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;
+  font-size:18px;line-height:1.66;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.18}
+h1,h2,h3,p,li,dd,dt{overflow-wrap:break-word}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,36,.35)}
+a:hover{border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.label{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 1rem;
+}
+.wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:12px;z-index:10;background:var(--paper);padding:10px 16px;border:1px solid var(--rule)}
+
+.band{
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.6875rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
+  text-align:center;padding:11px 24px 10px;
+}
+.masthead{padding:38px 0 0;text-align:center}
+.masthead .name{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ink);
+}
+.masthead .name a{color:inherit;border:0}
+
+.rule{border:0;border-top:1px solid var(--rule);margin:56px auto;max-width:var(--measure)}
+
+/* ---------- Buchkopf ---------- */
+.head{padding:50px 0 0;text-align:center}
+.head .cover{
+  display:block;width:100%;max-width:320px;height:auto;margin:0 auto 36px;
+  border:1px solid var(--rule);
+}
+.head h1{font-size:clamp(1.8rem,4.6vw,2.5rem);margin-bottom:.4rem}
+.head .sub{color:var(--ink-2);font-style:italic;margin:0 0 1.5rem;font-size:1.0625rem}
+.head .meta{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 2rem;
+}
+.buy{margin-top:1.6rem}
+.btn{
+  display:inline-block;border:1px solid var(--accent);border-radius:2px;
+  background:var(--accent);color:var(--paper);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.875rem;font-weight:600;letter-spacing:.06em;padding:13px 26px;
+}
+.btn:hover{background:#75271e;border-color:#75271e}
+.btn-quiet{background:transparent;color:var(--accent);margin-left:.5rem}
+.btn-quiet:hover{background:rgba(140,47,36,.06);border-color:var(--accent);color:var(--accent)}
+.buy .note{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
+}
+
+/* ---------- Fliesstext ---------- */
+.prose{padding:8px 0}
+.prose p{color:var(--ink-2)}
+.prose h2{font-size:1.5rem;margin:0 0 1rem}
+
+/* ---------- Aufzaehlung der Labs ---------- */
+.does{margin:1.4rem 0 0;padding:0;list-style:none}
+.does li{
+  color:var(--ink-2);padding:.5rem 0 .5rem 1.5rem;position:relative;
+  border-bottom:1px solid var(--rule);
+}
+.does li:first-child{border-top:1px solid var(--rule)}
+.does li::before{
+  content:"—";position:absolute;left:0;color:var(--ink-3);
+}
+.does li strong{color:var(--ink);font-weight:400;font-style:italic}
+
+/* ---------- Inhaltsverzeichnis ----------
+   Book One listet 24 Kapiteltitel. Hier stehen die sechs Teile statt der
+   siebzehn Kapitel: das Buch ist nach Teilen gegliedert, und eine Liste
+   aus siebzehn Zeilen sagt weniger als sechs mit je einem Satz. */
+.toc{margin:1.4rem 0 0;padding:0;list-style:none}
+.toc li{display:flex;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+.toc li span{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);flex:none;width:2.2rem;text-align:right;
+  padding-top:.25rem;
+}
+.toc li strong{color:var(--ink);font-weight:400;display:block}
+.toc li em{font-style:normal;font-size:.9375rem}
+.toc-note{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);margin:1rem 0 0;
+}
+
+footer{
+  border-top:1px solid var(--rule);margin-top:66px;padding:30px 0 46px;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.8125rem;color:var(--ink-3);text-align:center;
+}
+footer a{color:var(--ink-3);border-bottom-color:rgba(138,131,120,.4)}
+footer a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+footer .links{margin:0 0 .6rem}
+footer .links a{margin:0 .55rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="band">In Practice · Book Two</div>
+
+<div class="masthead">
+  <p class="name"><a href="/">Nyrvex</a></p>
+</div>
+
+<main id="main">
+
+  <section class="head">
+    <div class="wrap">
+      <img class="cover" src="img/enterprise-ai-platform.webp" width="720" height="1029"
+           alt="Cover of Enterprise AI Platform by Thomas Zachmann">
+      <h1>Enterprise AI Platform</h1>
+      <p class="sub">Lab Guide — GPU Infrastructure, Model Serving and Operations</p>
+      <p class="meta">386 pages · 17 chapters · 23 labs · 4 appendices · PDF and EPUB</p>
+      <div class="buy">
+        <a class="btn" href="https://leanpub.com/enterprise-ai-platform" rel="noopener">Buy on Leanpub</a>
+        <a class="btn btn-quiet" href="https://leanpub.com/enterprise-ai-platform#sample" rel="noopener">Read a sample</a>
+        <p class="note">PDF and EPUB · free updates for every future edition</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Why this book</p>
+      <h2>Somewhere there is a server with two GPUs</h2>
+      <p>
+        Developers have long been using ChatGPT and Claude, often through private
+        accounts. Business units have built proofs of concept that nobody operates.
+        The data protection officer has questions. Procurement has seen an invoice
+        that nobody can attribute to a team. And somewhere there is a server with
+        two GPUs for which no operational process exists.
+      </p>
+      <p>
+        Whoever is to turn that into an operable platform needs different knowledge
+        from the data scientist who picks the models, and different knowledge from
+        the application developer who calls an API: GPUs in the cluster, the
+        mechanics of inference servers, access control on models, cost attribution —
+        and the question of which data may reach which model.
+      </p>
+      <p>
+        The book builds that platform piece by piece on a reference lab you can
+        rebuild: one NVIDIA GPU with 24 GiB, passed through to a virtual machine,
+        RKE2 across several nodes. Every lab names its prerequisite and its expected
+        output, so you can tell whether it worked — and how you notice when it did
+        not. Where the hardware runs out, the book says so instead of pretending:
+        the tensor parallelism measurement in Chapter 9 rents a two-GPU instance by
+        the hour, one to three euros for the whole series.
+      </p>
+    </div>
+  </section>
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">What you will operate</p>
+      <ul class="does">
+        <li><strong>vLLM</strong> — batching, prefix caching, chunked prefill,
+          preemption and the KV cache made visible through the scheduler's own
+          metrics; engine arguments set from a calculation instead of by guessing</li>
+        <li><strong>KServe</strong> — ServingRuntime and InferenceService, canary
+          rollouts, autoscaling on the queue, scale-to-zero</li>
+        <li><strong>LiteLLM as the AI gateway</strong> — virtual keys, budgets,
+          rate limits, model allowlists bound to the data class, fallbacks, spend
+          logs per team</li>
+        <li><strong>NVIDIA GPU Operator, driver, Container Toolkit, DCGM Exporter</strong>
+          — from PCI passthrough to a GPU the scheduler can allocate; MIG and
+          time-slicing, including the memory isolation test that shows why one of
+          them is unsuitable for tenants</li>
+        <li><strong>Keycloak and OpenBao</strong> — OIDC claims down to team and
+          data class, and provider keys that no developer ever sees</li>
+        <li><strong>Prometheus and Grafana</strong> — the metrics that carry meaning
+          for inference, and the ones that mislead</li>
+        <li><strong>Argo CD and Harbor</strong> — moving a 20 GB model artefact
+          through a GitOps chain, with a rollback that takes minutes</li>
+        <li><strong>pgvector</strong> — a retrieval path with permission filtering
+          inside the query, and erasure you can demonstrate</li>
+      </ul>
+      <p style="margin-top:1.6rem">
+        Also covered: Ray, Qdrant, Milvus, PostgreSQL, Redis, External Secrets,
+        Proxmox VE and RKE2. Chapters 2 to 16 each end with a troubleshooting table;
+        every chapter ends with interview questions at senior level, and with what
+        separates a weak answer from a convincing one.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Contents</p>
+      <h2>Six parts, from the card to the reference architecture</h2>
+      <ul class="toc">
+        <li>
+          <span>I</span>
+          <div>
+            <strong>LLM Inference Fundamentals</strong>
+            <em>What actually happens on the card: prefill and decode, the KV cache,
+            the VRAM budget, batching as the central lever, model formats and
+            quantisation.</em>
+          </div>
+        </li>
+        <li>
+          <span>II</span>
+          <div>
+            <strong>GPU Infrastructure</strong>
+            <em>How a card becomes a platform resource: the NVIDIA software stack,
+            GPUs under Kubernetes, GPU sharing and multi-tenancy.</em>
+          </div>
+        </li>
+        <li>
+          <span>III</span>
+          <div>
+            <strong>Model Serving</strong>
+            <em>vLLM from its architecture into production, distributed inference,
+            KServe and the rest of the serving ecosystem.</em>
+          </div>
+        </li>
+        <li>
+          <span>IV</span>
+          <div>
+            <strong>The Enterprise Layer</strong>
+            <em>An AI gateway with LiteLLM, identity, authorisation and secrets,
+            AI security, governance and compliance.</em>
+          </div>
+        </li>
+        <li>
+          <span>V</span>
+          <div>
+            <strong>Operations</strong>
+            <em>Observability and FinOps, operating the retrieval path, model
+            lifecycle, GitOps and delivery.</em>
+          </div>
+        </li>
+        <li>
+          <span>VI</span>
+          <div>
+            <strong>Synthesis</strong>
+            <em>Reference architectures and capacity planning in three sizes, worked
+            through from under a hundred users to several thousand.</em>
+          </div>
+        </li>
+      </ul>
+      <p class="toc-note">
+        Four appendices follow, among them interview and whiteboard training, the
+        reference repository, a command and configuration reference, a glossary and
+        an index. Every chapter carries a version stamp naming what it was written
+        and checked against.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="prose">
+    <div class="wrap">
+      <p class="label">Who it is for</p>
+      <p>
+        Platform engineers who will be responsible for an AI platform rather than
+        for choosing models. The book assumes Kubernetes, GitOps, identity providers
+        and monitoring in production, and starts where those leave off. It is not a
+        Kubernetes book and not a machine learning book: no transformers, no
+        attention mathematics, no training and no finetuning.
+      </p>
+      <p>
+        The labs are there to make things measurable, not to be followed once and
+        used up. The aim is to make the derivations available: why the KV cache and
+        not the weights is the capacity bottleneck, why 100 percent GPU utilization
+        can mean nothing at all, why self-hosting pays off above a certain
+        utilization and not above a certain number of users.
+      </p>
+      <p class="toc-note" style="margin-bottom:0">
+        This is the English edition. The material first appeared as a German lab
+        guide, which the author still gives away on
+        <a href="https://thomaszachmann.de/buch">his own site</a>.
+      </p>
+      <div class="buy" style="text-align:center">
+        <a class="btn" href="https://leanpub.com/enterprise-ai-platform" rel="noopener">Buy on Leanpub</a>
+        <p class="note">
+          NVIDIA is a trademark of NVIDIA Corporation. All other product names are
+          trademarks of their respective owners. This book is an independent
+          publication and is not affiliated with, authorized by, sponsored by, or
+          otherwise approved by any of them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="/">All books</a>
+      <a href="/imprint">Impressum</a>
+      <a href="/privacy">Datenschutz</a>
+      <a href="mailto:thomas@zachmann.work">Contact</a>
+    </p>
+    <p>© 2026 Thomas Zachmann · Nyrvex</p>
+  </div>
+</footer>
+</body>
+</html>

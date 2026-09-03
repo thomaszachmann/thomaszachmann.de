@@ -8,7 +8,7 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://nyrvex.com/">
 <meta property="og:title" content="In Practice — hands-on lab guides for infrastructure engineers">
-<meta property="og:description" content="Lab guides that end in something running on your own machine. Book One: Vault in Practice.">
+<meta property="og:description" content="Lab guides that end in something running on your own machine. Vault in Practice and Enterprise AI Platform.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nyrvex.com/">
 <meta property="og:image" content="https://nyrvex.com/img/vault-in-practice.webp">
@@ -130,15 +130,6 @@ a:hover{border-bottom-color:var(--accent)}
   font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
 }
 
-/* ---------- Angekündigt ---------- */
-.forthcoming{opacity:.85}
-.forthcoming .cover-placeholder{
-  width:100%;max-width:200px;aspect-ratio:2250/2775;margin:0 auto 30px;
-  border:1px dashed var(--rule);display:flex;align-items:center;justify-content:center;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.6875rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);
-}
-
 /* ---------- Autor ---------- */
 .author p{color:var(--ink-2)}
 
@@ -224,12 +215,16 @@ footer .links a{margin:0 .55rem}
   <hr class="rule">
 
   <!-- ================= BOOK TWO ================= -->
-  <section class="book forthcoming">
+  <section class="book">
     <div class="wrap">
-      <p class="label">Book Two — in preparation</p>
-      <div class="cover-placeholder" aria-hidden="true">In Practice</div>
+      <p class="label">Book Two — available</p>
+      <a href="/enterprise-ai-platform" aria-label="Enterprise AI Platform">
+        <img class="cover" src="img/enterprise-ai-platform.webp" width="720" height="1029"
+             alt="Cover of Enterprise AI Platform by Thomas Zachmann">
+      </a>
       <h2>Enterprise AI Platform</h2>
-      <p class="sub">GPU infrastructure, model serving and running an AI platform in-house</p>
+      <p class="sub">Lab Guide — GPU Infrastructure, Model Serving and Operations</p>
+      <p class="meta">386 pages · 17 chapters · 23 labs · PDF and EPUB</p>
 
       <p>
         The platform underneath the models: GPUs under Kubernetes, inference
@@ -238,10 +233,18 @@ footer .links a{margin:0 .55rem}
         data scientists.
       </p>
       <p>
-        A German edition is finished and
-        <a href="https://thomaszachmann.de/buch">available free of charge</a>. The
-        English edition for this series is in preparation.
+        Twenty-three labs on a reference lab you can rebuild: one NVIDIA GPU passed
+        through to a virtual machine, RKE2 across several nodes. Every lab names its
+        prerequisite and its expected output, so you can tell whether it worked —
+        and how you notice when it did not.
       </p>
+
+      <div class="buy">
+        <a class="btn" href="https://leanpub.com/enterprise-ai-platform" rel="noopener">Buy on Leanpub</a>
+        <a class="btn btn-quiet" href="https://leanpub.com/enterprise-ai-platform#sample" rel="noopener">Read a sample</a>
+        <p class="note">PDF and EPUB · free updates for every future edition</p>
+        <p class="note"><a href="/enterprise-ai-platform">What is in the book</a></p>
+      </div>
     </div>
   </section>
 
