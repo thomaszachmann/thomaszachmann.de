@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nyrvex-de-tls
+  namespace: web-nyrvex-de
+spec:
+  secretName: nyrvex-de-tls
+  issuerRef:
+    kind: ClusterIssuer
+    # Eigenes Zertifikat statt weiterer SANs auf nyrvex-tls: die beiden Sites
+    # laufen in getrennten Namespaces, und ein Secret ist namespace-gebunden.
+    #
+    # ACHTUNG: Die DNS-01-Kette laeuft ueber denselben Cloudflare-Token wie
+    # nyrvex.com (Secret cloudflare-api-token in cert-manager). Der Token war
+    # am 2026-09-09 nur auf die Zonen nyrvex.com und thomaszachmann.de
+    # berechtigt - ohne Zone:DNS:Edit auch fuer nyrvex.de schlaegt die
+    # Challenge fehl. Im Fehlerfall hier auf letsencrypt-staging wechseln und
+    # erst nach erfolgreicher Probe zurueck: fuenf Ausstellungen pro Domain
+    # und Woche.
+    name: letsencrypt-prod
+  commonName: nyrvex.de
+  dnsNames:
+    - nyrvex.de
+    - www.nyrvex.de

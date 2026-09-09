@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - ../base/thomaszachmann
   - ../base/nyrvex
+  - ../base/nyrvex-de
 
 # Diesen Digest schreibt ausschliesslich GitHub Actions. Digest statt Tag, weil
 # ein Tag verschiebbar ist: so steht im Repo exakt das, was laeuft.
@@ -22,3 +23,9 @@ images:
     # Platzhalter aus Nullen wie beim ersten Eintrag: syntaktisch gueltig,
     # garantiert nicht existent. Der erste Pipeline-Lauf ersetzt ihn.
     digest: sha256:df2a412e63e29879310f04f4d820538d8a3bcb1476b9fa7902a34a7da6751f11
+  - name: ghcr.io/thomaszachmann/nyrvex-de
+    # Platzhalter aus Nullen: syntaktisch gueltig, garantiert nicht existent.
+    # Der erste Pipeline-Lauf fuer sites/nyrvex-de/ ersetzt ihn. Bis dahin
+    # kann der Pod das Image nicht ziehen - gewollt, denn nyrvex.de ist noch
+    # nicht ausgerollt.
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
