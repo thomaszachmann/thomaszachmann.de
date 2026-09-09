@@ -1,284 +1,630 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>In Practice — hands-on lab guides for infrastructure engineers</title>
-<meta name="description" content="In Practice is a series of hands-on lab guides for platform, infrastructure and security engineers. Every chapter ends in a lab that runs on your own machine.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://nyrvex.com/">
-<meta property="og:title" content="In Practice — hands-on lab guides for infrastructure engineers">
-<meta property="og:description" content="Lab guides that end in something running on your own machine. Vault in Practice and Enterprise AI Platform.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Between your applications and your GPUs, one layer is missing. nyrvex is a catalog of models, teams and environments that generates the configuration of gateway, serving layer, identity provider and secret store - and works out whether it fits before it rolls anything out.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="nyrvex - The control plane layer for AI infrastructure">
+<meta property="og:description" content="Six systems run an AI platform. A person holds the rest together, by hand, every day. nyrvex is that layer.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nyrvex.com/">
-<meta property="og:image" content="https://nyrvex.com/img/vault-in-practice.webp">
-<meta name="theme-color" content="#f5f1e8">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f5f1e8'/><rect y='2' width='32' height='7' fill='%238c2f24'/><text x='16' y='26' font-family='Georgia,serif' font-size='17' fill='%231a1a18' text-anchor='middle'>N</text></svg>">
-
+<link rel="canonical" href="https://nyrvex.com/">
+<link rel="alternate" hreflang="en" href="https://nyrvex.com/">
+<link rel="alternate" hreflang="de" href="https://nyrvex.de/">
+<link rel="alternate" hreflang="x-default" href="https://nyrvex.com/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:image" content="https://nyrvex.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>nyrvex — The control plane layer for AI infrastructure</title>
 <style>
-/* ============================================================
-   Nyrvex — Reihe "In Practice"
+/* Schriften lokal ausgeliefert — keine Verbindung zu Dritten */
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/archivo-400-700-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/archivo-400-700-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-400-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-600-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/source-serif-4-400-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/source-serif-4-400-600-latin.woff2') format('woff2');
+}
+</style>
+<style>
+  :root{
+    --paper:#f1f2ee;
+    --paper-2:#e6e8e1;
+    --line:#c6cabe;
+    --line-soft:#d8dbd2;
+    --ink:#0e1620;
+    --ink-2:#4d5763;
+    --ink-3:#7d8794;
+    --signal:#b24418;
+    --signal-wash:#f6e7e0;
+    --plate:#0e1620;
+    --plate-2:#18222f;
+    --plate-line:#2e3a49;
+    --plate-ink:#e8eaec;
+    --plate-ink-2:#9aa5b2;
+    --plate-signal:#e0673a;
+    --ok:#4f8a68;
+    --disp:"Archivo",Helvetica,Arial,sans-serif;
+    --serif:"Source Serif 4",Charter,Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#12181f;
+      --paper-2:#1a222b;
+      --line:#2c3742;
+      --line-soft:#242d37;
+      --ink:#e9ebee;
+      --ink-2:#a4aeba;
+      --ink-3:#75808d;
+      --signal:#e0673a;
+      --signal-wash:#2a1a13;
+      --plate:#080c12;
+      --plate-2:#111922;
+      --plate-line:#26313d;
+      --ok:#63b083;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12181f;--paper-2:#1a222b;--line:#2c3742;--line-soft:#242d37;
+    --ink:#e9ebee;--ink-2:#a4aeba;--ink-3:#75808d;
+    --signal:#e0673a;--signal-wash:#2a1a13;
+    --plate:#080c12;--plate-2:#111922;--plate-line:#26313d;--ok:#63b083;
+  }
 
-   Bewusst KEIN gemeinsames Design mit thomaszachmann.de. Die Palette
-   stammt aus den Umschlaegen selbst (front-cover.svg): cremefarbener
-   Grund, ein Oxblood-Band, Kupferstich-Motiv, leise Typografie.
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.63;-webkit-font-smoothing:antialiased}
+  a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 40%,transparent)}
+  a:hover{border-bottom-color:var(--signal)}
+  a:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
 
-   Ebenso bewusst KEINE Webfonts. Ein Verlagsauftritt mit vier Seiten
-   braucht keinen Ladezustand ohne Text und keinen Font-Request. Die
-   Serifenschrift kommt vom System — das laedt sofort, sieht auf jeder
-   Plattform nach Buch aus und ist datenschutzrechtlich ein Nichtthema.
-   ============================================================ */
-:root{
-  --paper:#f5f1e8;
-  --ink:#1a1a18;
-  --ink-2:#4a4a45;
-  --ink-3:#8a8378;
-  --rule:#c9c0ad;
-  --accent:#8c2f24;
-  --measure:41rem;
-}
+  .sheet{max-width:1060px;margin:0 auto;padding:0 28px}
+  .col{max-width:660px}
 
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;
-  font-size:18px;line-height:1.66;
-  -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3{margin:0;font-weight:400;line-height:1.18}
-h1,h2,h3,p,li{overflow-wrap:break-word}
-p{margin:0 0 1.15rem}
-a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,36,.35)}
-a:hover{border-bottom-color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  h1,h2,h3,.disp{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600}
+  h1{
+    font-size:clamp(2.116rem,1.248rem+3.1vw,3.418rem);line-height:1.06;
+    letter-spacing:-0.028em;font-variation-settings:"wdth" 116;font-weight:700;
+    margin:0 0 26px;text-wrap:balance;
+  }
+  h2{font-size:clamp(1.736rem,1.248rem+1.7vw,2.441rem);line-height:1.12;letter-spacing:-0.022em;margin:0 0 18px;text-wrap:balance}
+  p{margin:0 0 19px}
+  em{font-style:italic}
 
-/* Kleinkapitälchen-Label: das einzige Sans auf der Seite, wie auf dem Umschlag */
-.label{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.6875rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--ink-3);margin:0 0 1rem;
-}
+  /* ---------- Maßlinie ---------- */
+  .mass{display:flex;align-items:center;gap:16px;margin:0 0 30px}
+  .mass .lbl{font-family:var(--mono);font-size:0.759rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);white-space:nowrap}
+  .mass .rule{flex:1;height:7px;border-top:1px solid var(--line);border-left:1px solid var(--line);border-right:1px solid var(--line)}
 
-.wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
-.skip{position:absolute;left:-9999px}
-.skip:focus{left:16px;top:12px;z-index:10;background:var(--paper);padding:10px 16px;border:1px solid var(--rule)}
+  /* ---------- Kopf ---------- */
+  header.top{background:var(--plate);color:var(--plate-ink)}
+  .top .sheet{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px;flex-wrap:wrap}
+  .wordmark{font-family:var(--disp);font-variation-settings:"wdth" 120;font-weight:700;font-size:1.541rem;letter-spacing:-0.02em;color:var(--plate-ink);border:0}
+  .wordmark b{color:var(--plate-signal);font-weight:700}
+  .top nav{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:0.792rem;letter-spacing:.06em;text-transform:uppercase}
+  .top nav a{color:var(--plate-ink-2);border:0}
+  .top nav a:hover{color:var(--plate-signal)}
+  .lang{display:flex;gap:10px;align-items:center;padding-left:20px;margin-left:2px;border-left:1px solid var(--plate-line)}
+  .lang a{color:var(--plate-ink-2)}
+  .lang .on{color:var(--plate-signal);font-weight:600}
 
-/* ---------- Reihenband, direkt vom Umschlag ---------- */
-.band{
-  background:var(--accent);color:var(--paper);
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.6875rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
-  text-align:center;padding:11px 24px 10px;
-}
+  /* ---------- Platte (dunkel) ---------- */
+  .plate{background:var(--plate);color:var(--plate-ink)}
+  .plate .eyebrow{font-family:var(--mono);font-size:0.781rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 20px}
+  .plate h1{color:var(--plate-ink)}
+  .plate .lead{font-size:1.291rem;line-height:1.55;color:var(--plate-ink-2);max-width:620px}
+  .plate .lead b{color:var(--plate-ink);font-weight:600}
+  .claim{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:clamp(1.248rem,0.977rem+.9vw,1.627rem);color:var(--plate-signal);margin:26px 0 0;letter-spacing:-0.012em}
+  .hero{padding:60px 0 26px}
+  .masthead{font-family:var(--disp);font-variation-settings:"wdth" 125;font-weight:700;font-size:clamp(3.906rem,1.627rem+8.6vw,8.029rem);line-height:.86;letter-spacing:-0.045em;color:var(--plate-ink);margin:0 0 22px}
+  .masthead b{color:var(--plate-signal);font-weight:700}
+  .hero .stamp{margin-top:34px}
 
-/* ---------- Impressum-Zeile oben ---------- */
-.masthead{padding:38px 0 0;text-align:center}
-.masthead .name{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.75rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
-  color:var(--ink);
-}
-.masthead .name a{color:inherit;border:0}
+  .stamp{border:1px solid var(--plate-line);padding:13px 17px;display:inline-block;max-width:100%}
+  .stamp .k{font-family:var(--mono);font-size:0.684rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-ink-2);display:block;margin-bottom:6px}
+  .stamp .v{font-family:var(--mono);font-size:0.857rem;color:var(--plate-ink);line-height:1.75;display:block}
 
-/* ---------- Einleitung ---------- */
-.intro{padding:52px 0 8px;text-align:center}
-.intro h1{
-  font-size:clamp(1.9rem,5vw,2.7rem);letter-spacing:-.01em;
-  margin-bottom:1.1rem;text-wrap:balance;
-}
-.intro p{color:var(--ink-2);text-align:left}
-.intro .first{font-size:1.125rem}
+  /* ---------- Diagramm ---------- */
+  .diagram{padding:8px 0 74px}
+  .diagram figure{margin:0}
+  .diagram svg{display:block;width:100%;height:auto;overflow:visible}
+  .d-box{fill:none;stroke:var(--plate-line);stroke-width:1}
+  .d-fill{fill:var(--plate-2)}
+  .d-gap{fill:none;stroke:var(--plate-signal);stroke-width:1.5;stroke-dasharray:7 6}
+  .d-line{stroke:var(--plate-line);stroke-width:1}
+  .d-t{font-family:var(--mono);font-size:13px;fill:var(--plate-ink)}
+  .d-s{font-family:var(--mono);font-size:11.4px;fill:var(--plate-ink-2)}
+  .d-cap{font-family:var(--mono);font-size:11.4px;letter-spacing:.16em;fill:var(--plate-ink-2)}
+  .d-name{font-family:var(--disp);font-variation-settings:"wdth" 125;font-size:49.9px;font-weight:700;fill:var(--plate-signal)}
+  .d-sig{font-family:var(--mono);font-size:12.5px;fill:var(--plate-signal)}
+  @media (prefers-reduced-motion:no-preference){
+    .d-gap{stroke-dashoffset:340;animation:draw 1.4s .25s ease-out forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+  }
+  .diagram figcaption{font-family:var(--mono);font-size:0.792rem;color:var(--plate-ink-2);margin-top:22px;letter-spacing:.03em}
 
-/* ---------- Trennregel im Buchsatz ---------- */
-.rule{border:0;border-top:1px solid var(--rule);margin:60px auto;max-width:var(--measure)}
-.rule-mark{
-  text-align:center;color:var(--ink-3);letter-spacing:.7em;
-  margin:56px 0;font-size:.8rem;
-}
+  /* ---------- Abschnitte ---------- */
+  section{padding:74px 0}
+  section + section{border-top:1px solid var(--line-soft)}
 
-/* ---------- Ein Buch ---------- */
-.book{padding:8px 0}
-.book .cover{
-  display:block;width:100%;max-width:290px;height:auto;margin:0 auto 34px;
-  border:1px solid var(--rule);
-}
-.book h2{font-size:clamp(1.5rem,3.6vw,2rem);margin-bottom:.35rem;text-align:center}
-.book .sub{
-  text-align:center;color:var(--ink-2);font-style:italic;
-  margin:0 0 1.6rem;font-size:1.0625rem;
-}
-.book .meta{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--ink-3);text-align:center;margin:0 0 2rem;
-}
-.book p{color:var(--ink-2)}
-.buy{text-align:center;margin-top:2rem}
-.btn{
-  display:inline-block;border:1px solid var(--accent);border-radius:2px;
-  background:var(--accent);color:var(--paper);
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.875rem;font-weight:600;letter-spacing:.06em;
-  padding:13px 26px;
-}
-.btn:hover{background:#75271e;border-color:#75271e}
-.btn-quiet{background:transparent;color:var(--accent)}
-.btn-quiet:hover{background:rgba(140,47,36,.06);border-color:var(--accent);color:var(--accent)}
-.buy .note{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
-}
+  /* ---------- Randnotiz ---------- */
+  aside.note{font-family:var(--mono);font-size:0.814rem;line-height:1.6;color:var(--ink-3);border-left:2px solid var(--signal);padding-left:14px;margin:0 0 24px}
+  @media (min-width:1080px){
+    aside.note{float:right;clear:right;width:236px;margin:.35rem -292px 1.5rem 46px}
+  }
 
-/* ---------- Autor ---------- */
-.author p{color:var(--ink-2)}
+  /* ---------- Tabelle ---------- */
+  .tablewrap{overflow-x:auto;margin:26px 0 12px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:1.031rem}
+  th{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 18px 10px 0;border-bottom:1.5px solid var(--ink)}
+  td{padding:12px 18px 12px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.45}
+  td:last-child,th:last-child{padding-right:0}
+  td.n{font-family:var(--mono);font-size:0.868rem;color:var(--signal);font-weight:600;width:34px;padding-top:14px}
+  td.sys{font-family:var(--mono);font-size:0.879rem;color:var(--ink-2);white-space:nowrap}
+  .caption{font-family:var(--mono);font-size:0.803rem;color:var(--ink-3);margin:0 0 24px;letter-spacing:.02em}
 
-/* ---------- Fuss ---------- */
-footer{
-  border-top:1px solid var(--rule);margin-top:70px;padding:30px 0 46px;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.8125rem;color:var(--ink-3);text-align:center;
-}
-footer a{color:var(--ink-3);border-bottom-color:rgba(138,131,120,.4)}
-footer a:hover{color:var(--ink);border-bottom-color:var(--ink)}
-footer .links{margin:0 0 .6rem}
-footer .links a{margin:0 .55rem}
+  /* ---------- Zitatplatte ---------- */
+  .zitat{border-left:4px solid var(--signal);background:var(--signal-wash);padding:26px 28px;margin:4px 0 24px}
+  .zitat .k{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:12px}
+  .zitat p{margin:0;font-family:var(--disp);font-variation-settings:"wdth" 108;font-weight:500;font-size:1.541rem;line-height:1.24;letter-spacing:-0.015em;color:var(--ink)}
+  .zitat .cite{font-family:var(--mono);font-size:0.781rem;color:var(--ink-3);margin-top:14px;font-weight:400;letter-spacing:.02em}
+
+  /* ---------- Bausteine als Kreislauf ---------- */
+  .spine{position:relative;margin:30px 0 0;padding-left:38px}
+  .spine::before{content:"";position:absolute;left:5px;top:10px;bottom:44px;width:1px;background:var(--line)}
+  .bs{position:relative;padding:0 0 30px}
+  .bs::before{content:"";position:absolute;left:-38px;top:9px;width:11px;height:11px;border:2px solid var(--signal);background:var(--paper);border-radius:50%}
+  .bs h3{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600;font-size:1.28rem;letter-spacing:-0.01em;margin:0 0 2px}
+  .bs .was{font-family:var(--mono);font-size:0.803rem;color:var(--signal);letter-spacing:.09em;text-transform:uppercase;margin:0 0 9px}
+  .bs p{margin:0}
+  .loop{position:relative;font-family:var(--mono);font-size:0.814rem;color:var(--ink-3);padding-left:0;line-height:1.5}
+  .loop::before{content:"";position:absolute;left:-38px;top:2px;width:11px;height:11px;border:2px dashed var(--line);border-radius:50%;background:var(--paper)}
+
+  /* ---------- Buch ---------- */
+  .buch{display:grid;grid-template-columns:236px minmax(0,1fr);gap:46px;align-items:start}
+  .buch-cover img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+  .buch-text{max-width:600px}
+  .fakten{margin:26px 0 0;padding:0;border-top:1px solid var(--line-soft)}
+  .fakten div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+  .fakten dt{font-family:var(--mono);font-size:0.738rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+  .fakten dd{margin:0;font-size:1.052rem;line-height:1.5}
+  .btnrow{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin:28px 0 14px}
+  .btn{font-family:var(--mono);font-size:0.89rem;font-weight:600;letter-spacing:.05em;background:var(--signal);color:#fff;padding:14px 24px;border:0;display:inline-block}
+  .btn:hover{background:var(--ink);color:var(--paper);border:0}
+  @media (max-width:720px){.buch{grid-template-columns:1fr;gap:26px}.buch-cover{max-width:214px}}
+
+  /* ---------- Terminal ---------- */
+  code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1px 5px;border:1px solid var(--line-soft)}
+  .term{background:var(--plate);padding:26px 24px;margin:26px 0 12px;overflow-x:auto;border-left:4px solid var(--plate-signal)}
+  .term pre{margin:0;font-family:var(--mono);font-size:0.868rem;line-height:1.78;color:var(--plate-ink-2);font-variant-numeric:tabular-nums}
+  .term .cmd{color:var(--plate-ink);font-weight:500}
+  .term .pr{color:#5d6874}
+  .term .cm{color:#5d6874}
+  .term .ok{color:#5fbf8b;font-weight:500}
+  .term .wt{color:var(--plate-signal);font-weight:500}
+  .term .em{color:var(--plate-ink);font-weight:500}
+
+  /* ---------- Negativliste ---------- */
+  .nicht{margin:26px 0 0;padding:0;list-style:none}
+  .nicht li{padding:16px 0;border-top:1px solid var(--line-soft)}
+  .nicht li:last-child{border-bottom:1px solid var(--line-soft)}
+  .nicht b{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.107rem;display:block;margin-bottom:4px;letter-spacing:-0.008em}
+
+  /* ---------- Fragen ---------- */
+  .frage{padding:24px 0;border-top:1px solid var(--line-soft)}
+  .frage:first-of-type{border-top:1.5px solid var(--ink)}
+  .frage h3{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.389rem;letter-spacing:-0.015em;margin:0 0 7px}
+  .frage p{margin:0;color:var(--ink-2);font-size:1.107rem}
+  .kontakt{margin-top:36px;padding:26px 28px;border:1px solid var(--line);background:var(--paper-2)}
+  .kontakt p:last-child{margin-bottom:0}
+  .todo{font-family:var(--mono);font-size:0.781rem;background:var(--signal);color:#fff;padding:2px 7px;white-space:nowrap}
+
+  /* ---------- Fuß ---------- */
+  footer{background:var(--plate);color:var(--plate-ink-2)}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:34px;padding:56px 0 40px}
+  .fgrid h4{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 13px}
+  .fgrid ul{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:0.857rem;line-height:2.05}
+  .fgrid p{font-family:var(--mono);font-size:0.857rem;line-height:1.7;margin:0}
+  footer a{color:var(--plate-ink);border-bottom-color:#39434f}
+  footer a:hover{color:var(--plate-signal);border-bottom-color:var(--plate-signal)}
+  .fbot{border-top:1px solid var(--plate-line);font-family:var(--mono);font-size:0.803rem;color:#68727e;padding:20px 0 44px}
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
 
-<div class="band">In Practice</div>
+<header class="top">
+  <div class="sheet">
+    <a class="wordmark" href="/">nyrvex<b>.</b></a>
+    <nav>
+      <a href="#problem">Problem</a>
+      <a href="#thesis">Thesis</a>
+      <a href="#book">Book</a>
+      <a href="#parts">Parts</a>
+      <a href="#sizing">Sizing</a>
+      <a href="#status">Status</a>
+      <a href="#decisions">Decisions</a>
+      <span class="lang"><span class="on">EN</span><a href="https://nyrvex.de/">DE</a></span>
+    </nav>
+  </div>
+</header>
 
-<div class="masthead">
-  <p class="name"><a href="/">Nyrvex</a></p>
+<div class="plate">
+  <div class="sheet hero">
+    <p class="masthead">nyrvex<b>.</b></p>
+    <p class="eyebrow">Control plane for AI infrastructure</p>
+    <h1>Between your applications and your GPUs, one layer is missing.</h1>
+    <p class="lead">Six systems run an enterprise AI platform. Each one knows its own slice: the gateway knows the quotas, the serving layer knows the replicas, the identity provider knows the teams. <b>A person holds the rest together</b> — by hand, every day.</p>
+    <p class="claim">nyrvex is that layer.</p>
+    <div class="stamp">
+      <span class="k">Written against</span>
+      <span class="v">Kubernetes 1.31 · KServe 0.14 · vLLM 0.8.x · LiteLLM 1.6x</span>
+      <span class="v">September 2026 — an architecture, not a product</span>
+    </div>
+  </div>
+
+  <div class="sheet diagram">
+    <figure>
+      <svg viewBox="0 0 1000 430" role="img" aria-label="Layer diagram of an AI platform: applications on top, six tools below, and an empty layer in between that is filled in by hand today.">
+        <rect class="d-fill" x="40" y="16" width="920" height="42"/>
+        <rect class="d-box" x="40" y="16" width="920" height="42"/>
+        <text class="d-cap" x="60" y="42">APPLICATIONS · DEVELOPERS · BUSINESS UNITS</text>
+
+        <line class="d-line" x1="500" y1="58" x2="500" y2="88"/>
+
+        <rect class="d-gap" x="40" y="88" width="920" height="152"/>
+        <text class="d-name" x="66" y="152">nyrvex</text>
+        <text class="d-t" x="66" y="186">Catalog · Sizing · Reconcile · Accounting</text>
+        <text class="d-s" x="66" y="208">One catalog of models, teams and environments —</text>
+        <text class="d-s" x="66" y="226">everything below is generated from it, and kept in step.</text>
+        <text class="d-sig" x="934" y="118" text-anchor="end">this layer is missing</text>
+        <text class="d-s" x="934" y="138" text-anchor="end">today its work is done</text>
+        <text class="d-s" x="934" y="156" text-anchor="end">by a person, by hand</text>
+
+        <line class="d-line" x1="115" y1="240" x2="115" y2="272"/>
+        <line class="d-line" x1="268" y1="240" x2="268" y2="272"/>
+        <line class="d-line" x1="421" y1="240" x2="421" y2="272"/>
+        <line class="d-line" x1="574" y1="240" x2="574" y2="272"/>
+        <line class="d-line" x1="727" y1="240" x2="727" y2="272"/>
+        <line class="d-line" x1="880" y1="240" x2="880" y2="272"/>
+
+        <rect class="d-fill" x="40" y="272" width="150" height="58"/><rect class="d-box" x="40" y="272" width="150" height="58"/>
+        <text class="d-t" x="56" y="296">Keycloak</text><text class="d-s" x="56" y="315">identity</text>
+        <rect class="d-fill" x="193" y="272" width="150" height="58"/><rect class="d-box" x="193" y="272" width="150" height="58"/>
+        <text class="d-t" x="209" y="296">OpenBao</text><text class="d-s" x="209" y="315">secrets</text>
+        <rect class="d-fill" x="346" y="272" width="150" height="58"/><rect class="d-box" x="346" y="272" width="150" height="58"/>
+        <text class="d-t" x="362" y="296">LiteLLM</text><text class="d-s" x="362" y="315">gateway</text>
+        <rect class="d-fill" x="499" y="272" width="150" height="58"/><rect class="d-box" x="499" y="272" width="150" height="58"/>
+        <text class="d-t" x="515" y="296">KServe</text><text class="d-s" x="515" y="315">serving</text>
+        <rect class="d-fill" x="652" y="272" width="150" height="58"/><rect class="d-box" x="652" y="272" width="150" height="58"/>
+        <text class="d-t" x="668" y="296">vLLM</text><text class="d-s" x="668" y="315">inference</text>
+        <rect class="d-fill" x="805" y="272" width="155" height="58"/><rect class="d-box" x="805" y="272" width="155" height="58"/>
+        <text class="d-t" x="821" y="296">DCGM</text><text class="d-s" x="821" y="315">metrics</text>
+
+        <line class="d-line" x1="574" y1="330" x2="574" y2="358"/>
+        <line class="d-line" x1="727" y1="330" x2="727" y2="358"/>
+        <line class="d-line" x1="880" y1="330" x2="880" y2="358"/>
+
+        <rect class="d-box" x="40" y="358" width="920" height="42"/>
+        <text class="d-cap" x="60" y="384">KUBERNETES · NVIDIA GPU · VRAM</text>
+      </svg>
+      <figcaption>The target architecture of an enterprise AI platform — with the layer that does not exist yet.</figcaption>
+    </figure>
+  </div>
 </div>
 
-<main id="main">
+<main class="sheet">
 
-  <section class="intro">
-    <div class="wrap">
-      <h1>Lab guides that end in something running</h1>
-      <p class="first">
-        <em>In Practice</em> is a series of hands-on books for the people who
-        operate infrastructure rather than evaluate it. Every chapter closes with
-        a lab that runs on your own machine — no cloud account, no spare server —
-        and with the error messages you will actually meet, their causes and their
-        fixes.
-      </p>
-      <p>
-        The gap these books address is not conceptual. Engineers understand what a
-        tool does within an hour, then spend months learning what the defaults will
-        cost them and what happens at three in the morning. That second part is what
-        gets written down here.
-      </p>
+  <section id="problem">
+    <div class="mass"><span class="lbl">The problem</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>Seven decisions, six systems</h2>
+      <aside class="note">Each row is a chapter of its own in the Lab Guide. Nowhere is it a single operation.</aside>
+      <p>A single request passes seven stations. Something is decided at each one — and every one of those decisions rests on configuration that somebody entered by hand beforehand.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th style="width:23%">Station</th><th style="width:42%">What gets decided</th><th>Where it is configured</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td>Authentication</td><td>Who is this, and which team do they belong to?</td><td class="sys">Keycloak</td></tr>
+          <tr><td class="n">2</td><td>Quota check</td><td>Budget spent? RPM or TPM exceeded?</td><td class="sys">LiteLLM</td></tr>
+          <tr><td class="n">3</td><td>Content check</td><td>Does the prompt carry protected data?</td><td class="sys">gateway rules</td></tr>
+          <tr><td class="n">4</td><td>Model selection</td><td>May this user use this model for this data class?</td><td class="sys">LiteLLM · allowlist</td></tr>
+          <tr><td class="n">5</td><td>Serving</td><td>Which model revision, and is an instance running?</td><td class="sys">KServe</td></tr>
+          <tr><td class="n">6</td><td>Execution</td><td>Does the request fit the batch? Is there KV cache left?</td><td class="sys">vLLM arguments</td></tr>
+          <tr><td class="n">7</td><td>Accounting</td><td>How many tokens, at what cost, charged to which team?</td><td class="sys">LiteLLM · DCGM · cost centre</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <p class="caption">Six systems, six formats, six places.</p>
+      <p>No system sees more than its own slice. Raise a model's context length and you have to work out for yourself whether the quotas of the teams assigned to it still add up. Today that sum is done on a calculator, if it is done at all.</p>
     </div>
   </section>
 
-  <p class="rule-mark" aria-hidden="true">· · ·</p>
+  <section id="thesis">
+    <div class="mass"><span class="lbl">The thesis</span><span class="rule"></span></div>
+    <div class="col">
+      <p>An appendix of the <em>Enterprise AI Platform Lab Guide</em> lists what does not belong in the repository. One line reads:</p>
+      <div class="zitat">
+        <span class="k">Generated configuration</span>
+        <p>Is built from the catalog, not maintained.</p>
+        <p class="cite">Lab Guide, appendix B.5</p>
+      </div>
+      <p>In the book that is an instruction to the reader: write yourself a script. nyrvex is the answer to what happens when that “built” becomes a product — with state of its own, drift detection, a way back, and an interface.</p>
+      <p><strong>The catalog is the only truth. Everything else is generated from it.</strong></p>
+    </div>
+  </section>
 
-  <!-- ================= BOOK ONE ================= -->
-  <section class="book">
-    <div class="wrap">
-      <p class="label">Book One — available</p>
-      <a href="/vault-in-practice" aria-label="Vault in Practice">
-        <img class="cover" src="img/vault-in-practice.webp" width="720" height="889"
-             alt="Cover of Vault in Practice by Thomas Zachmann">
-      </a>
-      <h2>Vault in Practice</h2>
-      <p class="sub">A Hands-On Lab Guide to HashiCorp Vault and OpenBao</p>
-      <p class="meta">598 pages · 24 chapters · 24 labs · PDF and EPUB</p>
-
-      <p>
-        Follow a fictional logistics company from passwords-in-Git to a
-        production-shaped installation. Split an encryption key with Shamir and
-        then lose it on purpose. Write policies that fail, and find out why in one
-        command. Issue database credentials that did not exist until they were
-        asked for. Break a Raft cluster's quorum, and put it back together.
-      </p>
-      <p>
-        Five chapters ask you to destroy your own setup, because nobody who has
-        recovered a sealed cluster under pressure learned how from a reference
-        manual. The book covers the Vault Associate exam objectives in full and
-        ends with a practice exam.
-      </p>
-
-      <div class="buy">
-        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
-        <a class="btn btn-quiet" href="https://leanpub.com/vault-in-practice#sample" rel="noopener">Read a sample</a>
-        <p class="note">PDF and EPUB · free updates for every future edition</p>
-        <p class="note"><a href="/vault-in-practice">What is in the book</a></p>
+  <section id="book">
+    <div class="mass"><span class="lbl">Where it comes from</span><span class="rule"></span></div>
+    <div class="buch">
+      <div class="buch-cover">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAbgBuAAD/4QCARXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAABuAAAAAQAAAG4AAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAYygAwAEAAAAAQAAAjAAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/AABEIAjABjAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2wBDAAICAgICAgMCAgMFAwMDBQYFBQUFBggGBgYGBggKCAgICAgICgoKCgoKCgoMDAwMDAwODg4ODg8PDw8PDw8PDw//2wBDAQICAgQEBAcEBAcQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/3QAEABn/2gAMAwEAAhEDEQA/AP3uT7i/QU6mp9xfoKdQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABVO4++PpVyqdx98fSgD//0P3uT7i/QU6mp9xfoKdQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABVO4++PpVyqdx98fSgD//0f3uT7i/QU6mp9xfoKdQAUUUUAFFFFABRXOeJdW1nSLSOfRNGk1qV22tHHNHCVXH3sycH0rjv+E0+IH/AEIN1/4HW3+NaRpNq6/NGcqqTseqUV5Z/wAJp4//AOhBuv8AwOtv8aP+E08f/wDQg3X/AIHW3+NV7CXl96F7Zef3M9Toryz/AITTx/8A9CDdf+B1t/jR/wAJp4//AOhBuv8AwOtv8aPYS8vvQe2Xn9zPU6K8s/4TTx//ANCDdf8Agdbf40f8Jp4//wChBuv/AAOtv8aPYS8vvQe2Xn9zPU6K8s/4TTx//wBCDdf+B1t/jR/wmnj/AP6EG6/8Drb/ABo9hLy+9B7Zef3M9Toryz/hNPH/AP0IN1/4HW3+NH/CaeP/APoQbr/wOtv8aPYS8vvQe2Xn9zPU6K8s/wCE08f/APQg3X/gdbf40f8ACaeP/wDoQbr/AMDrb/Gj2EvL70Htl5/cz1OivLP+E08f/wDQg3X/AIHW3+NH/CaeP/8AoQbr/wADrb/Gj2EvL70Htl5/cz1OivLP+E08f/8AQg3X/gdbf40f8Jp4/wD+hBuv/A62/wAaPYS8vvQe2Xn9zPU6K8s/4TTx/wD9CDdf+B1t/jR/wmnj/wD6EG6/8Drb/Gj2EvL70Htl5/cz1OivLP8AhNPH/wD0IN1/4HW3+NH/AAmnj/8A6EG6/wDA62/xo9hLy+9B7Zef3M9Toryz/hNPH/8A0IN1/wCB1t/jR/wmnj//AKEG6/8AA62/xo9hLy+9B7Zef3M9Toryz/hNPH//AEIN1/4HW3+NH/CaeP8A/oQbr/wOtv8AGj2EvL70Htl5/cz1OivLP+E08f8A/Qg3X/gdbf40f8Jp4/8A+hBuv/A62/xo9hLy+9B7Zef3M9Toryz/AITTx/8A9CDdf+B1t/jR/wAJp4//AOhBuv8AwOtv8aPYS8vvQe2Xn9zPU6K8s/4TTx//ANCDdf8Agdbf40f8Jp4//wChBuv/AAOtv8aPYS8vvQe2Xn9zPU6K8s/4TTx//wBCDdf+B1t/jR/wmnj/AP6EG6/8Drb/ABo9hLy+9B7Zef3M9Toryz/hNPH/AP0IN1/4HW3+NH/CaeP/APoQbr/wOtv8aPYS8vvQe2Xn9zPU6K8uj8Z+PWkRZPAdyiswBY3ttwCeT17V6jUTg1uXGaewUUUVBQUUUUAFU7j74+lXKp3H3x9KAP/S/e5PuL9BTqan3F+gp1ABRRRQAUUUUAZWpatb6ZLYxXA/4/7gW6sSAFYxvJk59kI/GuTu/iLpEMfiD7LE1xN4fdI5IweZGfAyoUM2A2V+6SSDgGu3u7GyvkWO+t47hEYOqyorgMOhAYHBGetRy6Zp08bxT2sUscg2srRqysuc4IIwRkk49eetVzITMr/hJLc+GF8TrETE0KzCPcM/NwBnoOTye36Vmt42sYzpcbxiR9Uj3oYn3JkOqEAkKW5bPQcDpXXG1tWtvsZhQ25XZ5e0bNvptxjHtiqw0nSl+zBbOBRZ/wCoxEn7rt+74+X8MU7oNTkNS8e22npbyC0MizXN1A2ZAjKLSTy3ZQR8xJ5C8EjvnitzSfEK6tq2qabHAY10x1jMhLfOzIrnAKgAAMOjE+oFak2laXcGI3FnDKYXMke+NW2OxyWXI4Ynkkc5qaOys4biW7ht44558eZIqKHfHTcwGTj3pNqwFmiiipGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA/9P97k+4v0FOpqfcX6CnUAFFFFABRRRQAUV5V8cfHWp/DH4QeLviFo0MVxfeH9OnvIY5s+W7xLkBtpBx64NfkR4T/wCCiP7YPjuwk1TwV8LLPXbOF/Keays7yeNZAASpZHIzgg4rqo4SU4uSehzVcVGEuVrU/cyivi39kT42/Hn4xf8ACT/8Ls8Ef8Id/Zf2T7D/AKNcW/2jzfM83/Xk7tm1enTPNfaXtWNSnyuxtTnzR5rBRQcivCvD/wC0j8IPFfxavPgj4b1o6h4s06K4luoI4JBHB9lZVlV5WULuBcDAJzUqDd2huaTsz3WiijB9KkoKKKKEAUUUUAFFFfD/AO2B8a/2jvhHP4Zj+BfgUeK4NSdxeTNbTXfluCAkWyBlMe8c+Y2VFaU6bk7XM6lRRVz7gorD8MXur6n4d0zUNfsf7N1K5topLm13b/ImdAXj3DrtORmtzmosaBRRRgjrSuAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA//U/e5PuL9BTqan3F+gp1ABRRRQAUUUUAfOv7XP/JsfxN/7Ad3/AOgV+Jv7HX7cem/szfD3U/Bl54RvPED3+oNeia3lWNVDRomwggnPy5r9sv2uf+TY/ib/ANgO7/8AQK/I39g39rD4C/Aj4Xav4X+KZn/tK81R7qLy7L7SPJaJFHzduQeK9fBxvQl7t9djysVK1ZPmtofo18Ov2qJv2gf2cfiR8TPDmkXXhS78NwX9tD5siySCaKzWdZVIGBguAOOor87/AIA+Kf26/wBrHwDe+HPB/jtdG0/QLhnutZuJDDd3Us6gx2wkhQsFQAnKgdRknpX6EwftM/Bv4/8AwX+K9n8JnnP9iaBdyXQltDaj/SIJVQj+8f3Zz6cV8/f8EjefhP40/wCwvF/6TrRG9OnN8tnf7hyXPUiua6secfsa/GD9ovxZrfxT/Zy8V+J57vxNY6bdjTL28l82Sx1CB2hf98VZimSCMhsYyK+N/hN8Of2kdc/aq8UeC/A3jGLTPiVZrqJv9WaTCT+VJGtxhvKbO9ipHyDp2r7A/Y2/5SE/FwD/AJ6az/6V15p8N/ij4N+Bn/BRb4heKfibenR9Kml1i1ado3cI9xJHJEWVAzYYJ1x3Fdkm1KooLomclk4wcn1PoT9qP9or48fB3w78Of2c/DOsJcfEvW7OEarrCFZGMksnlRrCzqArOeS5ThegzyPGfiq37ZX7F0Ph/wCKniH4rjxtpt5eJBeWBuJLmPcVMhiZJx911VgHTaQRXM/8FBF8K+LPix8Ofjuvn6v8OPFtlbq1zbhoWkjtpis0aFlykhTkZGfau6uPhH/wSuks7GWPxzqVy+pSRQxwRX8rTK05CDzE8jMYBb5i2AKiCUYR0330Lndzlrbtqel/txftO/FPwLrvwg8U/CrVp7C08Q2H26TT12+VdO7IUjlBBJHzbeCK7fwP4T/bI8A+CPif8XfjX408433hu4utNs7a58wWF4cyAiLyxGhRMAbc++eteAf8FLdI0vw/46+COh6KNun6fbpBb87v3UdxEqc98gDnvX6qftA/8m3+OP8AsXrn/wBEVzynaFNJb/5nRGF5Tbe3+R+R3wJvv26P2vPAEyeGfiSNA0vwxK0D3kkjQ3d/dSDzQjSQJuwikAchR3ya92/YB/aJ+L2q/EvxZ+zv8Z9Tk1nUtDiuJba4uGElxFJaSCOeJpcAyL8wZS2T74ryb/gnX+058E/gl8I/FOjfErxGmkai2pG9it2ild5ovJRf3exSGYspGM5/Cp/+CflnqnxV/ar+JHx/trSS30J0v1R2GF83UJVZI892WNMsB0zW2Ii7VFNWXQxoSV4OLu+p5z8Mvix+218fPGPjL4PfDbxi4KXktxLqF3KsLWVrDKyCKORIyyhzj7oLHHUDNe2/ti+P/wBoj9nL4N/BjQB44u4PFU63cOtXttKJftcsaoQS8iZYDdwSAa5z/gmX/wAnF/Fb/rhL/wClj11n/BXrjTvhb/193/8A6BFVSd8SoW0/4AlH9w531/4Jsft9/tGfFfwBofw28EeB9dk8OnxPYw3V/qifLKchEx5gBKKCS7lRur0z9mn4OftQ6B420HxhqHxztfiD4BnV3vIobh7sS5T92qNMrnG4jJV1Ix07V1f7R15+ybr3gbwN8Nf2lNTGlXF/p0N1p12m9JbYpCiswmRXCBs4w42tj1Ar82/gTdWnwd/bT8O+B/2bPG9x4x8IazcRR3RXPkSwyKxmSVVAjZogARKAMdM9axprmo2StZdtzWUrVbt3+ex9FfF745/tA/tG/tN6p+zt8CPE6+C9F0BpY7i+VvJdzbACaWSVQXwHO1EQjPU1F8Nfij+0X+zN+1J4c+BPxc8af8J9oHi0wpHO8jTlPtJKRyRvIPNVlcYZWJBHIr5T8U/D34R+Fv21fGnhD9pt73TfDGpXlzcW97bSNFs+0kSwSsyoxMbAlWIHB69K+2fgx8IP+CdsPxr8L2nws8V3uueLraU31igvnntvMthvCuxiVCx6hQ2TitavLGFktLdv1MqfNKV29b9/0P176HFFFFeAj2wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACqdx98fSrlU7j74+lAH/9X97k+4v0FOpqfcX6CnUAFFFFABRRRQBieJPDmh+L9Bv/C/iazTUdK1SFoLm3lzslicYZWwQcH6186f8MSfsof9Ez0r8pf/AI5X1NX5ef8ABQv9rvx78AtQ8LeDvhRfw2euX8c17evLAlxttgdkShXBA3MHJPXAFdGGpznLkgznxE4QjzSR9ueDP2d/gl8O9O1vSfBPg+y0iz8SQC21GOEPtuYQGAR9zHjDt0x1rofhv8I/hr8INOutI+Gfh+28PWd7IJpo7bdteQKFDHcW5wMVS+CPxJsfi98J/C3xHsSCut2UU0ij+CbGJVIHQhweO1fBXxS/ap+L/hX9ufw/8B9HvbZPCeoz6fHLE1sjSlbiDzJMSn5hlvyp06U5uUb7ahOrCKi7bn3n4Y+B/wAJfBnjTUviJ4W8MWmm+JNXMpu76IP5sxnbfJuyxHzNyeK4/wCIv7Kf7PnxX8Sf8Jf4+8GWmqawyqr3BaSJpVThRJ5bKGwOMkZxxmvoU9a/KH9v/wDao+OHwQ+JHhXwR8JdQt7CPW7ATOZLWOeRp2nMSgGUEAYA4xRhoTqTtF6ixEoQjeSP0Qu/gv8ACnUPh/b/AArvvC1jceErRAkOnPHmGIAkjZk7lOSTuBzyea8p8M/sU/sueEdXh13Rvh9Y/bbdxJG05kuFRgcghJXZOPcGvzW8Y/tC/wDBSX9n6wtvGnxY0211Dw+ZEWRpbS2eAb+iySWm1oy3QEnrX1l8SP2ydU1v9jN/2iPhME0rVxc29rLBcotwLefzhHPGQcBh/dbuDmuj6rUVlGV0+zMfrNN3vHVH2L4++Bvwk+KV/pep/EHwvaa5daKMWck4bMA3BsJtZR1ANZP7RduzfAHx9a2kZY/2HeIiICScREAADmuf/ZN+JHin4t/AHwp8QfGc0c+s6vFK87xRiJCVkZRhF4HAr6MaPcCrLkHqDyDXHdxlZ9DqspR9T8QP+Cef7Lvwf+Lnwo1zV/i54OXUdSs9XMUElwZ4JBD5KNtwrJlck9q/ZLwV4D8GfDjw9B4U8C6Pb6JpNtnZb2ybVy3Uk9WY9yxJqx4o8Q6F4E8L6r4s1n/RtM0e3ku7loo9xWOJdzEIgyxwOgGa8r/Z/wD2hvBf7R/hzU/FfgO3u4dN068Nnvu0EbSsFDblUEkLz/Fg+1bVqk6l6j2M6UIQtDqdF4D+Bnwj+GGt6j4j8AeF7TRNT1YEXU8AffMGYuQ25iPvEngVY+JPwX+FnxgSwj+Jvhu18QrpbO9qLncfKaQAMV2svUAV+f37Zf7Wnxo8FfGbQP2fPgFDBF4h1RLYvPNEk0jzXZxDFGJf3arjlmYH8AOfrL9l4/tN/wDCN6wn7T32T+2I7pUsharDg2/lgszNAdhJbIxjjFFSjKMVNy3+8IVoyk4Jbfcd38RP2fPgv8WLOxsfiD4SstYTTYxDavIrLLDGowEWRCr7R2BJFUvhf+zb8D/gzezap8N/CNpo9/OpRrkb5Z9h6qHkZioPcLjPevcdppK5+eVrXN+WO9jyL4ofAX4P/GeOBPib4WtNce1BEMsgZJkB7CSMq+PYnFYvw2/Zk+A3wi1D+1/h94MsdL1HGBdYaadR/svKWK/VcGveMHrRg0c8rWvoHLG97aiUUuD0oxioKuJRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP/9b97k+4v0FOpqfcX6CnUAFFFFABRRRQAjMqKXc7VUEknsB1r8EfB3hmX9tH9sD4teI55BLoekaXqVhZSNgoPMjexswue7fPID/s5r9S/wBs34sr8G/2dvFfie3n8jUr2D+zbA5w32q8BjUr7om+T/gNflB+zB/wTy174u/CbTPihd+Orzwk+vmR4re2iLb7dGKxyMwdc7sEgdq9TBpQpucna+iPNxXNOagle2p9Ff8ABKX4l3H/AAjvi74D66+y/wDDV019bRMckQyv5dwg9kmG4/79eR/HX/lKZ4R/6+tI/wDSSvKPDXhbV/2EP24vDGi6rqr6lo+qNbwveyL5X2my1M+U7suTzHL156rmvVvjqy/8PTPCGGBBudHxg9R9krrcF7Sc47SizmU5ezjCW6Z+61fg5/wVRvYdN+P/AMO9RuM+VaaZHK+Bk7Y7tmOB64FfvHX4Q/8ABUiKC4/aI+GttcqskUunxI6NyGVrwggg9iK4ctt7XXsztzFP2enc3v2t/wDgoN8Kviz8GdR+FHwvsL/Ub/xCsEEs1zbmFIER0c7UOWdyVAXAwOvpWLr3wl8VfCT/AIJlapY+M7V7DVNb1i21JrWT/WQRTTqI1cdmKgEjqM1+vXhX4CfBPwjdQax4a8C6Np1+gVluIrGESqcdVfaSPwIr5x/4KRW9xP8AsneJWgjaQQ3NjI+ATtRZ1yx9hnk1rRxMeeEIKyvcyrYaSjKcnd2I/wBjrRdY8R/sMeHNC8PanJo2qX2mXkVrexHD28zSPscEAkYbGcc46V8E/Fz9mHxR4G8J614t8SftMJf+MdIge5/s99QZZJpY+WRC0/m7jztGzriq3gH9puO9/YS1T4MfCmbULbx94X00z3jwx7Qtg14qzvDKrbs+W/OACBmvnj4daz+yhd/Aq98P6h4I1bxd8atSju0hkAllSOU7mSaMpKoCRxjc25GJYHtXTSpTjJvz2OatVjJJW6H1F4Z1L4vftP8A7CWqavq/jKezvfh/e35urh2kMuo2MVqrrBMyEbz8xBL5yMZzXC/sAfs8/Ev4j2Fp8SPC/j+fw9omha3F9q0uN51S68rZI2QhCHcvHI+te2fsP2MurfsC/FzSNNQz38k2sKI15dibKMqABzk4OBXm/wDwTt/a0+F/wa8J3Pwr8bpexavrutQ/ZGhhEkX+kBIv3jFgU2N97g8UTnPkmqfR/gOEY88JT6o8B+LnwM+IOkftmaZ8KL7xvNd+IdaubR7bWS8xktRdlmiAJO8eUOBg/Svqj9pnx/8AG39njwF4E/ZP8N+L59V8V+ITLNfa0kkguZIrm58uCFJZCXTJPznOdowOKZ8f2X/h6Z4HGR/rdE/9ANdB/wAFOfBPinwz8SvAP7Qmj2T3ml6N5VvdMoLLFNb3HnR7z/CsikqD0zVKrzTgpdr/ADE6dozce/4Hk/xp/Zv+P/7HfgzSvjr4d+KV7qN/BcwRajEHlCRPN0++7CaMuNrBlGc9K+gP2pfj94l+IX7C3g34t+HtQn0LVtWvrVLtrKV4SJk3pMqshB2llJxXkv7Yf7c3wx/aC+CNn8MPhrZajca9rl3aS3MMsG3yPKO4xqVZi7s+Au0citH9o74a6v8ACT/gnN4D8GeIk8jU4tRguLmInmKW5MkpQ+67sH3qYJ3p+1+K7+4cnG0/Z/DY9C/Zh+B37RfxM1fwR+1F8R/iEZtOSHz4tJE0+WtIYniiBCnywWIDkHJPU818y/s4aT+0f+07q/j34SaV8S7zQ/DlpePe39xLLLNcNmR4YreNtwYRHBZlBA45zwK/Xr9kEg/sneAT/wBQX/4uvzy/4JVkH4p/F7B7xf8ApXLWKxD5aku1rfebyoR5oR73ufOPwO0/9pjV/ir4o/Y+8PfEG40q1nuLhNQvWlklaKKxJLtbktvQyjAYKRkHBPWvUvgHL8Uv2ZP25rT4F6v4rudf0vUmFvOJJJGhniuYvNhl8t2bbIpHUe4zg1037MpU/wDBTLx6uQfn1n/2WpfieR/w9f8ADgzzu0z/ANJmroqTvKcenLf5nNTppKMut7H7hdhRS+n0FJXzx7oUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP/1/3uT7i/QU6mp9xfoKdQAUUUUAFFFFAGB4i8KeFvF9mmneLNGstbtY38xIb62iuY1cDG4LKrANgkZAzWlp2m6do9hBpekWsVjZWqCOGCCNYoo0XoqIgCqB2AGKu0U7gcl4g8AeBPFt3Bf+K/Dem61c2y7Ypb2zguZI1zuwjSoxUZ5wD15pLj4f8AgK812HxRd+GtMn1q32eVfSWUDXUfljam2YpvG0cDB4HArrqKLisgrktf8A+BfFV7Bqfijw5pusXlqAsM15Zw3EsYB3AI8iMygHng9ea62ikMAABgdBVHU9L0zWtPuNJ1m0ivrK7QxzQToskUiNwVdGBBB9DV6igDzfwj8HfhT4BluLjwX4R0vRprpTHLJbWkaO6N1QtjdtPdc4PpVvQfhX8MvCuoz6v4Z8J6VpV9dBllntbKCGR1b7ylkQHB7joe9d7RVOTFZHO+HvCHhPwjbT2fhTRbHRYLlzJLHY20VskjkY3MsSqGOO55ribT4D/BWx19vFNp4F0aLVnfzftIsYd4kznePlwGzzkAHPNesUUuZhZHKXngTwPqOvxeK9Q8O6dc63Bs8u/ls4Xu08v7m2ZkMg29sNx2re1HTNO1ixn0zV7SK+s7ldksM8ayxSKeqsjAqw9iKu0UXGeT+G/gT8GPCGrjX/DHgjSNM1JSStxBZxLIhPdGx8h/3cV3niDwv4a8WWI0vxVpFnrNmHEggvbeO5i3r0bZKrLkdjjNblFDk3qxJaWKGm6VpejadDo+kWcNjYWyeXFbwRrFDGn91UQBVHsBWL4f8DeCfCdxc3fhXw/p2jT3mPPksrSG2eXBJG9okUtySec811NFK4WOUsPAfgfS9dm8UaZ4d02z1m43GW+hs4Y7qTf97dMqBzu75bnvRP4E8D3XiGPxdc+HdOm12Lbsv3s4Wu12DC4nKeYMDgYbgV1dFO47BRRRSAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACqdx98fSrlU7j74+lAH//0P3uT7i/QU6mp9xfoKdQAUUUUAFFFFABRRRkUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA//9H97k+4v0FOpqfcX6CnUAFFFFABRRRQBwHxF1S90rSLSS3un0+3nvIYbu8jA321uwYlwWDKuXCJuYELv3EcV5LYa/468Rak83hi7vZLOygt23TSW7wsm1/NLhYw0sj4+QoQM4JGMg/Qur6vpGh2TX+t3UdnaghS8rbVy3Qe5Nc2PiB4Ot1D3mp21pFJIUgd5k2zAKrbk2k4GHXrjqPUVrF6bENK+5yvg7xtea9qaNZO+sWqabpiz+TsCxXkrzfaC5O35goQsvUccc1yen/ErxlFpumRvbQXbTW8Hmzzb1lM1z9p2NsRdu1DCNw4J3cV7B/wm/gqKea0/tm0SWCVIZE8wZEshKquO5JUgY7g1FJ4y0lfE7eEIYpJdRQxlkUL8sToWMpyeEXhSf7xAGaav2JfqeM2fxO8XeHPCElzrhtru7t4rfZJMZS1xcXELXBUlY0VQB8q8deOT10p/ix4im1O3toI7C0iF/aRyeY0kg+y3EMj/M6jakhkXaFPI4zw2a9F1Dx9plt4a0rxHFZTXaay8McECGNZN0ys67i7KowEPf6U3SviV4Q1PTDrE1wNPtf3OXucRrulXcBnJGRjk9PQ45qr+Q/K5wo+LWrLp8Cala21vfalb209skbSElLmVo2wGXJMQGT2z7Vh2vxe8VR2umXl5BbQxLZ3bXMFz5i3Ty26QMh+VdgLLIXwMgryDxXpV78XvhtZrKz6vE8lul2xQBt2LL/XAZAGR29e1aNl8RvBN1Z/arrU7azkjgE80MsyF4UOPvlSV43DOCeopW/ukpa/EYGg/EqbXNdNui2kOkI1yv2lpGzLsnaCHyjjYS5APX6ZrjrzxV8TI5bjywDpy6+8a3SqpcWqXBhNrsI+8cZD4+6euRmvVX8bfD25vU0aTWLKS581FWEyAt5gb5Rj1DfrV7U/GXhvQbye01y9g04QKjb5pUUNvDHpncMBSSSAO/Y0k+yKcdNzwrU/jR4jn8P3TWkNlaXEkMrx3QeQxW7iFnED7k/4+ARgLjBNacvxR8SXH2yBo4rCDTpbJJJt4+0APPEjmSNhgJKrEggcCvXJfGfhg6FL4g0+5j1GyimjhZrch8SSyJGAenOZAfpzUc3jnwhZ3txY6pfQ2M0dx9mCzsEMjrs5X1GXAye9NNdgt5nn/jXxjqPhXxq0hvZb63+ys8GnWkkYZZUid/38RRpGR8ZDqw24wR6waf8AFDxjfWUV5BpdjOiQXF1I0UzsskMDqv7vaDh8Ekqx7YHWvQrD4jeANShtby11q2K3jyRxF22MzROUcYbB4YEc9as23jzwNPPBa2mt2jy3IZokWUfMACSQPTCk/gaL6bDt1ueaP8RfFU9/E2m6eiPqVus0Ed08gjSEieRGZUj3CRljXcMkcgcY50fDPxUvte8V2OhTWtvbxXkbkxF3+1IY4Em37Su3y2L7VOc8V1TfE/wJ9ttLVdWt2S8V9kwceVvjZF2E9mPmDA7iq0OvfC+48UreRaraS62c265uGZlzkFVQsUUnaQSACcEZpfIlN9zkpPi1qt3cw6Zo9jbPfPL5MgkeTZBJ50seH2rnO2Pdj39Kr6J8TNf8R+KNB09xBp8UzJ9otgXaeQPb+bvAZQoh3cKcgkivSf8AhYXgBYkuP7dshHLIY1bzQAXXAI/DI/Ouz2Rt8wAOeh9qTfkVy36nyl/wszxXpHizXXeeW+tLSa6iEMjxvDEBNGiO6xoskKRqxJLM2/t6jqtO+Jvja61Fba5t9ND3n2AQQrJI7BblmWSXeoIeMbeMdCcGvoQxoc5A+br7/Wjy0HQD0pua7AqfmfNs3xU8UC2XTLK0RZW06a5Ms837/OZwHjG1Q4j8sZG3PP5+o/DTxVqXivQWutTEMklu0cf2i2ZmhnzEjsylgOQzFW4wGBr0AxRk7iOaeqqg2qMD0qJSVthqLWtxaKKKgoKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKp3H3x9KuVTuPvj6UAf//S/e5PuL9BTqan3F+gp1ABRRRQAUUUUAcn4w8I2XjGxtrO8mkt2s7hbmKSM8rIqOnI4yCrsCM965d/hLoLxTwrczRrcW9xbkIEVVW5WBW2jHGPIXA6cn2x6pRVKbRPKtzy7R/hRoei3sV5bXErfZ7oXMIbGUwZD5e7klMyE44ran8CabJ4qPjKC4lt9SYxhmTbhoY1KmFsjJR+GIPRgCMV29FPnYKKPN2+FnheXTNK0yeNpk0t7d9z8mf7MjoiyDpj5yTgDmqfiP4Vad4gNzEmo3OnWl0gje2ttiQ7RF5IGABwF+6OgPbmvVKKSmx8qPMbn4Y2lyjQHVbpbdxep5YCcR3wTeoO3PysgZT1B46VFP8ACnSrnUjfzX9yYxPJdJCNm1JpnjeRg23cQTGOD0yfavU6KOdi5UedXHw10i5llme6nUzSTysAVwGuLlLlgOOgZAB7e9Sa78OdJ8Qavcazd3M8ctzbSWrKhXaEkieIkZHXDk/WvQaKOdhyo4ObwBps2j6po/2mZF1OWGcyLt3RyQLEIyvGODCpwc55HSqH/CsrCUXct9qFxc3V9HKk0xCKWMzIxIULgY2KAOmK9LooUmNxR46Pg1ovnwzTahcT+VDJb7ZApUxPK8yjAAG5Hc7WIJ6elbN18MNDvLGTT7i4uGilgtbduVBKWilV5x1O7n9K9Jop+0l3FyI8ltvhBoVvYLYm7nbEBtzIAodk3RMpYkHJUQqoPpnjpVw/CrQXgW2lubhox5YIyoJEbyvjIHcysD9B3r06ilzvuHIux5NYfCHQrHTv7PF3O/8Ao09oZMKHaOZQvzEg5KhQB29q9Tt4Vt7eK3UkrEioCeuFGKmopOTe40ktgooopDCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKp3H3x9KuVTuPvj6UAf/9P97k+4v0FOpqfcX6CnUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA//9T97k+4v0FOpqfcX6CnUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA//9X97k+4v0FOpqfcX6CnUAFFFFABRRRQBnalqtnpSQveMVFxKsEeBuLSOCVH44pLfV7C6uJrWKTEkD+W+4YAckgLk9+MgemDVq4tbW7QR3cSzKp3AOAQDgjIz3wTTltrdHeRYlDysGY7RlmUYBPuAODT0FqZH/CR6WLeG6d2jiuZlt4iy43uxwNvt70k/iTS7a2e8uGeOFHePeUOGMYJJX1Hynmr/wDZWmbfL+yRbdxfGwY3HqcetP8A7O0/a6/Zo8SMzONowzMMEn3IJzT0CzIbLVrPULm5tbbcXtdm/KkDMihxgnrwRmn3+p2mnWUmoXDEwxEA7BuOSwUAAdeTU0NnaW8sk8EKRyTY3soALbRgZ9cDgU6e1tbqBra4iWSF+qMAVPOeR9eaQGPfeJ9H01TJeyNGquiMSh4aRC65/AfnxV+01S1vrq5s4N++0KhyVwuXGRg9+OtPl03T51ZZraORWxkMoIOF2jOf9kkfSpYrS1gmkuIYVjkmxvZRgtt4GfXFNtBZmUPEems0CAS7ric2yDyznzFBY5HUDA6mmDxNpWZQxkUROEyUOGzu5U9x8jc1o/2Xpm8P9kj3LJ5oO0Z8zGN2fXHGfSqw0DRw9y5tUb7YQ0oblWIzzg8A8npRdBqQTeJtKgW5eUyBLSOOWRvLJAWUjbjHU88jtVi31ywu5reG23yfakeRHCfJtQ4JLdsnp61b/s6w3vJ9mj3yBVY7RkhDlQfoelRjSdMVg0drGjCMxAqoUhCclQR0GeaLoNRLvVLSyuLe2uN4a537SFyv7sbjk9Bx0Heqtp4g0+9+x+QJGN9uMYKEHCYyTnoORWlNZ2ty0T3EKStCcoWGdpxjIz3xxUUemadCIRFaxp9nJMeFA2E9dvpmjQLMyofFmi3MPnwSPInmpCSEPyu4yM5xgepq5e63Yaff22mXBYT3edmFJXjjk9qsHStMMRga0iMZKsV2DaSvQkd8dqlmsbK4niuri3SSaH7jsoLLn0Pai6CzMiTxNpsf2MjeyXgDBgvCITtDP6DdxT5fEmlwxpNKZESW4FqhKH55SSAF9sg81eTSNKQRBLSJRAS0YCj5SeTj05px0vTGQxtaxlS/mkFQR5n976+9GgWYllqdtqEt3Dbhs2UphkLKVG8AE4PcYI5q/UENrbWzSvbxLG07b5CowXbGMn1OBU9SMKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAqncffH0q5VO4++PpQB//1v3uT7i/QU6mp9xfoKdQAUUUUAFFFFAEUkjIyoi7i2e+OmP8ab5k/wDzx/8AHx/hTZpFilidgdoDDgZ64xTftsH+1/3yaaQDzNKuN8WASBncD1pFnkk3FIshWZfvAfdOKhkuY5tiRhs71PKkdDRFcRwiRJAwPmyH7p6FiQafKLqWN8//ADx/8fH+Fcp418ZWvgfwxqXifUrZ5YtNVGeOMgs3mMFGCeOprpxewZ6N/wB8mvJPjfpupa/8L/ElhotpLe3VxHAI4o1JdysqE7V74HNZ1bqLaOvBQhKtCNT4W1f0PKf+GwfB/wD0Bb3/AL6T/GrVj+1v4Sv762sU0a8VrmVIgSUwC7Bcnntmviw/Cr4nZP8AxSmpf+A5rV0H4W/EqHXdNmm8L6ikaXUDMxgIAUSKST7AV5EMRXuk0ff1spypQk4tXt/N/wAE/WjznMjxxx7vLIBOQOozS+ZP/wA8f/Hx/hUAmSC4uBIGG4qRgE5G0D+dSfbYP9r/AL5Ne3yn5pcpanqy6VY3d/cxEpZwSXDBSCSsYJIHvxXyqP2xfB5Gf7Evf++o/wDGvpTxTFNqOhavBZRPJJLp9xGiheWdkYBR7mvyfHwn+KAAH/CKal/4DmnY+czvGYqnKKoLTrpc+y2/bF8Hqpb+xL7gE/ej7fjX1No2tprelafqtrCwTUIFuFViAVVwCAffmvyMf4T/ABQMbAeE9SJIP/LufSv1Y8FxT6Z4V8P21/C8MsNhFG6FTuRwoypHYim0isjxWJquXt/lpY7DzJ/+eP8A4+P8KTzpBIiPHtD553Z6UwXsH+1/3yaQzpLLEqBuC2cqRjioa0Z9E2eC6j+0T4e07ULnT5NMuna2kaMkFcEqcZFU/wDhpbw3/wBAq6/NP8a+fvEfgLxvP4g1OaHQbySN7mVlZYiQwLHBBrG/4V948/6F6+/78mvx2rn2dKbSTtf+U/Q6eVZa4ptr7/8Agn394R8XW3jHQbfXrC3eKO4d4wkhG4FOvI4rp98//PH/AMfH+FeT/B3TtQ0XwFp9pq1rLaTxzzM0cikOAxOCR716qb2DP8X/AHya/WcDKc6EJT+JpXPgsRGKqSjHa4STyxIZHi+UdcMDXjXi7446J4Q8Q3fh270+4nmtNm50KhTvUNxnnvXr9xcRywPGgYs2MDafUV8WfF7wb4t1T4iavf6Zo11dW0pi2SRRlkbESg4P1FeDxZi8XQoQlg1719dL6WZ6mQ4ehVquOIelu9tT1D/hpbw3/wBAq6/NP8a9M8CfEjT/AB7ZXt7p1pLbiykjiZZCMsZBkYxXw1/wr7x5/wBC9ff9+TX058BdB1zQdG1pNa0+eyeW5t2RZUKllVeSB3Ar5/hrNczrYpQxSfLZ9LHq51gMFToOVB+9fvc+id84/wCWP/jw/wAKQyzgE+T0GfvD/Cmm9g/2v++TTWvICjAbuQf4T6V+k8p8ffQeLhmfZHHu+VW5IH3qd5k//PH/AMfH+FVY5RBNmRWAMUYBwTyM5qf7bB/tf98mk0CY2S6MJHnR7QVZsgg/dGTXyY37Yfg9WK/2Je8HH3o6+qbt/tOFhVmwkvYjquBX5Gy/Cj4nmVyPCmpEZP8AywNOx89neLxNNx+rr10ufY//AA2J4P8A+gJe/wDfUdfSvhHxZbeMfDel+JNPt3ii1SEzokhAZVB24OOM5r8n/wDhU/xQ/wChU1L/AMBzX6Z/B6wv9D+G3hew1e2ktLm3smjlikUh0cvnDDscUWJyTGYqpKSrrT0sepeZP/zx/wDHx/hTWnkRkDxYDsFyGBwTSfbIP9r/AL5NRS3EczwLGGJEin7pHApcp9Jc+a/FH7U3hbwv4i1Hw7c6ReSy6dM8DuhQKzIcEjJzisL/AIbE8H/9AS9/76j/AMa+cPil8NfiHqXxF8RX+neG7+5tri9meOWOEsjqzcEHuDXBf8Kn+KH/AEKmpf8AgOaqx8HVzTMOZ8qf3f8AAP1J+GXxF074n+HX8RaXbS2kSTvAUlxuygBzxxjmvQ6+dP2YdA1zw58OZrDxBYTaddNfTOIp02OVIXDY9DivouoZ9pgpylSjKe9tQooopHSFFFFABVO4++PpVyqdx98fSgD/1/3uT7i/QU6mp9xfoKdQAUUUUAFFFFAFeZTJJHHvZAQxO04PGKT7N/02l/77/wDrVR1fVLDSI47zULuCzjyUDXEgjUlh0BPfisP/AITrwx/0HNM/8Ck/xqkYTrQi7SkvvOnkiMW11lkPzKMM2RycU2KJpvMkeWQHzHXCtgABiBWDa+K9A1O5isbXV7CeWRhtSK4V3YjnCqDk1tCZ4DJGjxEGRm5JBG45wcZ6UxwnGWsXcs/Zf+m0v/ff/wBaoNrK0luJHIBTktlhu64NJ9rl/vQ/99N/hShiyS3BePdlehO0bfU9eaC2Tm1Gf9dL/wB9/wD1qhuIDHC8iTS7lGRls/0pDeSk53Q/99N/hUclxJLG0ZeEBhjO4/4UahbQ+ZfjN8RvGPhXxcul6Hf/AGa2NtHJt2K3zNnJya8l/wCF1/Ev/oL/APkJK+jfiT8IU8ceIRrP9rrZFYUiMZj3n5c85z3rz/8A4ZvT/oY0/wC/P/16/Kc0yPOKmJqTot8renvH3eAzLL40YxqJcyWuh0vwU8eeK/Fs+tRa9ffaVtbdXi+RV2sScnj6V9FrajaCZpckD+P/AOtXkHw0+GCeA5NUk/tVL37bCE4TZs25OTz716wLuUADdDwAPvN/hX32QUK9LCQhiPjW/U+VzSrSnXlKj8P3Fj7IDx50v/ff/wBaqsBkn8lXkcZRiSpwSQcc0/7ZL/eh/wC+m/wqhdahYaQltJd3ttBuVlUzSCMNzk7c9cV6s6kYLmm7I4IwbdorU1/so/57S/8Aff8A9am+UYpoyJHYNkEM2RwKwP8AhLdE/wCgrp//AIEL/jVqy13TNSu44La/tJ5FDNshmDuRjBOB2HesYY6jJ8sZpv1RpLDzSu4v7jQtoWlt45Xlk3OMnDYGan+zD/ntL/33/wDWqpFO8MawrJCwQYBLHJ/IU/7XL/eh/wC+m/wrpMbAgcgxGR8CZlzn5sAZxmrH2Uf89pf++/8A61Zd1qFnplkb+/u7e3j84sXlkCRgtxjc2Oayf+E68Mf9BzTP/ApP8aDKVaEXZtL5nSXELQwtKk0m5MEZbI6gcinrGZZZi0si7XwArYAAFc3F4t8O6jItjBrOnySTkKqx3KM5OeijPJ9q6B5nhllCtF8zbvmJBGR7CgqM4y1i7k/2Yf8APaX/AL7/APrV5P8AGzxHrfgz4UeMfEfh+6MOoaZp7z28jgSbJAODg8H8a9Q+1y/3of8Avpv8K4n4j+EP+FieAfEfg971LL+2rRrXzlG8RbujEHGfpXTg5xjWhKpsmr+lzLFwlKlKMN2nY/E/w1+2L+014n16x8Pw+MYLSS/kESSy2cZRWbpu2jOCeKqn9tP9pm01g6XeeJl3w3HkSA2canKSbGBBGRyDwele/wBh/wAE9pbPxSNP0f4hGK4soBPLcJZj9yznEaj5j8zDcfYDNJb/APBPAR+KW07UPHgWUhbqCRrXP2gBsy5JfO9WwT6hs1+pTzbJ/etFbfy/8A/OoZVmel29/wCY+qPjx8W/H/g7UfD8Ph3UhapfabFcTDy1bdI3U89PpXgv/DRvxh/6Dg/78J/hX138VPgKnxDvNIuBrq2H9m2SWuDFv3hOj9eM15X/AMMgp/0Nif8AgP8A/Xr8OxFGu5tweh/RuVZnlsMPCFZLmS10N39nT4r+PPHXivUdM8Uaj9st4bMyovlqmHDAZyPavsSK23RIzTS5Kg/f9R9K+evg98C0+GGv3esDXF1I3NuYPLEWzHzA5zk17+l1IqKoeEhQBnce34V3YWM1C0tz5XOq9GpiJSoL3fuLQtR/z2l/77/+tXzd+0T498V+A/DGj33he9+yT3N28UjlFcsioxA59xX0T9rl/vQ/99N/hXkfxe+Fq/FHQdN0s6qmnGzneffs8wPuUrgcjpmqxEZODUdzPKatKniYSrfCt+p8L/8ADRvxh/6Dg/78J/hXpPwi+OHxN8TfEbRNC1rVxcWV5MUlj8pF3DaT1HNb3/DIKf8AQ2J/4D//AF67H4f/ALNMfgrxlpfij/hI0u/sEm8ReTt3kgjGc8V5tKhXUk5PT1PsswzTLJUJRpRXM1pofV0MRmUyPLJks44bA4Ygdqm+yj/ntL/33/8AWqqszwbokeIgMx5Y55JPOB2zTvtcv96H/vpv8K9i7PzxFm3BV5o9zMFK43HJ5HrViqtqS3myllYuR9wkgYHvVqpkNBRRRSGFFFFABVO4++PpVyqdx98fSgD/0P3uT7i/QU6mp9xfoKdQAUUUUAFFFFAHyV+2CqN4B0sOAR/aC9f9xq/OTyYP+eaf98j/AAr9qvE/hrQvFVrDpuv6bFqkKuZFjm+6rKMZ+vNcX/wpj4af9CjZfnV3Plc04fniKzqKVj85fgPHCvxe8MEIoIuhyAB/Ca/Wq1VSkh2gnzZe3+0a8+0r4YeA9A1K31bTPDNpZ3UDjy5ozlkY8ZFdwFaRpGitsjzHBPmbckHBOPeg9PKMvlhqbpt31NIIv90flVJgvnyAAY3R8UzyZ/8An2H/AH+o4CSxtB+8yvG/rnp83bFJHqtmiVUk/KPyqtdov2WXKj7vpVcwzZ/49h/3+qORJEjZpLbKjk/vc0IH5lqFQbi5OM/Mnb/YFWti/wB0flVCQeZPIIoN5XaGPmbMkqD0+lN8mb/n2H/f6mwEvAoebjH+jv2+taCIuxflHQdvaub1vVYNA0jUtXvbUsljaS3DKr7i6RKWKjPc4r87k/4KS/D13EUfg3VHYnaFWaMknoAADzXpYHJsTik5UIXS32PPxma0MNJKtK1z9Nwi55UflXyL+0ekZs/DIYA4a5xkD0WvAJv+Ck/w+gLpL4N1RHjyGVpowQV6g89RX3jYw+GviT4a0HXL3RkuYb21S7hjnYZiWZQcZHf1rxuLOFMXLCuhVXLzbN67eh6PD/EGHeIVWk+bl3+Z+dPlRf3E/IV7N8A0RfiZZFVUH7NddAB/CK+sf+FYeCP+hZtf++q0tH8F+F9B1KO/0zRILK4w6iWM5YAjkfjX5zlHAdXDYmFd1E+V3Ps8w4ohWoypKDV0dXZIv2OH5Qfl9KtbB/dH5VlxK0kavFbYVhkfvccfSpPKmHW2/wDI1fpvU+LR84/tSqp+E94GUEf2jDwRx1r8zvJg/wCeaf8AfI/wr9p9Z0LRfEultpOuaZHe27TcwytlS687s1x3/CmPhp/0KNl+dFz5jNcgliKvtIysfmP8LIoV+JPhkhFH/Ewg6Af3vpX7FQqpec4B/eH+QrzW0+FXw+0a7h1Wz8LWlvPausiSIfmRgeCPcV6EwaSWXy7fdhsE+ZtyfpTO/KMueGg4N3u7l/Yv90flXNeItUtdC0++1W6XMVusTFVGSx3fKoHcscAfWtTyZu9t/wCRq4K/Y674pj0hYAbPRjFc3Q37g9w2Rbxk/wCz/rD+FVSSvqerUeh03hHR7jTdLa41JQdS1GQ3N2cf8tH6IPaNcIPpnvSeLdCk1fThNp5WHU7BvPtJSPuyqOVP+y4yjDuDWz5M3/Pt/wCRqa0UgUlrbjBz++zSU3zc3Ubgrcpl+GNXg8QWMepxRGIvEivE3LRSoWV4z7qwI9+tdNsH90flXl+osPDHigaskX/Er1rykusvtWC5I2xSHsFcDY5/vbT613/ly4/49v8AyLTqxSd1sKnJ7PcluAq3EBxjiT/0Gp4EXyI8KPur29qokiFw0sGw7XIO/f0GSPxFfN//AA0d4fHC6FdYH/TZf8a8fMs6w2EaVedrnfg8urV7ulG9j6jCr/dH5Vm26q00ORnCy4/77FfN3/DR+g/9AO6/7/L/AI17t4c1q38S6DpmtWdoY0vomlVGfDIu7BBI65NLLc8wuKbjh53a3HjMsr0EpVY2udbsX+6PyqrdKoMHygfvU7VD5U3/AD7f+RqTDRyRGS3xlwAfM3YJ6HFesjiuWLRVMJwoPzydv9s1Z2L/AHR+VZqq0m5orb5dzD/W7ckEgnH1p3lTf8+3/kakwTLUIAmuABjlf/Qanqra4/eL5flspGfm3Z445q1SkNBRRRSGFFFFABVO4++PpVyqdx98fSgD/9H97k+4v0FOpqfcX6CnUAFFFFABRRRQBWnk8qWKQqzKAw+UZ5OMUn2yP/nnJ/3wafIC0sabmUEMTtOOmKd5I/56Sf8AfdPQnUrSTrLsREkzvU8qQOD602G4EXmxyRvnzJDwpIwWJFTSoYwrJI+dyjlsjk1+dHxU+NXxN0H4i+ING0nXJLezs7t44o1VcKg6DkZrHEYhU1do9bKconjJuEHZrU/Rf7ZH/ck/74NQGQu0s4R9uY/4Tk468V+WH/DQPxe/6GKX/vhP8K+1f2c/GXibxr4Gu9S8TXz3t0moNCshAUiMKhxx7k1lh8bGcuVI7M14bq4Sl7Wck1ex9Am8jz/q5P8Avg1DcXKyQPGkchZhgfIatmAA48yT/vs1DcRlIHdJJAyjI+auxHzjIxKIbifcjncVIKqSOEAqX7ZH/wA85P8Avg0ibpZ5gzsAhUAKcDlQT+tS+SP+ekn/AH3Q9x6nFeOba71fwn4gstPgklnn0y6ijTbgvI8bBVGe5Jr+ezSP2fPjzBrfnWngbU5rjSp4pJEVChDAh1UupypI7jkda/oM8R61qJ1B/DHhqRjqD25lmnb50s4znEhHQu3RE79TwOem0TQbHQ9OjsLJpSoy7O7kvJI/LO7d2Y8k/wBK+kyfiCrgYSjBJ83c8HM8lp4ypGU21y9j+dbXfgD8evE+vazqMXw/1GGaad5JYEQuInmG/blzuI5yCa/fz4Z2N9ofgDwpp2qW0kFza6XbwyxlcskiIoKtjoRVnV4RoXiqw1tGdbXVNthdfNwHzm3kP45jJ91FdbA8s3kq7sMoxODgkg45NLO8/q41QVRJJdisnyWnhHLkbbfcs/bI/wDnnJ/3waYZ1lmiVUcY3EllIHT1qx5I/wCekn/fdRspSWIB3IYtkFsjpXzsT3HcrWtysVtHG8cgZRg/Ie1T/bYv7kn/AHwa/MPxZ8d/ivYeKNXsbPX5IoLe7mjjQImFVXIAHHYVz4/aB+L+f+Rjl/74T/Cix8vLiqkm1ys/VSOQged5b7TOzY284IxnFWftkf8Azzk/74NeO/ArxLrni/4baZrPiC7a6vZp50eXhWKoxwOK9n8kf89JP++6TPpKNTngprqVLicTQtEkcm5sYypHenrOsMkysjnL5BCkgggUtyhigaRJH3LgjLZHUU5E3vMzO42uQAGwAMU+hTMfXvENvouk3OpPFJIYl+RNhBkkY7UQe7MQKyPDGk3GlaU/2sNLfXDrcXT7Tl53bc+M9lACj2AqpcQjxL4ujsxI7af4eZZZfmJEl44/dp/2yX5z/tEUz4l6tqPh/wACeJNV0m4eG6srMywyE7ij+ozWjVlymM52jKpLZHe/bYv7kn/fBpkl3GUYBJCSD/AfSvykH7QPxfx/yMUv/fCf4VNB+0B8XmmjVvEUpBZR9xPX6VFj5+PFVJu3Kz9Q7+xtdQtp9N1KBpba6t0idQpIxg5+hHb3rD8J63MguPDOrCRtQ0nau8qcz27Z8qYf7wGG9GB9s9Jp0st1DA80jZa3hc4OMsy8mud8WaTdxeR4n0YPJqGl7iYwx/0i2b/Wwn3ONy+jAVcLP3WfSTuveR0tw5uWVY43GEkzuXA5XAr87j8NvH4P/Iv3n/fv/wCvX6G2d9b30Vpf2E7TW13GZEbdkFSuQavxRboY2aSQkqCfmPpXzOe8N0cc4us2uXse1lecVMKn7NJ3Pzi/4Vv4/wC3h68/79//AF6+3/hzaXuj+CtAs9StpIJ4LVkkjK/MjF84I+leheSM/wCsk/77NU4mkkaONpGxtkJIOCcMAMn6Usj4Zo4CUp0m3ddSs0zqpioqNRJW7E/2yP8A55yf98GoZZhM0KojjEikkqQABVvyR/z0k/77qCVWiaErI/zSKCC2QQetfRLc8fUjguViVo3R9wdzwpPVif61N9si/uSf98Gvw4+Ov7Vvx98KfGHxh4c0DxXLaabpupTwW8KxRkJGhwqgkZrlfFf7T/7TfhVdJkfx5Jdx6tZx3kbpbogAccp8ygkqeCcYJ6ZFfc0uBK81F861V+p8hLjGjFtcj09D98rZ97zuFZQxXG4Y6AVZr5B/Yk+I/jP4pfBubxL471JtU1JNTuIBMyqp8tFQquFAHGTX19XxuNwzo1pUpbxdj6nCYhVaUai2auFFFFcx0BRRRQAVTuPvj6VcqncffH0oA//S/e5PuL9BTqan3F+gp1ABRRRQAUUUUAVblijRyKwUjcPmBOc49PpUX2ib+9H+TVZb/j4i+j/0qfBqriZnGR5SqO6AbgeA2eD718qeNv2YrLxf4t1XxKfEjWp1Gd5TELcPsJ6jdnnFfWtxnYv++n86baj5JMf89Zf/AEI1nUpRmrSR1YPHVqEnKjKzZ8R/8MfWX/Q1v/4C/wD16+gPhj4AsPhH4Su9Lk1hbqI3JuWnmUQqm4KoB59uua9lANeR/GgA/DzxEGHHl2/X/rotcGNlHDUKlenHWKb+47/7QxGLnChWqNptHWf8Jn4d/wCg1p//AH+X/GkbxZ4fuR9nXWrAmUhQBMpJJPbnrX5pFY89F/IVoaOsf9safwv/AB8w9h/z0Wvzuh4hYidSMfZLV26n0NbhKlGDl7R6eh+nzs0M8ux0+cqSGByMKB29RzXI+IPEupQ3EegeHxFPq10u4Fgxjtos4M0vt2VerHjoCat65r02nXL6VpEa3WsX7AW8JOFUBBullI6Rp1PqflHJrT8PeH4tCt5GaQ3V9dsJLq5cfPNIBjPsq9FUcAV+uJcurPz9u+iKGg6Da6NZz28U/myzK7zzvkySyP8AekcnH4AcAcCt5biYKAGjOAOzUl4Pnmz/AM+7VoKDsX6D+VRJ31ZolbRHNa9ZNrmkXWlySRoZ0IR8NlJByjA442sAa5zR/GOlw6Fp99ruo2unXYElvMlxIsf7+FsSgAkdDzj0Ir0sZyK/Or9rTTzpuq+HbgFRaaubmQqR0uo1VWYf76AZ9wTUVajjSbXTU78swUa+JjTm7Jn21/wsLwh/0MOmf+BKf/FVe0zxX4e1q+jtNP1iyu5wGYRwTK7kAcnAJOB3r8YtkP8AdT8hX0P+y4sI+L1jtCg/ZLvpj+4K8yhmEpTUWtz63MuEqVChOqqjdl5Htuufsm2Os6zf6uPFDRfbZ5JtotgwXexOM55xWX/wx3ZD/ma3/wDAX/69fb9kD9jh/wB0Vawa9W5+X/2HhXq4HlPgPwvp3wr8EWmhT6tHLDZzSN9onAhUtKfu4zwa6b/hM/Dv/Qa0/wD7/L/jXmfx7APw9u93/P8Ap1+tfDmI/RfyFfn/ABHxfWwWJdCFNNWXc++yPhynXoKfM10+4/TFPFGhX7rZQ6vZSPMQqqkqszHPAAzyTS+JNdPh3Tby/j2yyZAiiwSzzyYWOPjuWx+Ffnz4DCDxroeAP+PyH0/vV93wo3iPxlNld2n+HZMj0kvZFHPv5SH/AL6b2r3eFM7nj6MqtSKXK7aHmZ9lscLUjTg73RqeGdPn0TSY7aZ43u5C01y+GJeeU7pDnHTccD2AqPxboCeLvDGseH5roW39pweQZFUny89Dg9a7TBrMnz50mfWH/wBCr6TmvqeNOmnHlex8Uj9jqzx/yNj/APgL/wDXp6fsfWUTrIfFb/IQf+PUdjn1r7mIOaZID5bfQ/ypXPNWR4VbQOSu9b0Lwybe11LV7S0cwRqq3MqxsyoMbgCRwarf8LB8If8AQxaX/wCBKf8AxVfD/wC18sZ8YaHuCk/2cOoH9818j7Yf7qfkKdjxcdxFUo1ZUlFWR+tXhnxDoNl4rPh3TNUtLzT9Q824tFt5Vk8mdgTNCcE4VuXT33D0r1SOeVUVQ8bAAAHDc4r82v2YNEg13xRrWnq/2eX7B5kMyAbopo5AyOP90/mMjoa/Q/wjrMusaSFvUEWo2TfZ7uIdEmQDJH+y4wyn+6R3BrSpqub7z2spxcq1JTkrXNn7RN/ej/JqiA8sQyJKpOHHIODubJxjnitUA5rHE8Frtubh1iijSUs7EKFG8cknpWaPTk7blj7TN/ej/Jq5vXPFNjpMlvbTuJ72Vw0FpArPPMR0Cqeg9WOAPWqR1zW/FJMPhFfslhnDalMmQwHX7NEfv/77YX0zWxp3hrTNCKy2ytLdXEqedczMXnlP+057eijAHYVaSXxEczfwn52+M/2BR8SfGOuePNb8WnSbrXbyW7a0itxOsHmHOwyZG4juRx6Vgz/8E1rG5Ktc/EO5mKKEXfabtqr0UZY4A7AcCv1QtAfIP++//obVZwa9pcUY+KSjVaS9P8jyv9XcE3d01r6ngn7OnwXtvgP4Ak8D2urNrKteS3RmaMREGUKNu0E9NvWveqgiH764z6r/AOg1PXiV6sqk3Um7t6s9ejSjCChFaIKKKKxNQooooAKp3H3x9KuVTuPvj6UAf//T/e5PuL9BTqan3F+gp1ABRRRQAUUUUAUrtPMMcYj8xjuI+bbgDGeRUH2Rv+fcf9/jV2VtksbkEgBhwM9cUfaI/Rv++TT5ibIpiAROjvbgDcBnzC2Mn0NN8kTSSOlvxvcZ80rkg4Jx71allEgREVs71PKkdDSQyCMSK6sD5kh+6SMFiRTuKxX+yN/z7/8AkY1VutPsr2xuNMv7JJ4pSgeJ23K+TkZJ9MVsfaE/uv8A98moGJZ5JQrbcx9uTjrxSaTVmO9ndHHf8K78H/8AQu2f6f4VzfiHQvB3h1YRZeGbS51W4bFpAhG5nUj5ycfKidWY9B74Fd/4g8TWuhW6MYpLi7uW8u2tkX95PKeQq+g7sx4UcmsrRNEmtEudW1hjd63fKBLIqHZGn8MMWeka/mx+Y1McHSVpOC+5Dniaj91Sf3i6D4cOnSXV3egX2q3RU3dyXMe84yqIv8MaA4VfxPNdH9kP/PuP+/xqdW8q4nLq2GZSCATnCAfzqb7RH6N/3ya1lJt3ZMYpKxiahdxaPYX99Pa5W2tpJmAfcXSMEleemcV8iD9rnw5gY8L3f/gUv+FfWnia3uNR0XVraziaSWawnjRcYLO6sFAz3Jr8uh8DPi3gf8Uxdf8Ajv8A8VXn4ypUi17M+s4cweCqxn9aavpa7sfSLftdeHApb/hF7s4Gf+Ppe34V714p0DSPiX4L06/Ojw3F19nS+slnwxicBXCe+/G0+ua/PKT4GfFsxsB4YuskEfw+n+9X6feDbS60zwxoNnfQtFNb2MUUi4yUdVGQcelVgKtRtuoTxFg8HSUfqj1e9nc5HRPh/wDDjXNJtdWtfCth5d1GrgYGVJ+8p46qcg/Suo0bwN4S8PalHf6ToFpYXG11E0IG8AjkdOh71W0KcaH4n1Lw86sLa+3aha/KcAsQLhB9HIcD0biu3ZxJLFtVuC2cgjqK7pU4qWiPmFiZyjaUn95RigEsaypbAKwyP3pHH0qQ2h/59x/3+NTWsoit44nVgyjB+U9RU/2iP0b/AL5NJk2MS+0zTdWsDp2o6fHdRGYgxSHcu5RndkisL/hXfhD/AKF2z/T/AArr4yV/eFWx5zN05wRjOKs/aI/R/wDvk1jOhCTvKKfyLhVklpJo8t1/QPC/hTT/AO1rDw9aDUFkRLRVxua5c7YwOPU5PsDXi3iH456H8J9ZuPAd5otzqd1p+x57pJ1jE006iV3wRnkt3r3kt/wk/iia9Tc9loOYIRjhrx8ea3/bNCFB9SfSvjP45fCj4ieJPinretaFoVxeWNx5Hlypt2tthRTjJHQgissVF0qajRVn1sj2eHaOHr1pfW37ttLvzR3P/DXPh3/oV7v/AMCl/wAK9w+FPxT0z4o6Vql7Y6VLYixmihZJZQ5cyDcCGA4xX5/f8KM+Lf8A0LF1/wCO/wDxVfX/AOzP4K8VeDdC1+38TaZLp8lzd20kayYy6omGIwT0Nc+Fq1pTtPY9rPcvy6nh3LDNc111ufTX2Rv+ff8A8jGka1IUsbYEAE/641fNwmfuv/3yaY8ysjAK+SD/AAn0r0z4myOU1vwj4X8T3UUutaHbajLDEoV5wCVRuQoyDxWP/wAKn+Hv/Qp6f/3yP8K72MmKbc6tgxRjgZ5GcirP2hP7r/8AfJoZm6EHq0jjNK8KeFvCM8l9o2h22nyyROGeAAMyoN208Dg1+Z9z/wAFCvBNr4mGs2Xgu/jJja2uk+1xhZUQ5jb7v3kOQPYkV+qeoK9zEVhRiRHKORjlkIHX3r+eb/hlP9pC31I3kXgK7kMcpdQ4idGw2RuUvyD3HevseFcJgqsan1tq+lrux8vxDWxVJwWFWmt7K59zT/8ABSHwjbSGG48BalDKoBKvdorDIyMgrnkEEe1fRNp8SNM8Q/Dvwt8WPE+my31rr4MlppayBYLUZbBcn/XP8vLNwM8Cvyr8a/s7/tPeOvE174r1T4eXFvd35jMiW6xpHmONY8hd/GQoJ7dhwK/S7Sfhv45tv2cvhz4Sm0eZdX0mErdW3y74T8/Dc47jvXl+IdGhhcBz5Xb2nk+Y7uDatbEYxwx9+TzVjuf+GjNEAwPD1xj/AK+RXR+EfjdpHifxJYaFDos1vJdybVkeYOFOCckV83/8Ko+I3/QBuPyX/Gu6+Gfw68b6R460fUtT0ea3tbebdJI2MKMHk81+FZZm2dTxFONZPlb193ofrGOwGWxpSlTa5raan2UsImLSJbjaWb/lqRkgkE49yKf9lb/n3H/f41NbyiKMxurAh3/hJ6sSKm+0R+jf98mv1hs+FSI7RVTzIxH5ZUjPzbs5HrVuq8B3STvggMVxkYzgVYqWNBRRRSGFFFFABVO4++PpVyqdx98fSgD/1P3uT7i/QU6mp9xfoKdQAUUUUAFFFFAHiXx08R654Z8N2V5oV49nNJchGZMZK7Scc18rf8Lb+I//AEHZ/wDx3/CvtD4leCLfx3pFtplxfNYCGYShlTzC2ARjH49a8V/4Zy0v/oYpf/AWvzjiPI8zrYqVTDP3bL7Vj7DJsywVKgoV172vS5yHw3+JPjrV/HGkabqWsTT21xMFkRsYYYPBwK+0YY2l8yRpZM+Y4wHIAAbA4r5/8JfA/TfDPiOw12PXJLhrSQOIzBsDHpjd2ruNV+MHwx8N6ld6Nq/jDSrK8tpWEsE9wiyRsTkqwJ4Ir6nhDKcbToSp105SvfvoeDxDmGFlVU6bSjb01PTvs4/56y/9/DXP69rNt4ftJZrl5ZCzxxwxod00sr9I4x1LN+gyTgZrzi+/aG+DljZzXknjfSHWFSxWO4RnbHZVDck9AKueAtT0fx3HJ8Qk1W01OZXMMC2kgngsVGCY8qTmZgR5jfQDgc/WTwVWnHnqwaXmmeDHF05y5ack36nV6D4buvtb+I/EMjPq1wuwIshZLWHORFGfXu7fxH2ArqriExwO6yy7lGR85pn20n/lqv8A37f/AAqKW5EkZjadQG4J8t65W23dnSopKyPiX9o/4oeP/B/xAj0nw5rM1jaGzik8uPGNzE5PINeA/wDC+vi7/wBDNc/+O/4V9r/Fn4B6Z8S/FC+ILjXpNOkjt0gMSQCUYXJBz756V5j/AMMgaN/0Nk//AIBii58Xjcsx0q0pU3o33Nr9mb4ieNPGdz4ji8T6tLfraW0bxb8fIxJyRivsFbYFQTLLyB/y0PpXg/wi+DGnfC2XV5rbWn1E6jCsbB4fK2KpJ3e/Wvb1vMKB5ynAH/LN/wDCh+R9NllKpCjGNXctC1BP+tl/7+GqkJknECvI4+RiSrYJIOOTTvth7Sr/AN+3/wAKaClskBScfdIBKk5BOc8dKR3M5fxrYXENhB4gsWke40WUXO3ecvCARMg+qEn6iuqtpIp0tru1neSG4XcpLEhlZcg8+xpDdgggyqQe3lv/AIVxfguQ6fd3fhKaUbdLkMlqu1gWtJ8lOT/cbcn4CtErx9CNpep+f3iv43fFSx8UavZWniK4ihgu5kRF24VVcgAcdqwP+F8fFz/oZrn/AMd/wr6Z1v8AZV0bWNZvtW/4SiaI3k8k20WoYLvYnAPfHrWWP2Q9G/6Gyf8A8BBXz8sLXvp+Z+o088ypRSaX/gJ7r8CvEOueLPhrpmra/eyXV5NPOryk4YhGOBkelegeK9Ql0fSybJ5Jb+7dbe0QucNPJwpPsvLN7CsL4d+DbX4eeDrPw5a35vVtZZHEzx7SzSHJXaOeKZp94/iHxTPrDyg2Ojb7W2/duVe4P+vkHH8A+QH/AHq9yhFqKcuh+bY6rGVWTp7Nu3odLpGgxeHNDgsLWWR2t1BZyx/eSM2XdvUsxJrcWEyyTEySAK5ACsQAMelVnnE6+U0ygNgH5GHf1IxUjTiGaVRKoy2SCjEgkeopt31Ml5Fj7MP+esv/AH8NVZA8ZljWRyMx8liSNxwcGl+2f9NV/wC/b/4VWuLq1itrm+u7pIo4grO7AqqBDnJzipcrK8iuW7sjT+zgcebL/wB/DTXt8IxEsvAJ++fSuQ/4WB4S/wCg/Yf9/P8A69IfH3hJwU/t+xy3H+sHf8a4lmmGv/Ej96Oh4Ktb4H9zOrQPNNtaR1AjjbCsRy2c9Kn+z/8ATWX/AL+GqhkSGRWSZfnjT+EtkDoRt9aX7Z/01X/v2/8AhXdqcyJWV4p4wsjsHD5DNuHAyOtLFb7okYyyklQfvnvUSSLPOhaUEoGwArL1GD1pkd1tjVBMpCgAHy3/AMKGgTLYtuf9bL/38NVIxJK0MTSPjbISQ2CcMAMmn/bP+mq/9+3/AMKZlIkhnScZwwHysQQTk8DkYxTQpFv7MP8AnrL/AN/DUMsRiaFllkOZFBBckEH2NM+2f9NV/wC/b/4U0zCaSJWmXh1IGxhkjtk8UtSmz4l8b/E3x7p3i/WLCx1maG3t7qVI0XGFVWwAOK5b/hbfxH/6D0/5r/hXv/iL4D6brmvX+sNr0kJvJnlKC33BSxyRnvisf/hnLS/+hil/8Ba/HsRw1nDqScZO1/5v+CfoNHOMtUEpJXt/Kem/A/xDrPiXwdLf65dveXC3UiB3xnaAuBxXsdcB8OPB1v4G0GTRra9a+DTtKXZPLILAcbfwrv6/UMso1KeHpwq/Ekr+p8RjKkJVpyp7NuwUUUV3HMFFFFABVO4++PpVyqdx98fSgD//1f3uT7i/QU6mp9xfoKdQAUUUUAFFFFAETf8AHxEfZ/6VPlveqlwgkaNNgYncQSSMYxnpUX2U/wBwf99tVXJsT3WfLXP99f51/OB+1f5X/DRXjzdtz/aUvXHtX9G/kiJkdowRuA+8x6n3rzrVfg78K/EmpXetaz4N0m+vbmVzLPPaxvJIwOCzMRkk4r6PhzPY4GpKpKN7qx4We5PLGQjBStZ3P5xvGh+H50/Qf+EQVVuhar9uxu/1uxM795I8zfvzt+Xbtr9fP+Cb+wfA7U9mP+Q7L0/65R+lfV3/AAoD4L9vAWh/+Acf/wATUmuHwn8FPAOsal4d8O21nY2DJO9pYqtuskkrKm7IGAemTjtXo55xVDGYZYeMGtb3b9TzssyF4KrLE1Jq1ux7Cd2e9V7ssLaXOfumviH/AIbC0kZH/CJ3B/7fR/8AE1b079rbSdR1C108+FZ1+1TRxbjeKQN7Bc4284zmvjLHqrP8K2kpb+TPtC3J8+5x/eT/ANAFW/m96z2jWaeXbGMoVBO4jOVB7e3FJ9lP9wf99t/jSPYG3hO+bP8Az7vWim7YvXoP5VhX9xDpdpe3csG8QW0kpAYksqAkrk9M181j9pHTsD/inpf/AAKH+FeRmee4bByUa8rNnfgsrr4hN0o3sfWYLAjOayrLO6DH/PN//Qq+YG/aR08An/hHpuB/z9D/AAr6Q0q8i1jTdPvorcRC6gWZVLHKBgDtyMZqsrzzDYxyVCV7Bjcsr4e3tY2udJ83vXnvjFDo+qaV4xQHFm5trv3tZyAWP/XOTa359q7E2p/uD/vtv8arXem213C9leQh4blHjcFiflZcMOfUV7FOSTuedUjdWL9hu+xQ4/ujpyKt5b3rzzwO80ukHSrz57zSXNrIS5BZV5ifjj5oyp+uRXZfZD2Qf99t/jRNWbQ4O6TOW8U6nd2FgbbSyP7T1C6Nvaj0kkHL/SNcsfpXT6NpUGh6XbaTaZ8q2QKCerHqWPuxyT7mvAfGfjq28MWt/wDEa5086hYaVcf2dZxJJs3SOcXE4Y57jYPYGvK/+GvtM/6FWf8A8DB/8TWOIxVOD5Gz08vyTFYiPtaUbr1Ptu9z9kkz6D+Yp0G7fPj/AJ6H+Qr5A8L/ALUemeJPEemaAPDM0J1C4SEO10HClz1K7ecelfWzQiWWVljAw2CdxGSO/FKlVjNXizLHZfWw8lCtGzZo/N715x8TjjwR4k3f8+ddt9lP9wf99t/jVW4trSe3ubG8tknilCK6OdyuHOMEHtWeMoe1ozpJ2umvvRjh6vs6kZ9nc/LoBcDp+lSRbPNTp94enrX6R/8ACvfBmf8AkXrD/v0P8KQ/D/wagLDw/Ycc/wCqHb8K/MqfhzUjJP2q08j7WXGEXFr2e/mdFpOfKix/z7Qf+g1sfN71l+XHLIEjiA2xoepXgg4HHpT/ALKf7g/77av1VKysfCPVktwSLiDd6Sf+g1PBu8iP/dH8qz322rb3jBO1yDuJ+6uSOfWvjFv2u9LjYoPCk+FOP+Pwf/E1lWxEIfEd+Ayuvib+xjex9xjd71mWxxNF/uy/+hivi3/hr7TP+hVn/wDAwf8AxNfVfgzxDb+NPCuj+IrezNquowGdYmfcYxuwRuXGfWiliITdosrH5RiMMlKtG1zust71Uuy37jP/AD1SoRan+4P++2ppiELxM0YOXUD5icE9+fStkzzizZk+Txn77/8AoZq183vWYkKyhpEiCgs38bDoxHanG1P9wf8AfbUMSLER/f3GeuV/9BqeqtsApkjC7SpGeSc5Ge/NWqlspBRRRSGFFFFABVO4++PpVyqdx98fSgD/1v3uT7i/QU6mp9xfoKdQAUUUUAFFFFAFeVvLlicgkAMOBnrjHSj7TH/dk/74NJMhkliTeyKQxO1ip4x6UfZV/wCes3/fxqtITYySZZdqIr53KeVIGAfWkhl8oSRyI4PmSHhSRgsSKWSHygjrLKTvUcuSOT6U2GEyiR3lkB8yQAByAAGIHAoFcm+1R/3ZP++DXlHxo0PV/FPw08R6RoNo91eXccAiiGFZykqMcZx2BNerfZV/56zf9/GqAoyvLCJH25TksSwz1wetMxxFP2kHTb0Z+UJ+Avxfz/yLFx/30n/xVamh/Av4tW2t6dcz+G7hIormB3YsmAqyKST83YCv1SNqoOPNm/7+NUM9vsgd0mlDKMj941B4MeGqCaab09BwfyZ596th2UghSRwoHb3qT7VGP4ZP++DUSxmaefdJIApUAKxUcqCenvUn2Vf+es3/AH8alY+kuYmuwz6jpmpQWkbM8tnNGgI27nZSABn1r4MHwj+JGB/xIp+n+z/jX6CzB4GmVJXI8hmG5i2D6jPSrC2w2qTNNyB/y0avnc74ZoY6UZ1W1bsetlmc1cKmqaWvc/PFvhH8SNrD+wZycH+7/jX3b4Zt7jTNC0i2vYmjlgtEjdQMlWAGQcV0X2RSf9bN/wB/Gr5E/ab8deMPB9n4Ybwzq0+ntdtciYxNgvsC7cn2q8k4coYBydFt37nHxDxHOdJVKy0j28z67+1xf3X/AO+DTfOWWaIIrcbiSVIxx71+Sn/C8fi3/wBDTe/99j/Cvb/2efih8QPFHxNtNH8Q65c39lJbXLNFI2VLIoKn8DX0Fj5LD8S06tSMFF6n15dSJ4c8SafrTKyW+pKthefKcLKMm3c/jlCewIrU8Y63JBp8ek6aXXUdXf7LB8pym4fvJPpGmW+uB3r8JPiz+0r8dIfHfinw/H4xvU0621K4ijhDDaiRSnYBx/DgYqj4t+P37RfhbXLH7f471CS8eyinQuGikiju1D7SrqCCQAcjqMc19/DgWq+Vuor2v1PLnxhSXN7jtfyP2U+NPgfVtX+E/wDwi/hGwe7khuYTHEuAxjj6sdxHPc96+I/+FD/F3/oWbn80/wDiq+wf2RPGHij4gfAnQfEfjDU5tS1O5uLpJLh2xIyo5CgkY6Cvp77Kv/PWb/v41fneYZYlWlGb1TsfqGS8U1qOHjGlFWeuvmfmh8Pvgv8AFHSvHOg6lqHh6eC2tbyKSWRimFRTkk/N2r9LVlEUkwdX+ZywIUkEEVHcQ+VC0qSy7lxjLkjqO1PEPmyTFpJBh8AK5AAAHYVNDDqmrIwzTNamLmp1ErrTQk+1R/3ZP++DVaQtIZZURsZj6jBO05OBVj7Kv/PWb/v41VpFaNpYlkcg+XyWJIycHB7VueY2WvtUf92T/vg017lCjAI5JBH3D6Uv2Vf+es3/AH8amvbAIxE02QD/AMtG9KAuRRv5E26RWw0Ua8AnkZz0qf7XF/df/vg18tfHPxl4p8O69pttoepzWUUtoHdY2wGYseT714f/AMLT+In/AEMF3/33Xw2Y8dUMNXnQlBtxduh9NguGatalGrGSVz9C7km6wsKNwknUEdVwOtflbL8Cfi4ZXI8NXGCT3T/4qvrX4FeNPFXiHxLe2euanNewpas6rK24BgwGR719SRWwMSMZpclQT+8avcwGJp5hQjXSaQqOOr5XUnRjZ3sflF/woj4uf9Czcfmn/wAVX6MfCfStT8OfD3w1pWs2z293aWbRTR43FHL5wcZ7V6R9lX/nrN/38aqsSvK0UbSuAFkJwxBOGAGTXp4fCRptuJyZtn1XGRjGolp2Lf2qL+7J/wB8GoZZBM0Kxq+RIrHKkAAdal+yr/z1m/7+NUUsRieFklkOZFBBckEH2NdKPGbCGZIUMciuCGc8KT1YkfzqX7XD6P8A98GvzQ+JXxf+Jmk/EDxBpmm+Iru3tbW9mjijRwFRFbAA47Vw/wDwu/4tf9DRe/8AfY/wrznmUU3ofZUeDK8oKSmtV5n6z27b3mkAIVyuMjHQVZr5+/Zr8T6/4t+H02p+JL6TULtb2WMSSnLBFC4GfQZr6BrsjPmSkfK4nDulUlTfR2CiiiqMQooooAKp3H3x9KuVTuPvj6UAf//X/e5PuL9BTqan3F+gp1ABRRRQAUUUUAc74j8Q6L4at4dQ1zUodNhZjGrznCszDOB78Vyf/C2/h5/0Nen/AJ//AF68c/a9K/8ACB6XuIH+njr/ALjV+dO6P1X8xXnYjHShPlSPtMl4Zo4rDqrOTT1P2F074i+Cdcv7fS9O8R2V1czOPLijPzuRzgc11wm8p5ES4GN7nHlscEnJGR6Gvym+BJT/AIW54ZAIJ+1D09DX6yWhxHJj/ntL/wChGurCV3UjzM8TPsqhhKypwd1a5X+1H/n4H/fp6QOrLLMZwW3JzsIxjp8vU1phj61Rb/j5lP8AtRV1JniNEZuif+Xgf9+nqOWfzI2Q3ICtwT5Tf1rWLHPWq922bWXJ/houJrQ5jVvFfh3Qb97bU9Yt7KaUK/ly/exjaD174rN/4WP4N/6GKy/z+NfLH7RBUePkyR/x6Rdfqa8ILL6j9K/Lcz45xNDEVKMaaai7dT7jA8L0atGNRyd2vI/TLS/EOheIjdf2XqsF60UJV/K/gVs/MRmtoXJCgfaBwB/yyevkv9nDb9q8R4wf9FT+bV9iqx2Lz2H8q+8yPMJYrCwrzVmz5fM8HGhXlSi9EZ32puouBn/ri9eNfFr4P6X8VLbRo7vWJNP/ALN81kMcPm+Z5uAeMjGMV7yGORzWTZthoBnH7t//AEKvXR5dehGouSauj41/4ZA8P/8AQ13P/gGP8a9B+GH7POkfDrxfB4ntNfmv5YopohC9uIgfNABO7PbFfT24+tQyHMsOT3b+VK5yU8pw8JKUIK6PzV8V/wDBPDwf4p8T6t4mk8cXkL6rdS3RjWyVlQysWIB3cgZ61iy/8E2fCc7iW4+IOoysABl7MOcDoMlicD0r9QLFv9Dhwf4RVrcfWvdXE+PWirP8DmfD2Cerpr8Txf4L/C3T/gx8ONO8B6Zqr6jDp80zi4lh2MxlYsVKKTjGa9W+1H/nuP8Av09OiP7w/wDXw/8A6DWhuPrXi1KrlJyk7tnrU6SilGOiRlPMJUMb3ACtjP7th39TXKat8QvBmganc6ZqviGzsrpCGeGU/Om4AjPPcc1214c2sgJ7D+Yr8qv2kGQfGjxECR1t/wD0QlSeVnOYTw1NTgr62P0P/wCFufDv/oa9P/76/wDr1v6J4l8PeKILq80PV4NQSFo1dofmEbD5lBHXmvxh3x+o/SvvX9j3afDfiYgg/wCnWn/oFB5+V55Ur1vZyikj7I+1H/nuP+/T01rklSPtAGQf+WT1qFjnrTJG/dvzn5T/ACpXPqLaHi3xE+FWn+O9StL+51Z7JraARBUh8zcM5DZzxmvPf+GcNG/6GKb/AMBf/r19QWxxOf8ArjF/Wru4+teLiOHcFVm6lSmm3uelQzfEwioQm0keJ/Dr4U6d4D1efUrbVpL154TFseHy8DOSc55xXrEdwVjVftCkAAA+S3SrM5zcQZ9JP/QanhOII+f4R/KvSwmDp0IKnSVkuhxV8ROrLnqO7KX2o/8APcf9+nrC1rxHoHhe1tb/AFvVoLCKUvGkk3yq7E7iAOuRiuvDHPWvjH9rwr/whnh8sRj+0Jev/XN66UeXmWJdGjKpFXaPfv8Ahbnw7/6GvT/++v8A69XdN+IngnXtRttM0zxHZXd1I4KRRn53K84HNfjlvjHcV7D8Aih+MHhkAgn7QfT+6aD5zB8R1alSMHFas+s/Fn7MGh+KPE2qeIpPEs9u+o3EkzRra7whY5Khs84Nc9/wyFoH/Q13H/gH/wDZV9p2ZxB1/jf/ANDNWtx9a5nhad9j9Kp5/jFGyqPQ8w+E3w+s/hp4Zk8OWWoPqKNcPOZHj8oguBxt59K9OqCLme4z6r/6CKnrVJJWR5c6spyc5PVhRRRQSFFFFABVO4++PpVyqdx98fSgD//Q/e5PuL9BTqan3F+gp1ABRRRQAUUUUAZWraHouv262uuWEGoQo29UuI1lUN0yAwIzXP8A/Ctvh3/0LGm/+AkX/wATXa0UrI0jVktEzlbHwJ4J0y7jv9N0CwtbmE5SWK2jR1PqGAyK6XyIck7Bkkk/U9aloppEyk27tkXkQ/3BSiGEKVCDBwT+FSUUEkXkQ/3BSfZ4CMFARU1FAWMTUPDXhzVp/tWq6XbXkwAXfNErttHbJB4qj/wg3gr/AKANj/4Dx/4V1NFZSoQerii1UltcyNO8P6BpBlOlabb2ZmG1/JiVNw9DgDNaPkQj+AVNRWkYpKyJbu7si8iHOdgoMEJx8g+Xge1S0VVxEXkQn+AUqwxKQwUZHQ1JRSAhFvAOiACjyIf7oqaigCLyIdu3YMZz+PrR5EP9wVLRQBD9nhIwUBFc7qPgjwZq95JqOraDY3l1LjfLNbxySNgYGWYEnA4rqKKdyZQT3RxX/Ctfh1/0K+mf+AkX/wATW3pXhzw9oMUsGh6ZbafHOwaRbeJYg7LwCQoGSO1bVFFxKnFO6RF5EPXYKQ28J6oKmopFkTQxMQSgyAB+Ao8iHpsFS0UARCGJTkKM8j86T7PAOAgwKmop3CxF5EP9wVmar4d8P67BHa63ptvqEMLbkS4iWVVYjBIDAgHFbFFITinoziv+Fa/Dr/oV9M/8BIv/AImrdh4F8FaVdx3+l6BYWlzCcpLFbRo6n2YDIrqqKdyVTj0RF5EPPyDnn86PIhP8AqWikWMSNI+EGM0+iigAooooAKKKKACqdx98fSrlU7j74+lAH//R/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP//S/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP//T/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP//U/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFU7j74+lXKp3H3x9KAP//V/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFRyCUj9yVB/2gT/Iio8Xf96P/AL5b/wCKpoTLFFV8Xf8Aej/75b/4qjF3/ej/AO+W/wDiqdkK7LFFV8Xf96P/AL5b/wCKoxd/3o/++W/+KosguyxRVfF3/ej/AO+W/wDiqMXf96P/AL5b/wCKosguyxRVfF3/AHo/++W/+Koxd/3o/wDvlv8A4qiyC7LFFV8Xf96P/vlv/iqMXf8Aej/75b/4qiyC7LFFV8Xf96P/AL5b/wCKoxd/3o/++W/+KosguyxRVfF3/ej/AO+W/wDiqMXf96P/AL5b/wCKosguyxRVfF3/AHo/++W/+Koxd/3o/wDvlv8A4qiyC7LFFV8Xf96P/vlv/iqMXf8Aej/75b/4qiyC7LFFV8Xf96P/AL5b/wCKoxd/3o/++W/+KosguyxRVfF3/ej/AO+W/wDiqMXf96P/AL5b/wCKosguyxRVfF3/AHo/++W/+Koxd/3o/wDvlv8A4qiyC7LFFV8Xf96P/vlv/iqMXf8Aej/75b/4qiyC7LFFV8Xf96P/AL5b/wCKoxd/3o/++W/+KosguyxRVfF3/ej/AO+W/wDiqMXf96P/AL5b/wCKosguyxRVfF3/AHo/++W/+Koxd/3o/wDvlv8A4qiyC7LFFV8Xf96P/vlv/iqMXf8Aej/75b/4qiyC7LFFV8XfHzR/98t/8VVikxoKKKKQwooooAKp3H3x9KuVTuPvj6UAf//W/e5PuL9BTqan3F+gp1ABRRRQAUUUUAFFcZ4+8Sal4Q8L3niPTbGPUDYr5kkUkphzGOu1trc5xx+tcPZ/G3RY7m+0vxBYXNlqNlNNbqkSGaO6mhkiiMdu/wAu5y88agEL94c9cWoNq6IdRXse10V4vP8AHnwHELd4/ttxHcBMPFbMURmi88o5JGGWLc7DsFPOcA6TfGXwWNWfQ1kle+S7gs/LUR5ZrgOY2BMgAUiN+CQ/HCHij2cuwe0j3PVqK8w1vx/qGheKZtIuNMjuNNtrR7ye4hnHnQxrgJ5kbhVXzH3KmXGQpJwAaxpvjj4Yl0b+3dCs7zV7VRabnt4gyhryRESLO7mUBw20ZGP4qapSB1Ee0UV4rN8fPAcJQ7b50MZkd1tWKxbFDyK5yMNGp3MBnABwSeKuX/xt8EaddX1hO1y93p8whlhiiWV8FGk8zCOcIERmO7DYH3emT2UuwOpHuevUVwnhv4jeGvFer3WjaQ0xltlZ1eSIpHMsb+XIYmP3gjcNkDqMZHNd3UNW3KTvsFFFFIYUUUUAFFFFABRRRQAUUUUAFFFFABRRWbquq2uj2yXV2HKSSxQjYu475mCLn0GTye1AGlRXKz+MNKs4tYnv1ltYtDVXuXlUBdjDcGUgnIxz2qc+LNCjt1ubm5+zK8QmUSqykxs21WAwc5yMAZPIyOarlYuZHR0VzEvjHw5BM0M96qFYmnzglTEoUlgygjHzrgdTngVo6frem6os8lnMGjtnEbOeFyVVxgnsQwocWF0a1FY667pz65J4dSQm8igFy4wdqxltgy3TJPb05rNtfGnhu7hSWO8VfNeaNFYEMWgJD8fhkE4BBBHUUuVhzI6qiuQtvHPhu6tLa/iuv9Gu4mlSVlKoFVd7BicbWCnO3rjkcc1aPjDwyEMh1GIKIjOSSeI1OCTx1z/D19qfKw5kdLRVe3ura7ijmtpVkSZd6EH7ynuPbmuIi+JXhqSeztmMsct9NNBGrKud8D+W4wGP8XAxk98YoUWFzv6K4mLx/oM/h+08Swea9nfTCCLCruLlio53bAMqed3XjrxV268aeG7Nblpr1Stnv88oC/l+WMtkLkn/AICD0PoaOVhzI6miudbxb4bjkeGTUIleOXyWUk5EmM4P4dT0HOTwa6Kk00CdwooopDCiiigAqncffH0q5VO4++PpQB//1/3uT7i/QU6mp9xfoKdQAUUUUAFFFFAGdq+k6drum3GkatD9os7pSksZJUMp7ZUgj8K5bUPhp4K1Te17p5Z3lmm3pNLG6y3DxSu6Mjgq2+GNgy4KlRtxzXdUU07bCaR59b/CvwDa2aWEGlBYIyGC+bKTuEBtckl8k+SSpyec5+9zWdB8GPhxawyW1tpsscMskErxi7udhNs7SRLt83Hlo7Fgn3cnpXqVFPmYuVHnWq/CnwRrWoalqmo2ty8+rmI3QS/u445DBt8s+UkqxqU2KQVUEHnqTl2n/CrwNpRxYWMsSHySY/tVwYmeBw8bshkKs4IHzkFiBgkivQ6KOdhyo8/Hwt8BLFNCNKXZP5u8ebLz567JP4/4l49u1VLH4P8Aw600ym00or524MGuJ3AV1dWVQzkKuJH4GAM/SvS6KOdj5UctpHgvwxoN1HeaRYi3miSWNWDu2FmcSOMMxHLAH+VdTRRSbGkFFFFIAooooAKKKKACiiigAooooAKKKKACs7VdJsdatPsWoozw70kwsjxndGwZTuQqeCAcZ571o0UAZE+g6Tc2d7p9xbiS31Fma4RiSJC4AbPPQgAYHFc3d/DfwpdSJMtvJDKoij3pNLu8qKQSCMfN8oyAMrggcA4ru6Kd2KxyF14C8J3sLW9xYZjePymAkkUFMIMHDdvLXB6gjPXNbVjommacs6WkO1blw8gJLAsqqoOGJxwo6fXrWrRQ2x2Mc6Bop1WTXPsca6hNCbd5wMSNESCVLD6DnrWTa+A/CFiNtlpqQLwQqFlUFcYOAcZ+UZPU45zXXUUXYWOLf4eeDnkjlbTgWhR40/eSYCOgjYY3Y5UAZ61Su/hr4avtQkubmJjaywPE9sHkCM0jbmkJ3fe7AgAj1xgV6DRRzMVkVrezt7WKOGFAqwoI07kKMcZ69hWIPCXh/AD2xlxM8/7yR3zK67S53McnaABn7vbFdJRQmxnMf8Id4f8A7EPhwQOunklmjE0oLZ6hnDbmB7gnFQjwN4VVLpEsdgvTK0u2SQZM4xJjDfLu9sYPI5rraKOZiscoPA/hYLcr9hBF28kkuXf5mlXa5+9xuHXHfnrXV0UUNjCiiikAUUUUAFU7j74+lXKp3H3x9KAP/9D97k+4v0FOpqfcX6CnUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVTuPvj6VcqncffH0oA//9H97k+4v0FOpEB2Lx2FOwfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEopcH0owfSgBKKXB9KMH0oASilwfSjB9KAEqncffH0q7g+lUrkHeOD0oA//Z" alt="Cover of the Enterprise AI Platform Lab Guide">
+      </div>
+      <div class="buch-text">
+        <h2>The book this architecture came out of</h2>
+        <p>The missing layer was not drawn on a whiteboard. It is what remains after 386 pages describing how this work is done by hand today — every station on the request path, every calculation, every operational mistake somebody has already made.</p>
+        <p>The <em>Enterprise AI Platform Lab Guide</em> covers the manual mode in full: GPU infrastructure and the NVIDIA stack, GPU sharing, vLLM and KServe, distributed inference, gateway, identity, governance, observability, FinOps and capacity planning. If you want to know why nyrvex is cut the way it is, the reasoning is in there — with labs that run on a single card.</p>
+        <dl class="fakten">
+          <div><dt>Length</dt><dd>386 pages · 17 chapters · 4 appendices</dd></div>
+          <div><dt>Labs</dt><dd>23 hands-on labs, all runnable on a single GPU</dd></div>
+          <div><dt>Edition</dt><dd>Updated 3 September 2026 — written against Kubernetes 1.31 and vLLM 0.8.x</dd></div>
+          <div><dt>Formats</dt><dd>PDF and EPUB, from Leanpub</dd></div>
+        </dl>
+        <p class="btnrow">
+          <a class="btn" href="https://leanpub.com/enterprise-ai-platform">Buy on Leanpub · from $25</a>
+          <a href="https://thomaszachmann.de/buch">German edition — free download</a>
+        </p>
+        <p class="caption">The German edition is a free download at thomaszachmann.de — no sign-up, no email address.</p>
       </div>
     </div>
   </section>
 
-  <hr class="rule">
-
-  <!-- ================= BOOK TWO ================= -->
-  <section class="book">
-    <div class="wrap">
-      <p class="label">Book Two — available</p>
-      <a href="/enterprise-ai-platform" aria-label="Enterprise AI Platform">
-        <img class="cover" src="img/enterprise-ai-platform.webp" width="720" height="1029"
-             alt="Cover of Enterprise AI Platform by Thomas Zachmann">
-      </a>
-      <h2>Enterprise AI Platform</h2>
-      <p class="sub">Lab Guide — GPU Infrastructure, Model Serving and Operations</p>
-      <p class="meta">386 pages · 17 chapters · 23 labs · PDF and EPUB</p>
-
-      <p>
-        The platform underneath the models: GPUs under Kubernetes, inference
-        servers, an AI gateway with identity and quotas, governance, observability
-        and the cost per thousand requests. Written for platform engineers, not for
-        data scientists.
-      </p>
-      <p>
-        Twenty-three labs on a reference lab you can rebuild: one NVIDIA GPU passed
-        through to a virtual machine, RKE2 across several nodes. Every lab names its
-        prerequisite and its expected output, so you can tell whether it worked —
-        and how you notice when it did not.
-      </p>
-
-      <div class="buy">
-        <a class="btn" href="https://leanpub.com/enterprise-ai-platform" rel="noopener">Buy on Leanpub</a>
-        <a class="btn btn-quiet" href="https://leanpub.com/enterprise-ai-platform#sample" rel="noopener">Read a sample</a>
-        <p class="note">PDF and EPUB · free updates for every future edition</p>
-        <p class="note"><a href="/enterprise-ai-platform">What is in the book</a></p>
+  <section id="parts">
+    <div class="mass"><span class="lbl">The four parts</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>Not a toolbox. A loop.</h2>
+      <div class="spine">
+        <div class="bs">
+          <h3>Catalog</h3>
+          <p class="was">what should hold</p>
+          <p>Models, teams, environments. A model has a purpose, a data class, a context length, an approval carrying a date and a signature, and an evaluation set it has to pass. A team has a cost centre, a data class, the models it may use, a budget and limits. None of this is invented here — it is the structure of the reference repository from the book, no longer a convention but a data model.</p>
+        </div>
+        <div class="bs">
+          <h3>Sizing</h3>
+          <p class="was">whether it fits</p>
+          <p>Before a change is rolled out, it is worked through: usable KV cache, concurrent sequences, requests in the system by Little's law, price per million tokens. nyrvex knows both the model and the quotas of the teams allowed to use it — which is why it can tell you the two do not add up.</p>
+        </div>
+        <div class="bs">
+          <h3>Reconcile</h3>
+          <p class="was">who carries it out</p>
+          <p>The configuration of every system involved is generated from the catalog and kept in step with it: the gateway's model list and quotas, the serving layer's InferenceServices, groups and mappers in the identity provider, provider keys in the secret store. When a system drifts from the catalog, that is visible and reversible.</p>
+        </div>
+        <div class="bs">
+          <h3>Accounting</h3>
+          <p class="was">what actually happened</p>
+          <p>Usage and cost arise at the gateway, utilisation at the GPU, readiness at the serving layer. Only joined do they answer a question worth asking: what does a thousand tokens cost in-house, and which team spent them?</p>
+        </div>
+        <p class="loop">↺ Accounting supplies the measurements that correct sizing's own assumptions. That is why it is a loop and not a chain.</p>
       </div>
     </div>
   </section>
 
-  <hr class="rule">
+  <section id="sizing">
+    <div class="mass"><span class="lbl">The core</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>Kubernetes has a scheduler. It is no use for GPUs.</h2>
+      <aside class="note">A tool that only generates configuration has the first and the third. The scheduler is what is missing.</aside>
+      <p>Kubernetes is three things: a declarative resource model, a scheduler that maps intent onto available capacity, and control loops that pull actual state towards desired state.</p>
+      <p>The scheduler cannot be borrowed here. It treats a GPU as an integral, non-overcommittable resource: it knows a card is free. It knows nothing about video memory, context length, weights or KV cache — which are exactly the quantities that decide whether a model actually runs.</p>
+      <p>This arithmetic is well understood. It is simply not part of the system yet; it is the operator's job.</p>
+    </div>
+    <div class="term">
+<pre><span class="pr">$</span> <span class="cmd">nyrvex apply -f catalog/models.yaml</span>                      <span class="cm"># draft</span>
 
-  <!-- ================= AUTHOR ================= -->
-  <section class="author">
-    <div class="wrap">
-      <p class="label">The author</p>
-      <p>
-        <strong>Thomas Zachmann</strong> has spent more than twenty years building
-        systems, most recently Kubernetes platforms for organisations where security
-        and auditability are the requirement rather than the aspiration:
-        on-premises, on bare metal, in air-gapped networks and in European sovereign
-        clouds. CKS, CKA, CKAD.
-      </p>
-      <p>
-        He works as an independent platform engineer from Hamburg, Germany —
-        <a href="https://thomaszachmann.de">thomaszachmann.de</a>.
-      </p>
+  <span class="ok">✓</span> corp-chat   sized · rolled out
+  <span class="wt">⏸</span> corp-rag    sized · waiting for capacity
+
+<span class="pr">$</span> <span class="cmd">nyrvex describe model corp-rag</span>
+
+  State      <span class="wt">Waiting for capacity</span> — for 4 min
+  Sizing     context 16384 · 2 replicas · pool a100-40g
+
+    weights              <span class="em">7.1 GB</span>
+    activations          <span class="em">1.8 GB</span>
+    usable              <span class="em">36.0 GB</span>
+    KV cache left       <span class="em">27.1 GB</span>
+    per sequence         <span class="em">1.05 GB</span>
+    → <span class="em">25</span> concurrent sequences per replica, <span class="em">50</span> in total
+
+    The teams assigned to it require <span class="em">118</span> concurrent.
+
+  Suggestion context 8192  → 51 per replica
+             5 replicas   → 125 in total
+             <span class="em">sizing: override</span>   (recorded)</pre>
+    </div>
+    <div class="col">
+      <p class="caption">Draft of the command-line output. Arithmetic follows the formulas in appendix C.8.</p>
+      <p>The declaration is accepted; the rollout is not. The model sits in the catalog and waits — with the arithmetic as its reason, rather than an error twenty minutes into loading. You can override the calculation; the override is recorded.</p>
+    </div>
+  </section>
+
+  <section id="not">
+    <div class="mass"><span class="lbl">Boundaries</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>What nyrvex is not</h2>
+      <ul class="nicht">
+        <li><b>Not a replacement for the tools you run.</b> Gateway, serving layer, inference server, identity provider and secret store stay exactly what they are. nyrvex configures them — the way Kubernetes did not replace the container runtime, but conducts it.</li>
+        <li><b>Not an inference server.</b> nyrvex runs no models and sits outside the request path. If it fails, requests keep flowing; you simply cannot change anything until it is back.</li>
+        <li><b>Not an ML platform.</b> No training, no fine-tuning, no experiment tracking. What happens inside the model matters only as far as it decides something an operator has to decide.</li>
+        <li><b>Not a replacement for Kubernetes.</b> The analogy describes the relationship, not the ambition.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="mass"><span class="lbl">Status</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>An architecture, not a product</h2>
+      <p>There is nothing to download and no timeline. The commands shown are drafts. If you came looking for a waiting-list form: there isn't one of those either.</p>
+      <p><strong>Settled so far:</strong> a resource model of its own as the single truth, built on the repository structure from the Lab Guide; the four parts; a command line and an interface; and that sizing holds back the rollout rather than rejecting the declaration.</p>
+    </div>
+  </section>
+
+  <section id="decisions">
+    <div class="mass"><span class="lbl">Decisions</span><span class="rule"></span></div>
+    <div class="col">
+      <h2>Three decisions, and the reasoning</h2>
+      <p>None of them was obvious. If you would have decided differently, that is the most useful thing you can send me.</p>
+
+      <div class="frage">
+        <h3>The catalog separates the file from the promise</h3>
+        <p>A <code>Model</code> states what is true about the artefact; an <code>Endpoint</code> states what we promise about the service. The same weights serve chat at 8k and RAG at 16k without being declared twice — and raising a revision becomes one operation that marks every endpoint whose approval has to be renewed.</p>
+      </div>
+      <div class="frage">
+        <h3>Sizing holds back the rollout — it does not reject the declaration</h3>
+        <p>An apply always succeeds, so a GitOps sync never breaks because someone changed a context length. What waits is the rollout, carrying the arithmetic as its reason. The calculation can be overridden, and the override is recorded.</p>
+      </div>
+      <div class="frage">
+        <h3>The control plane lives where the gateway database lives</h3>
+        <p>One operator in the cluster that already carries gateway, identity and secrets — not one per cluster. A team has one budget, so it needs one counter. Endpoints and GPU pools stay local to their cluster; everything a quota depends on stays central.</p>
+      </div>
+
+      <div class="kontakt">
+        <p>If you run an AI platform, you have probably made at least one of these calls differently. I read every message: <a href="mailto:contact@nyrvex.com">contact@nyrvex.com</a></p>
+        <p>The reasoning behind all of this is written out in the <em>Enterprise AI Platform Lab Guide</em> (German): <a href="https://thomaszachmann.de/buch">thomaszachmann.de/buch</a></p>
+      </div>
     </div>
   </section>
 
 </main>
 
 <footer>
-  <div class="wrap">
-    <p class="links">
-      <a href="/imprint">Impressum</a>
-      <a href="/privacy">Datenschutz</a>
-      <a href="mailto:thomas@zachmann.work">Contact</a>
-    </p>
-    <p>© 2026 Thomas Zachmann · Nyrvex</p>
+  <div class="sheet">
+    <div class="fgrid">
+      <div>
+        <h4>nyrvex</h4>
+        <p>The control plane layer for AI infrastructure.<br>An architecture, not a product.</p>
+      </div>
+      <div>
+        <h4>Page</h4>
+        <ul>
+          <li><a href="#problem">The problem</a></li>
+          <li><a href="#parts">The four parts</a></li>
+          <li><a href="#sizing">The core</a></li>
+          <li><a href="#status">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Books</h4>
+        <ul>
+          <li><a href="https://leanpub.com/enterprise-ai-platform">Enterprise AI Platform</a></li>
+          <li><a href="/vault-in-practice">Vault in Practice</a></li>
+          <li><a href="https://thomaszachmann.de/buch">AI Platform in German — free</a></li>
+          <li><a href="https://creativecommons.org/licenses/by-nd/4.0/">Licence CC BY-ND 4.0</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/imprint.html">Legal notice</a></li>
+          <li><a href="/privacy.html">Privacy policy</a></li>
+          <li><a href="mailto:contact@nyrvex.com">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbot">© 2026 Thomas Zachmann · Ohlendiekskamp 54, 22399 Hamburg</div>
   </div>
 </footer>
+
 </body>
 </html>

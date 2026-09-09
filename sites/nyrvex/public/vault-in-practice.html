@@ -1,289 +1,467 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vault in Practice — a hands-on lab guide to HashiCorp Vault and OpenBao</title>
-<meta name="description" content="598 pages, 24 chapters, 24 labs that run on your laptop in Docker. Covers the Vault Associate exam objectives in full, with a practice exam. For platform engineers, SREs and security engineers.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://nyrvex.com/vault-in-practice">
-<meta property="og:title" content="Vault in Practice — a hands-on lab guide to HashiCorp Vault and OpenBao">
-<meta property="og:description" content="24 chapters, 24 labs, and three that ask you to break things. Covers the Vault Associate exam objectives in full.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Vault in Practice - a hands-on lab guide to HashiCorp Vault and OpenBao. 598 pages, 24 chapters, 24 labs that run on your laptop in Docker. No cloud account required.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Vault in Practice - a hands-on lab guide to HashiCorp Vault and OpenBao">
+<meta property="og:description" content="Engineers understand what Vault does within an hour, then spend months learning what the error messages mean. Twenty-four chapters, each ending in a working lab.">
 <meta property="og:type" content="book">
 <meta property="og:url" content="https://nyrvex.com/vault-in-practice">
-<meta property="og:image" content="https://nyrvex.com/img/vault-in-practice.webp">
-<meta name="theme-color" content="#f5f1e8">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f5f1e8'/><rect y='2' width='32' height='7' fill='%238c2f24'/><text x='16' y='26' font-family='Georgia,serif' font-size='17' fill='%231a1a18' text-anchor='middle'>N</text></svg>">
-
+<link rel="canonical" href="https://nyrvex.com/vault-in-practice">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:image" content="https://nyrvex.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Vault in Practice — a hands-on lab guide to HashiCorp Vault and OpenBao</title>
 <style>
-/* Palette und Haltung wie index.html: Umschlagfarben, Systemschriften,
-   keine Webfonts. Eigener Style-Block je Seite, wie im Schwesterprojekt. */
-:root{
-  --paper:#f5f1e8;
-  --ink:#1a1a18;
-  --ink-2:#4a4a45;
-  --ink-3:#8a8378;
-  --rule:#c9c0ad;
-  --accent:#8c2f24;
-  --measure:41rem;
+/* Schriften lokal ausgeliefert — keine Verbindung zu Dritten */
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/archivo-400-700-latin-ext.woff2') format('woff2');
 }
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/archivo-400-700-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-400-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-600-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/source-serif-4-400-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/source-serif-4-400-600-latin.woff2') format('woff2');
+}
+</style>
+<style>
+  :root{
+    --paper:#f1f2ee;
+    --paper-2:#e6e8e1;
+    --line:#c6cabe;
+    --line-soft:#d8dbd2;
+    --ink:#0e1620;
+    --ink-2:#4d5763;
+    --ink-3:#7d8794;
+    --signal:#b24418;
+    --signal-wash:#f6e7e0;
+    --plate:#0e1620;
+    --plate-2:#18222f;
+    --plate-line:#2e3a49;
+    --plate-ink:#e8eaec;
+    --plate-ink-2:#9aa5b2;
+    --plate-signal:#e0673a;
+    --ok:#4f8a68;
+    --disp:"Archivo",Helvetica,Arial,sans-serif;
+    --serif:"Source Serif 4",Charter,Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#12181f;
+      --paper-2:#1a222b;
+      --line:#2c3742;
+      --line-soft:#242d37;
+      --ink:#e9ebee;
+      --ink-2:#a4aeba;
+      --ink-3:#75808d;
+      --signal:#e0673a;
+      --signal-wash:#2a1a13;
+      --plate:#080c12;
+      --plate-2:#111922;
+      --plate-line:#26313d;
+      --ok:#63b083;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12181f;--paper-2:#1a222b;--line:#2c3742;--line-soft:#242d37;
+    --ink:#e9ebee;--ink-2:#a4aeba;--ink-3:#75808d;
+    --signal:#e0673a;--signal-wash:#2a1a13;
+    --plate:#080c12;--plate-2:#111922;--plate-line:#26313d;--ok:#63b083;
+  }
 
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;
-  font-size:18px;line-height:1.66;
-  -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3{margin:0;font-weight:400;line-height:1.18}
-h1,h2,h3,p,li,dd,dt{overflow-wrap:break-word}
-p{margin:0 0 1.15rem}
-a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,36,.35)}
-a:hover{border-bottom-color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.63;-webkit-font-smoothing:antialiased}
+  a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 40%,transparent)}
+  a:hover{border-bottom-color:var(--signal)}
+  a:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
 
-.label{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.6875rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--ink-3);margin:0 0 1rem;
-}
-.wrap{max-width:var(--measure);margin:0 auto;padding:0 24px}
-.skip{position:absolute;left:-9999px}
-.skip:focus{left:16px;top:12px;z-index:10;background:var(--paper);padding:10px 16px;border:1px solid var(--rule)}
+  .sheet{max-width:1060px;margin:0 auto;padding:0 28px}
+  .col{max-width:660px}
 
-.band{
-  background:var(--accent);color:var(--paper);
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.6875rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
-  text-align:center;padding:11px 24px 10px;
-}
-.masthead{padding:38px 0 0;text-align:center}
-.masthead .name{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.75rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
-  color:var(--ink);
-}
-.masthead .name a{color:inherit;border:0}
+  h1,h2,h3,.disp{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600}
+  h1{
+    font-size:clamp(2.116rem,1.248rem+3.1vw,3.418rem);line-height:1.06;
+    letter-spacing:-0.028em;font-variation-settings:"wdth" 116;font-weight:700;
+    margin:0 0 26px;text-wrap:balance;
+  }
+  h2{font-size:clamp(1.736rem,1.248rem+1.7vw,2.441rem);line-height:1.12;letter-spacing:-0.022em;margin:0 0 18px;text-wrap:balance}
+  p{margin:0 0 19px}
+  em{font-style:italic}
 
-.rule{border:0;border-top:1px solid var(--rule);margin:56px auto;max-width:var(--measure)}
+  /* ---------- Maßlinie ---------- */
+  .mass{display:flex;align-items:center;gap:16px;margin:0 0 30px}
+  .mass .lbl{font-family:var(--mono);font-size:0.759rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);white-space:nowrap}
+  .mass .rule{flex:1;height:7px;border-top:1px solid var(--line);border-left:1px solid var(--line);border-right:1px solid var(--line)}
 
-/* ---------- Buchkopf ---------- */
-.head{padding:50px 0 0;text-align:center}
-.head .cover{
-  display:block;width:100%;max-width:320px;height:auto;margin:0 auto 36px;
-  border:1px solid var(--rule);
-}
-.head h1{font-size:clamp(1.8rem,4.6vw,2.5rem);margin-bottom:.4rem}
-.head .sub{color:var(--ink-2);font-style:italic;margin:0 0 1.5rem;font-size:1.0625rem}
-.head .meta{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--ink-3);margin:0 0 2rem;
-}
-.buy{margin-top:1.6rem}
-.btn{
-  display:inline-block;border:1px solid var(--accent);border-radius:2px;
-  background:var(--accent);color:var(--paper);
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.875rem;font-weight:600;letter-spacing:.06em;padding:13px 26px;
-}
-.btn:hover{background:#75271e;border-color:#75271e}
-.btn-quiet{background:transparent;color:var(--accent);margin-left:.5rem}
-.btn-quiet:hover{background:rgba(140,47,36,.06);border-color:var(--accent);color:var(--accent)}
-.buy .note{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.8125rem;color:var(--ink-3);margin:.9rem 0 0;
-}
+  /* ---------- Kopf ---------- */
+  header.top{background:var(--plate);color:var(--plate-ink)}
+  .top .sheet{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px;flex-wrap:wrap}
+  .wordmark{font-family:var(--disp);font-variation-settings:"wdth" 120;font-weight:700;font-size:1.541rem;letter-spacing:-0.02em;color:var(--plate-ink);border:0}
+  .wordmark b{color:var(--plate-signal);font-weight:700}
+  .top nav{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:0.792rem;letter-spacing:.06em;text-transform:uppercase}
+  .top nav a{color:var(--plate-ink-2);border:0}
+  .top nav a:hover{color:var(--plate-signal)}
+  .lang{display:flex;gap:10px;align-items:center;padding-left:20px;margin-left:2px;border-left:1px solid var(--plate-line)}
+  .lang a{color:var(--plate-ink-2)}
+  .lang .on{color:var(--plate-signal);font-weight:600}
 
-/* ---------- Fliesstext ---------- */
-.prose{padding:8px 0}
-.prose p{color:var(--ink-2)}
-.prose h2{font-size:1.5rem;margin:0 0 1rem}
+  /* ---------- Platte (dunkel) ---------- */
+  .plate{background:var(--plate);color:var(--plate-ink)}
+  .plate .eyebrow{font-family:var(--mono);font-size:0.781rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 20px}
+  .plate h1{color:var(--plate-ink)}
+  .plate .lead{font-size:1.291rem;line-height:1.55;color:var(--plate-ink-2);max-width:620px}
+  .plate .lead b{color:var(--plate-ink);font-weight:600}
+  .claim{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:clamp(1.248rem,0.977rem+.9vw,1.627rem);color:var(--plate-signal);margin:26px 0 0;letter-spacing:-0.012em}
+  .hero{padding:60px 0 26px}
+  .masthead{font-family:var(--disp);font-variation-settings:"wdth" 125;font-weight:700;font-size:clamp(3.906rem,1.627rem+8.6vw,8.029rem);line-height:.86;letter-spacing:-0.045em;color:var(--plate-ink);margin:0 0 22px}
+  .masthead b{color:var(--plate-signal);font-weight:700}
+  .hero .stamp{margin-top:34px}
 
-/* ---------- Aufzaehlung der Labs ---------- */
-.does{margin:1.4rem 0 0;padding:0;list-style:none}
-.does li{
-  color:var(--ink-2);padding:.5rem 0 .5rem 1.5rem;position:relative;
-  border-bottom:1px solid var(--rule);
-}
-.does li:first-child{border-top:1px solid var(--rule)}
-.does li::before{
-  content:"—";position:absolute;left:0;color:var(--ink-3);
-}
+  .stamp{border:1px solid var(--plate-line);padding:13px 17px;display:inline-block;max-width:100%}
+  .stamp .k{font-family:var(--mono);font-size:0.684rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-ink-2);display:block;margin-bottom:6px}
+  .stamp .v{font-family:var(--mono);font-size:0.857rem;color:var(--plate-ink);line-height:1.75;display:block}
 
-/* ---------- Inhaltsverzeichnis ---------- */
-.toc{margin:1.4rem 0 0;padding:0;list-style:none;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.9375rem}
-.toc li{display:flex;gap:1rem;padding:.4rem 0;border-bottom:1px solid var(--rule);color:var(--ink-2)}
-.toc li span{color:var(--ink-3);flex:none;width:2.2rem;text-align:right}
-.toc-note{
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.8125rem;color:var(--ink-3);margin:1rem 0 0;
-}
+  /* ---------- Diagramm ---------- */
+  .diagram{padding:8px 0 74px}
+  .diagram figure{margin:0}
+  .diagram svg{display:block;width:100%;height:auto;overflow:visible}
+  .d-box{fill:none;stroke:var(--plate-line);stroke-width:1}
+  .d-fill{fill:var(--plate-2)}
+  .d-gap{fill:none;stroke:var(--plate-signal);stroke-width:1.5;stroke-dasharray:7 6}
+  .d-line{stroke:var(--plate-line);stroke-width:1}
+  .d-t{font-family:var(--mono);font-size:13px;fill:var(--plate-ink)}
+  .d-s{font-family:var(--mono);font-size:11.4px;fill:var(--plate-ink-2)}
+  .d-cap{font-family:var(--mono);font-size:11.4px;letter-spacing:.16em;fill:var(--plate-ink-2)}
+  .d-name{font-family:var(--disp);font-variation-settings:"wdth" 125;font-size:49.9px;font-weight:700;fill:var(--plate-signal)}
+  .d-sig{font-family:var(--mono);font-size:12.5px;fill:var(--plate-signal)}
+  @media (prefers-reduced-motion:no-preference){
+    .d-gap{stroke-dashoffset:340;animation:draw 1.4s .25s ease-out forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+  }
+  .diagram figcaption{font-family:var(--mono);font-size:0.792rem;color:var(--plate-ink-2);margin-top:22px;letter-spacing:.03em}
 
-footer{
-  border-top:1px solid var(--rule);margin-top:66px;padding:30px 0 46px;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:.8125rem;color:var(--ink-3);text-align:center;
-}
-footer a{color:var(--ink-3);border-bottom-color:rgba(138,131,120,.4)}
-footer a:hover{color:var(--ink);border-bottom-color:var(--ink)}
-footer .links{margin:0 0 .6rem}
-footer .links a{margin:0 .55rem}
+  /* ---------- Abschnitte ---------- */
+  section{padding:74px 0}
+  section + section{border-top:1px solid var(--line-soft)}
+
+  /* ---------- Randnotiz ---------- */
+  aside.note{font-family:var(--mono);font-size:0.814rem;line-height:1.6;color:var(--ink-3);border-left:2px solid var(--signal);padding-left:14px;margin:0 0 24px}
+  @media (min-width:1080px){
+    aside.note{float:right;clear:right;width:236px;margin:.35rem -292px 1.5rem 46px}
+  }
+
+  /* ---------- Tabelle ---------- */
+  .tablewrap{overflow-x:auto;margin:26px 0 12px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:1.031rem}
+  th{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 18px 10px 0;border-bottom:1.5px solid var(--ink)}
+  td{padding:12px 18px 12px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.45}
+  td:last-child,th:last-child{padding-right:0}
+  td.n{font-family:var(--mono);font-size:0.868rem;color:var(--signal);font-weight:600;width:34px;padding-top:14px}
+  td.sys{font-family:var(--mono);font-size:0.879rem;color:var(--ink-2);white-space:nowrap}
+  .caption{font-family:var(--mono);font-size:0.803rem;color:var(--ink-3);margin:0 0 24px;letter-spacing:.02em}
+
+  /* ---------- Zitatplatte ---------- */
+  .zitat{border-left:4px solid var(--signal);background:var(--signal-wash);padding:26px 28px;margin:4px 0 24px}
+  .zitat .k{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:12px}
+  .zitat p{margin:0;font-family:var(--disp);font-variation-settings:"wdth" 108;font-weight:500;font-size:1.541rem;line-height:1.24;letter-spacing:-0.015em;color:var(--ink)}
+  .zitat .cite{font-family:var(--mono);font-size:0.781rem;color:var(--ink-3);margin-top:14px;font-weight:400;letter-spacing:.02em}
+
+  /* ---------- Bausteine als Kreislauf ---------- */
+  .spine{position:relative;margin:30px 0 0;padding-left:38px}
+  .spine::before{content:"";position:absolute;left:5px;top:10px;bottom:44px;width:1px;background:var(--line)}
+  .bs{position:relative;padding:0 0 30px}
+  .bs::before{content:"";position:absolute;left:-38px;top:9px;width:11px;height:11px;border:2px solid var(--signal);background:var(--paper);border-radius:50%}
+  .bs h3{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600;font-size:1.28rem;letter-spacing:-0.01em;margin:0 0 2px}
+  .bs .was{font-family:var(--mono);font-size:0.803rem;color:var(--signal);letter-spacing:.09em;text-transform:uppercase;margin:0 0 9px}
+  .bs p{margin:0}
+  .loop{position:relative;font-family:var(--mono);font-size:0.814rem;color:var(--ink-3);padding-left:0;line-height:1.5}
+  .loop::before{content:"";position:absolute;left:-38px;top:2px;width:11px;height:11px;border:2px dashed var(--line);border-radius:50%;background:var(--paper)}
+
+  /* ---------- Buch ---------- */
+  .buch{display:grid;grid-template-columns:236px minmax(0,1fr);gap:46px;align-items:start}
+  .buch-cover img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+  .buch-text{max-width:600px}
+  .fakten{margin:26px 0 0;padding:0;border-top:1px solid var(--line-soft)}
+  .fakten div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+  .fakten dt{font-family:var(--mono);font-size:0.738rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+  .fakten dd{margin:0;font-size:1.052rem;line-height:1.5}
+  .btnrow{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin:28px 0 14px}
+  .btn{font-family:var(--mono);font-size:0.89rem;font-weight:600;letter-spacing:.05em;background:var(--signal);color:#fff;padding:14px 24px;border:0;display:inline-block}
+  .btn:hover{background:var(--ink);color:var(--paper);border:0}
+  @media (max-width:720px){.buch{grid-template-columns:1fr;gap:26px}.buch-cover{max-width:214px}}
+
+  /* ---------- Terminal ---------- */
+  code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1px 5px;border:1px solid var(--line-soft)}
+  .term{background:var(--plate);padding:26px 24px;margin:26px 0 12px;overflow-x:auto;border-left:4px solid var(--plate-signal)}
+  .term pre{margin:0;font-family:var(--mono);font-size:0.868rem;line-height:1.78;color:var(--plate-ink-2);font-variant-numeric:tabular-nums}
+  .term .cmd{color:var(--plate-ink);font-weight:500}
+  .term .pr{color:#5d6874}
+  .term .cm{color:#5d6874}
+  .term .ok{color:#5fbf8b;font-weight:500}
+  .term .wt{color:var(--plate-signal);font-weight:500}
+  .term .em{color:var(--plate-ink);font-weight:500}
+
+  /* ---------- Negativliste ---------- */
+  .nicht{margin:26px 0 0;padding:0;list-style:none}
+  .nicht li{padding:16px 0;border-top:1px solid var(--line-soft)}
+  .nicht li:last-child{border-bottom:1px solid var(--line-soft)}
+  .nicht b{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.107rem;display:block;margin-bottom:4px;letter-spacing:-0.008em}
+
+  /* ---------- Fragen ---------- */
+  .frage{padding:24px 0;border-top:1px solid var(--line-soft)}
+  .frage:first-of-type{border-top:1.5px solid var(--ink)}
+  .frage h3{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.389rem;letter-spacing:-0.015em;margin:0 0 7px}
+  .frage p{margin:0;color:var(--ink-2);font-size:1.107rem}
+  .kontakt{margin-top:36px;padding:26px 28px;border:1px solid var(--line);background:var(--paper-2)}
+  .kontakt p:last-child{margin-bottom:0}
+  .todo{font-family:var(--mono);font-size:0.781rem;background:var(--signal);color:#fff;padding:2px 7px;white-space:nowrap}
+
+  /* ---------- Fuß ---------- */
+  footer{background:var(--plate);color:var(--plate-ink-2)}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:34px;padding:56px 0 40px}
+  .fgrid h4{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 13px}
+  .fgrid ul{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:0.857rem;line-height:2.05}
+  .fgrid p{font-family:var(--mono);font-size:0.857rem;line-height:1.7;margin:0}
+  footer a{color:var(--plate-ink);border-bottom-color:#39434f}
+  footer a:hover{color:var(--plate-signal);border-bottom-color:var(--plate-signal)}
+  .fbot{border-top:1px solid var(--plate-line);font-family:var(--mono);font-size:0.803rem;color:#68727e;padding:20px 0 44px}
+</style>
+<style>
+  /* Der dunkle Seitenkopf. Steht sonst im impressumseigenen Block; hier
+     dupliziert, damit diese Seite nicht von einer fremden Datei abhaengt. */
+  .pagehead{padding:56px 0 52px}
+  .pagehead h1{font-size:clamp(2.061rem,1.411rem+2vw,3.146rem);margin:0 0 18px}
+
+  /* Bejahende Aufzaehlung. Optisch identisch zu ".nicht", aber unter diesem
+     Namen zu lesen waere irrefuehrend — dort steht, was nyrvex NICHT ist. */
+  .tun{margin:26px 0 0;padding:0;list-style:none}
+  .tun li{padding:14px 0;border-top:1px solid var(--line-soft);font-size:1.052rem}
+  .tun li:last-child{border-bottom:1px solid var(--line-soft)}
+
+  /* Inhaltsverzeichnis. Zwei Spalten erst ab 720px: darunter wuerden die
+     Kapitelnamen umbrechen und die Nummern verlieren ihren Bezug. */
+  .kapitel{margin:26px 0 0;padding:0;list-style:none;counter-reset:kap}
+  @media (min-width:720px){.kapitel{columns:2;column-gap:46px}}
+  .kapitel li{counter-increment:kap;break-inside:avoid;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  .kapitel li::before{content:counter(kap);font-family:var(--mono);font-size:0.868rem;font-weight:600;color:var(--signal);padding-top:3px}
+  .kapitel span{font-size:1.031rem;line-height:1.4}
+
+  .marke{font-family:var(--mono);font-size:0.781rem;line-height:1.7;color:var(--ink-3);border-top:1px solid var(--line-soft);padding-top:20px;margin-top:44px}
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="sheet">
+<a class="wordmark" href="/">nyrvex<b>.</b></a>
+<nav>
+<a href="/">Home</a>
+<a href="/imprint.html">Legal notice</a>
+<a href="/privacy.html">Privacy</a>
+<span class="lang"><span class="on">EN</span><a href="https://nyrvex.de/">DE</a></span>
+</nav></div></header>
 
-<div class="band">In Practice · Book One</div>
+<div class="plate"><div class="sheet pagehead">
+  <p class="eyebrow">Lab guide</p>
+  <h1>Vault in Practice</h1>
+  <p class="lead">A hands-on lab guide to <b>HashiCorp Vault and OpenBao</b>. Twenty-four chapters, each ending in a lab that runs on your laptop in Docker — no cloud account, no spare server.</p>
+  <div class="stamp" style="margin-top:32px">
+    <span class="k">Edition</span>
+    <span class="v">598 pages · 24 chapters · 24 labs · 12 appendices<br>PDF and EPUB · free updates for every future edition</span>
+  </div>
+</div></div>
 
-<div class="masthead">
-  <p class="name"><a href="/">Nyrvex</a></p>
-</div>
-
-<main id="main">
-
-  <section class="head">
-    <div class="wrap">
-      <!-- Raster statt der vorhandenen front-cover.svg: die SVG setzt
-           font-family "Avenir Next", das es nur auf macOS gibt. Auf Linux
-           und Windows faellt der Umschlag auf eine Ersatzschrift zurueck
-           und sieht dann anders aus als das gedruckte Buch. -->
-      <img class="cover" src="img/vault-in-practice.webp" width="720" height="889"
-           alt="Cover of Vault in Practice by Thomas Zachmann">
-      <h1>Vault in Practice</h1>
-      <p class="sub">A Hands-On Lab Guide to HashiCorp Vault and OpenBao</p>
-      <p class="meta">598 pages · 24 chapters · 24 labs · 12 appendices · PDF and EPUB</p>
-      <div class="buy">
-        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
-        <a class="btn btn-quiet" href="https://leanpub.com/vault-in-practice#sample" rel="noopener">Read a sample</a>
-        <p class="note">PDF and EPUB · free updates for every future edition</p>
+<main>
+  <section id="book">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">The book</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/vault-in-practice.webp" width="720" height="889" alt="Cover of Vault in Practice">
+        </div>
+        <div class="buch-text">
+          <h2>The gap is not conceptual</h2>
+          <p>Engineers understand what Vault does within an hour, then spend months learning what the error messages mean, which defaults will hurt, and what happens at three in the morning when a cluster comes back sealed and nobody can find the third unseal key.</p>
+          <p>The book follows a fictional logistics company from passwords-in-Git to a production-shaped installation. Every chapter ends with the real error messages, their causes and their fixes. Five chapters ask you to destroy your own setup, because nobody who has recovered a sealed cluster under pressure learned how from a reference manual.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>598 pages · 24 chapters · 12 appendices</dd></div>
+            <div><dt>Labs</dt><dd>24 hands-on labs, all runnable on a laptop in Docker</dd></div>
+            <div><dt>Covers</dt><dd>HashiCorp Vault and OpenBao, side by side</dd></div>
+            <div><dt>Formats</dt><dd>PDF and EPUB, from Leanpub</dd></div>
+          </dl>
+          <p class="btnrow">
+            <a class="btn" href="https://leanpub.com/vault-in-practice">Buy on Leanpub</a>
+            <a href="https://leanpub.com/vault-in-practice#sample">Read a sample</a>
+          </p>
+          <p class="caption">Free updates for every future edition.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <hr class="rule">
-
-  <section class="prose">
-    <div class="wrap">
-      <p class="label">Why this book</p>
-      <h2>The gap is not conceptual</h2>
-      <p>
-        Engineers understand what Vault does within an hour, then spend months
-        learning what the error messages mean, which defaults will hurt, and what
-        happens at three in the morning when a cluster comes back sealed and nobody
-        can find the third unseal key.
-      </p>
-      <p>
-        Twenty-four chapters, each ending in a working lab that runs on your laptop
-        in Docker. No cloud account. No spare server. The book follows a fictional
-        logistics company from passwords-in-Git to a production-shaped installation.
-      </p>
+  <section id="what">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">What you will do</span><span class="rule"></span></div>
+      <div class="col">
+        <p>Not a tour of the feature list. Eight of the twenty-four labs, so the shape of the rest is visible:</p>
+        <ul class="tun">
+          <li>Split an encryption key with Shamir, then lose it on purpose</li>
+          <li>Write policies that fail, and find out why in one command</li>
+          <li>Issue database credentials that did not exist until asked for</li>
+          <li>Run a certificate authority with 24-hour certificates</li>
+          <li>Encrypt data without the application ever holding a key</li>
+          <li>Break a Raft cluster's quorum, and put it back together</li>
+          <li>Deliver secrets into Kubernetes four different ways</li>
+          <li>Deploy OpenBao, and answer the licence question honestly</li>
+        </ul>
+      </div>
     </div>
   </section>
 
-  <section class="prose">
-    <div class="wrap">
-      <p class="label">What you will do</p>
-      <ul class="does">
-        <li>Split an encryption key with Shamir, then lose it on purpose</li>
-        <li>Write policies that fail, and find out why in one command</li>
-        <li>Issue database credentials that did not exist until asked for</li>
-        <li>Run a certificate authority with 24-hour certificates</li>
-        <li>Encrypt data without the application ever holding a key</li>
-        <li>Break a Raft cluster's quorum, and put it back together</li>
-        <li>Deliver secrets into Kubernetes four different ways</li>
-        <li>Deploy OpenBao, and answer the licence question honestly</li>
-      </ul>
-      <p style="margin-top:1.6rem">
-        Every chapter ends with the real error messages, their causes and their
-        fixes. Five chapters ask you to destroy your own setup, because nobody who
-        has recovered a sealed cluster under pressure learned how from a reference
-        manual.
-      </p>
+  <section id="contents">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Contents</span><span class="rule"></span></div>
+      <div class="col"><h2>Twenty-four chapters</h2></div>
+      <ol class="kapitel">
+        <li><span>The Problem With Secrets</span></li>
+        <li><span>Building Your Lab</span></li>
+        <li><span>Initialise, Seal, Unseal</span></li>
+        <li><span>The CLI, the API, and the UI</span></li>
+        <li><span>Tokens</span></li>
+        <li><span>Policies</span></li>
+        <li><span>Authentication Methods</span></li>
+        <li><span>Identity, Entities, and Groups</span></li>
+        <li><span>Key/Value Secrets</span></li>
+        <li><span>Dynamic Database Credentials</span></li>
+        <li><span>Leases, Renewal, and Revocation</span></li>
+        <li><span>Encryption as a Service</span></li>
+        <li><span>Running Your Own CA</span></li>
+        <li><span>Response Wrapping and Secret Zero</span></li>
+        <li><span>Vault Agent</span></li>
+        <li><span>Kubernetes Foundations</span></li>
+        <li><span>Delivering Secrets into Pods</span></li>
+        <li><span>OpenBao</span></li>
+        <li><span>SSH, Cloud, and Other Engines</span></li>
+        <li><span>Storage Backends</span></li>
+        <li><span>High Availability and Raft</span></li>
+        <li><span>Auto-Unseal</span></li>
+        <li><span>Audit and Operations</span></li>
+        <li><span>Production Checklist</span></li>
+      </ol>
+      <div class="col">
+        <p class="caption" style="margin-top:28px">Twelve appendices follow, among them a command reference, a troubleshooting guide, an exam objective map, a practice exam, a production readiness review and a chapter on migrating an existing estate.</p>
+      </div>
     </div>
   </section>
 
-  <hr class="rule">
-
-  <section class="prose">
-    <div class="wrap">
-      <p class="label">Contents</p>
-      <h2>Twenty-four chapters</h2>
-      <ul class="toc">
-        <li><span>1</span>The Problem With Secrets</li>
-        <li><span>2</span>Building Your Lab</li>
-        <li><span>3</span>Initialise, Seal, Unseal</li>
-        <li><span>4</span>The CLI, the API, and the UI</li>
-        <li><span>5</span>Tokens</li>
-        <li><span>6</span>Policies</li>
-        <li><span>7</span>Authentication Methods</li>
-        <li><span>8</span>Identity, Entities, and Groups</li>
-        <li><span>9</span>Key/Value Secrets</li>
-        <li><span>10</span>Dynamic Database Credentials</li>
-        <li><span>11</span>Leases, Renewal, and Revocation</li>
-        <li><span>12</span>Encryption as a Service</li>
-        <li><span>13</span>Running Your Own CA</li>
-        <li><span>14</span>Response Wrapping and Secret Zero</li>
-        <li><span>15</span>Vault Agent</li>
-        <li><span>16</span>Kubernetes Foundations</li>
-        <li><span>17</span>Delivering Secrets into Pods</li>
-        <li><span>18</span>OpenBao</li>
-        <li><span>19</span>SSH, Cloud, and Other Engines</li>
-        <li><span>20</span>Storage Backends</li>
-        <li><span>21</span>High Availability and Raft</li>
-        <li><span>22</span>Auto-Unseal</li>
-        <li><span>23</span>Audit and Operations</li>
-        <li><span>24</span>Production Checklist</li>
-      </ul>
-      <p class="toc-note">
-        Twelve appendices follow, among them a command reference, a troubleshooting
-        guide, an exam objective map, a practice exam, a production readiness review
-        and a chapter on migrating an existing estate.
-      </p>
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <section class="prose">
-    <div class="wrap">
-      <p class="label">Who it is for</p>
-      <p>
-        Platform engineers, SREs and security engineers who will be responsible for
-        a Vault installation — not for evaluating one. The book assumes you are
-        comfortable on a Linux command line and with containers; it does not assume
-        you have used Vault before.
-      </p>
-      <p>
-        It covers the Vault Associate exam objectives in full and ends with a
-        practice exam, so it doubles as preparation without being written as a
-        cram guide.
-      </p>
-      <div class="buy" style="text-align:center">
-        <a class="btn" href="https://leanpub.com/vault-in-practice" rel="noopener">Buy on Leanpub</a>
-        <p class="note">
-          HashiCorp and Vault are trademarks of HashiCorp, Inc.
-          This book is an independent publication and is not affiliated with,
-          authorized by, sponsored by, or otherwise approved by HashiCorp, Inc.
+  <section id="who">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Who it is for</span><span class="rule"></span></div>
+      <div class="col">
+        <p>Platform engineers, SREs and security engineers who will be <em>responsible for</em> a Vault installation — not for evaluating one. The book assumes you are comfortable on a Linux command line and with containers; it does not assume you have used Vault before.</p>
+        <p>It covers the Vault Associate exam objectives in full and ends with a practice exam, so it doubles as preparation without being written as a cram guide.</p>
+        <p class="btnrow">
+          <a class="btn" href="https://leanpub.com/vault-in-practice">Buy on Leanpub</a>
+          <a href="https://leanpub.com/vault-in-practice#sample">Read a sample</a>
         </p>
+        <p class="marke">HashiCorp and Vault are trademarks of HashiCorp, Inc. This book is an independent publication and is not affiliated with, authorized by, sponsored by, or otherwise approved by HashiCorp, Inc.</p>
       </div>
     </div>
   </section>
-
 </main>
 
-<footer>
-  <div class="wrap">
-    <p class="links">
-      <a href="/">All books</a>
-      <a href="/imprint">Impressum</a>
-      <a href="/privacy">Datenschutz</a>
-      <a href="mailto:thomas@zachmann.work">Contact</a>
-    </p>
-    <p>© 2026 Thomas Zachmann · Nyrvex</p>
-  </div>
-</footer>
+<footer><div class="sheet"><div class="fgrid">
+<div><h4>nyrvex</h4><p>The control plane layer for AI infrastructure.<br>An architecture, not a product.</p></div>
+<div><h4>Page</h4><ul><li><a href="/">Home</a></li><li><a href="/#book">The book</a></li></ul></div>
+<div><h4>Books</h4><ul><li><a href="https://leanpub.com/enterprise-ai-platform">Enterprise AI Platform</a></li><li><a href="/vault-in-practice">Vault in Practice</a></li><li><a href="https://thomaszachmann.de/buch">AI Platform in German — free</a></li></ul></div>
+<div><h4>Legal</h4><ul><li><a href="/imprint.html">Legal notice</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="mailto:contact@nyrvex.com">Contact</a></li></ul></div>
+</div><div class="fbot">© 2026 Thomas Zachmann · Ohlendiekskamp 54, 22399 Hamburg</div></div></footer>
 </body>
 </html>
