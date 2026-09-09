@@ -36,8 +36,17 @@ metadata:
   name: www-redirect
   namespace: traefik
 spec:
-  # Kanonisch ist die Apex-Domain - passend zu og:url in der index.html.
+  # Kanonisch ist die Apex-Domain - passend zum canonical der Seiten.
+  #
+  # Domain-unabhaengig statt fest auf thomaszachmann.de: die Middleware wird
+  # von allen Ingresses geteilt, aber die alte Regex traf nur eine Domain.
+  # Folge, gemessen am 2026-09-09: www.thomaszachmann.de antwortete mit 308,
+  # www.nyrvex.com dagegen mit 200 - dieselbe Seite unter zwei Hosts. Mit
+  # nyrvex.de waere das die dritte Domain mit demselben Fehler.
+  #
+  # Greift nur, wo ein Ingress den www-Host auch annimmt; ein fremder
+  # Host-Header laeuft vorher ins Leere.
   redirectRegex:
-    regex: "^https://www\\.thomaszachmann\\.de/(.*)"
-    replacement: "https://thomaszachmann.de/${1}"
+    regex: "^https://www\\.(.+)"
+    replacement: "https://${1}"
     permanent: true
