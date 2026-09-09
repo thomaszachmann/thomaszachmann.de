@@ -1,15 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, follow">
+<meta name="description" content="Der Enterprise AI Platform Lab Guide ist das Buch, aus dem die nyrvex-Architektur stammt: 398 Seiten über GPU-Infrastruktur, Model Serving und den Betrieb einer KI-Plattform. Kostenlos als PDF.">
 <meta name="color-scheme" content="light dark">
-<link rel="canonical" href="https://nyrvex.com/imprint.html">
-<link rel="alternate" hreflang="de" href="https://nyrvex.de/impressum.html">
+<meta property="og:title" content="Enterprise AI Platform — das Buch hinter nyrvex">
+<meta property="og:description" content="398 Seiten darüber, wie diese Arbeit heute von Hand gemacht wird. Die fehlende Ebene ist das, was danach übrig blieb.">
+<meta property="og:type" content="book">
+<meta property="og:url" content="https://nyrvex.de/enterprise-ai-platform">
+<link rel="canonical" href="https://nyrvex.de/enterprise-ai-platform">
+<link rel="alternate" hreflang="en" href="https://nyrvex.com/enterprise-ai-platform">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:image" content="https://nyrvex.de/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Legal notice</title>
+<title>Enterprise AI Platform — das Buch, aus dem nyrvex stammt</title>
 <style>
 /* Schriften lokal ausgeliefert — keine Verbindung zu Dritten */
 @font-face {
@@ -317,73 +325,106 @@
   .fbot .ftech a:hover{color:var(--plate-signal);border-bottom-color:var(--plate-signal)}
 </style>
 <style>
-  .pagehead{padding:56px 0 46px}
-  .pagehead h1{font-size:clamp(2.061rem,1.411rem+2vw,3.146rem);margin:0 0 14px}
-  .pagehead .sub{margin:0;font-family:var(--mono);font-size:0.857rem;color:var(--plate-ink-2);letter-spacing:.03em}
-  .legal{padding:62px 0 30px}
-  .legal h2{font-size:1.454rem;margin:46px 0 15px}
-  .legal h2.first{margin-top:0}
-  .legal h3{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.107rem;margin:28px 0 7px}
-  .legal .adr{font-family:var(--mono);font-size:0.998rem;line-height:1.85;margin:0 0 22px}
-  .legal ul{margin:0 0 20px;padding-left:22px}
-  .legal li{margin-bottom:8px}
-  .legal .hinweis{border-left:3px solid var(--signal);background:var(--signal-wash);padding:20px 24px;margin:26px 0}
-  .legal .hinweis p:last-child{margin-bottom:0}
+  /* Dunkler Seitenkopf, wie auf den uebrigen Unterseiten. */
+  .pagehead{padding:56px 0 52px}
+  .pagehead h1{font-size:clamp(2.061rem,1.411rem+2vw,3.146rem);margin:0 0 18px}
+
+  /* Bejahende Aufzaehlung. Optisch identisch zu ".nicht", aber unter jenem
+     Namen zu lesen waere irrefuehrend - dort steht, was nyrvex NICHT ist. */
+  .tun{margin:26px 0 0;padding:0;list-style:none}
+  .tun li{padding:15px 0;border-top:1px solid var(--line-soft);font-size:1.031rem;line-height:1.5}
+  .tun li:last-child{border-bottom:1px solid var(--line-soft)}
+  .tun b{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.083rem;display:block;margin-bottom:3px;letter-spacing:-0.008em}
+
+  /* Die sechs Teile. Roemische Ziffer in der Signalfarbe wie td.n, aber als
+     Liste statt Tabelle: die Beschreibungen brauchen Fliesstext-Breite. */
+  .teile{margin:26px 0 0;padding:0;list-style:none}
+  .teile li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:18px;padding:16px 0;border-top:1px solid var(--line-soft)}
+  .teile li:last-child{border-bottom:1px solid var(--line-soft)}
+  .teile .r{font-family:var(--mono);font-size:0.803rem;font-weight:600;letter-spacing:.1em;color:var(--signal);padding-top:5px}
+  .teile h3{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.107rem;letter-spacing:-0.01em;margin:0 0 4px}
+  .teile p{margin:0;font-size:1.006rem;line-height:1.5;color:var(--ink-2)}
+
+  .marke{font-family:var(--mono);font-size:0.781rem;line-height:1.7;color:var(--ink-3);border-top:1px solid var(--line-soft);padding-top:20px;margin-top:44px}
 </style>
 </head>
 <body>
 <header class="top"><div class="sheet">
 <a class="wordmark" href="/">nyrvex<b>.</b></a>
 <nav>
-<a href="/">Home</a>
-<a href="/imprint.html">Legal notice</a>
-<a href="/privacy.html">Privacy</a>
-<span class="lang"><span class="on">EN</span><a href="https://nyrvex.de/">DE</a></span>
+<a href="/">Startseite</a>
+<a href="/impressum.html">Impressum</a>
+<a href="/datenschutz.html">Datenschutz</a>
+<span class="lang"><a href="https://nyrvex.com/enterprise-ai-platform">EN</a><span class="on">DE</span></span>
 </nav></div></header>
-<div class="plate"><div class="sheet pagehead"><h1>Legal notice</h1><p class="sub">Information pursuant to section 5 DDG · September 2026</p></div></div>
-<main class="sheet legal"><div class="col">
 
-<div class="hinweis">
-<p><b>This is a translation for convenience.</b> The operator is based in Germany, so the legally binding version is the German <a href="https://nyrvex.de/impressum.html">Impressum</a>.</p>
-</div>
+<div class="plate"><div class="sheet pagehead">
+  <p class="eyebrow">Lab Guide</p>
+  <h1>Enterprise AI Platform</h1>
+  <p class="lead">GPU-Infrastruktur, Model Serving und der Betrieb drumherum — aufgebaut an <b>einem Referenz-Lab, das sich nachbauen lässt</b>. Das Buch, aus dem die nyrvex-Architektur stammt.</p>
+  <div class="stamp" style="margin-top:32px">
+    <span class="k">Ausgabe</span>
+    <span class="v">398 Seiten · 17 Kapitel · 4 Anhänge · Stand September 2026<br>PDF, A4 · kostenlos · CC BY-ND 4.0</span>
+  </div>
+</div></div>
 
-<h2>Information pursuant to section 5 DDG (German Digital Services Act)</h2>
-<p class="adr">Thomas Zachmann<br>
-Ohlendiekskamp 54<br>
-22399 Hamburg<br>
-Germany</p>
+<main>
+  <section id="buch">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Das Buch</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/enterprise-ai-platform.webp" width="720" height="1029" alt="Umschlag des Lab Guide Enterprise AI Platform">
+        </div>
+        <div class="buch-text">
+          <h2>Das Buch, aus dem diese Architektur stammt</h2>
+          <p>Die fehlende Ebene ist nicht am Reißbrett entstanden. Sie ist das Ergebnis von 398 Seiten darüber, wie man diese Arbeit heute von Hand macht — jede Station des Anfragepfads, jede Rechnung, jeder Betriebsfehler, der schon jemandem passiert ist.</p>
+          <p>Der <em>Enterprise AI Platform Lab Guide</em> beschreibt den Handbetrieb vollständig: GPU-Infrastruktur und NVIDIA-Stack, GPU-Sharing, vLLM und KServe, Distributed Inference, Gateway, Identity, Governance, Observability, FinOps und Kapazitätsplanung. Wer wissen will, warum nyrvex so geschnitten ist, findet dort die Begründung — mit Labs, die auf einer einzelnen Karte laufen.</p>
+          <p>Vorausgesetzt wird Produktionserfahrung mit Kubernetes, GitOps, Identity-Providern, Secret-Verwaltung und Monitoring. Das Buch fängt dort an, wo die aufhören.</p>
+          <dl class="fakten">
+            <div><dt>Umfang</dt><dd>398 Seiten · 17 Kapitel · 4 Anhänge</dd></div>
+            <div><dt>Format</dt><dd>PDF, A4 · 7,4 MB</dd></div>
+            <div><dt>Englisch</dt><dd>386-seitige Ausgabe bei Leanpub, ab 25 $</dd></div>
+            <div><dt>Lizenz</dt><dd>CC BY-ND 4.0 — Weitergabe im Unternehmen ausdrücklich erlaubt</dd></div>
+          </dl>
+          <p class="btnrow">
+            <a class="btn" href="https://thomaszachmann.de/buch">PDF kostenlos herunterladen</a>
+            <a href="https://leanpub.com/enterprise-ai-platform">Englische Ausgabe kaufen</a>
+          </p>
+          <p class="caption">Der Download liegt beim Autor auf thomaszachmann.de. Keine Anmeldung, keine Adresse, kein Newsletter davor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<h3>Contact</h3>
-<p class="adr">Email: <a href="mailto:contact@nyrvex.com">contact@nyrvex.com</a></p>
+  <section id="inhalt">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Inhalt</span><span class="rule"></span></div>
+      <div class="col"><h2>Sechs Teile, von der GPU bis zur Referenzarchitektur</h2></div>
+      <div class="col">
+        <ul class="teile">
+          <li><span class="r">I</span><div><h3>Grundlagen der LLM-Inferenz</h3><p>Was auf der Karte tatsächlich passiert: Prefill und Decode, der KV-Cache, die VRAM-Bilanz, Batching als zentraler Hebel, Modellformate und Quantisierung.</p></div></li>
+          <li><span class="r">II</span><div><h3>GPU-Infrastruktur</h3><p>Wie aus einer Karte eine Plattform-Ressource wird: NVIDIA-Software-Stack, GPUs unter Kubernetes, GPU-Sharing und Multi-Tenancy.</p></div></li>
+          <li><span class="r">III</span><div><h3>Model Serving</h3><p>vLLM von der Architektur bis in den Produktionsbetrieb, Distributed Inference, KServe und das übrige Serving-Ökosystem.</p></div></li>
+          <li><span class="r">IV</span><div><h3>Der Enterprise-Layer</h3><p>AI Gateway mit LiteLLM, Identity, Autorisierung und Secrets, AI Security, Governance und Compliance.</p></div></li>
+          <li><span class="r">V</span><div><h3>Betrieb</h3><p>Observability und FinOps, RAG-Infrastruktur betreiben, Model Lifecycle, GitOps und Delivery.</p></div></li>
+          <li><span class="r">VI</span><div><h3>Synthese</h3><p>Referenzarchitekturen und Kapazitätsplanung in drei Größenordnungen — durchgerechnet, von unter hundert bis zu mehreren tausend Nutzern.</p></div></li>
+        </ul>
+        <p class="caption" style="margin-top:26px">Vier Anhänge folgen: Interview- und Whiteboard-Training, das Referenz-Repository, Kommando- und Konfigurationsreferenz, Glossar und Sachregister.</p>
+        <p class="marke">NVIDIA ist eine Marke der NVIDIA Corporation. Alle weiteren Produktnamen sind Marken der jeweiligen Inhaber. Dieses Buch ist eine unabhängige Veröffentlichung und steht in keiner Verbindung zu ihnen.</p>
+      </div>
+    </div>
+  </section>
+</main>
 
-<!-- VAT identification number: required under section 5 (1) no. 6 DDG, but only
-     "where available". If a VAT ID exists, restore this block:
-     <h3>VAT</h3>
-     <p>VAT identification number under section 27a of the German VAT Act: <b>DE123456789</b></p>  -->
-
-<h3>Responsible for content under section 18 (2) MStV</h3>
-<p class="adr">Thomas Zachmann, address as above</p>
-
-<h2>Consumer dispute resolution</h2>
-<p>I am neither willing nor obliged to take part in dispute resolution proceedings before a consumer arbitration board.</p>
-
-<h2>Liability for content and links</h2>
-<p>As a service provider I am responsible for my own content on these pages under general law. I am not obliged to monitor third-party information transmitted or stored here, nor to investigate circumstances that indicate unlawful activity. Obligations to remove or block the use of information under general law remain unaffected; liability in this respect begins only from the point at which a concrete infringement becomes known. Should I become aware of such infringements, I will remove the content without delay.</p>
-<p>This site links to external websites — Leanpub, thomaszachmann.de and Creative Commons — over whose content I have no influence. Responsibility for those pages rests with their respective providers.</p>
-
-<h2>Copyright</h2>
-<p>Content created by me on these pages is subject to German copyright law. Reproduction, adaptation, distribution and any form of exploitation beyond the limits of copyright require my written consent.</p>
-<p>The <em>Enterprise AI Platform Lab Guide</em> is an exception: it is published under <a href="https://creativecommons.org/licenses/by-nd/4.0/">Creative Commons Attribution–NoDerivatives 4.0 International</a>. It may be redistributed unchanged — inside companies and commercially — as long as author and source are named.</p>
-<p>Product and company names mentioned are trademarks of their respective owners.</p>
-</div></main>
 <footer><div class="sheet"><div class="fgrid">
-<div><h4>nyrvex</h4><p>The control plane layer for AI infrastructure.<br>An architecture, not a product.</p></div>
-<div><h4>Page</h4><ul><li><a href="/">Home</a></li><li><a href="/#thesis">The thesis</a></li></ul></div>
-<div><h4>Books</h4><ul><li><a href="/enterprise-ai-platform">Enterprise AI Platform</a></li><li><a href="/vault-in-practice">Vault in Practice</a></li><li><a href="https://thomaszachmann.de/buch">AI Platform in German — free</a></li></ul></div>
-<div><h4>Legal</h4><ul><li><a href="/imprint.html">Legal notice</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="mailto:contact@nyrvex.com">Contact</a></li></ul></div>
+<div><h4>nyrvex</h4><p>Die Control-Plane-Ebene für KI-Infrastruktur.<br>Architektur, kein Produkt.</p></div>
+<div><h4>Seite</h4><ul><li><a href="/">Startseite</a></li><li><a href="/#these">Die These</a></li></ul></div>
+<div><h4>Buch</h4><ul><li><a href="/enterprise-ai-platform">Enterprise AI Platform</a></li><li><a href="https://thomaszachmann.de/buch">PDF kostenlos herunterladen</a></li><li><a href="https://leanpub.com/enterprise-ai-platform">Englische Ausgabe kaufen</a></li></ul></div>
+<div><h4>Rechtliches</h4><ul><li><a href="/impressum.html">Impressum</a></li><li><a href="/datenschutz.html">Datenschutz</a></li><li><a href="mailto:contact@nyrvex.com">Kontakt</a></li></ul></div>
 </div><div class="fbot">
       <p>© 2026 Thomas Zachmann · Ohlendiekskamp 54, 22399 Hamburg</p>
-      <p class="ftech"><img src="/img/kubernetes.svg" alt="" width="16" height="16" aria-hidden="true"><span>This site runs on Kubernetes: k3s on a single node at Hetzner in Falkenstein, provisioned with Terraform, deployed via GitOps with Flux. <a href="https://github.com/thomaszachmann/thomaszachmann.de">Source on GitHub</a>.</span></p>
+      <p class="ftech"><img src="/img/kubernetes.svg" alt="" width="16" height="16" aria-hidden="true"><span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux. <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span></p>
     </div></div></footer>
 </body>
 </html>
