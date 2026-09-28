@@ -18,7 +18,7 @@ resources:
 # genau die digest-Zeile darunter.
 images:
   - name: ghcr.io/thomaszachmann/thomaszachmann
-    digest: sha256:81ecb8d7a8aabe93501f9b5d5b4260bb19f5ef3f626b5bff32aed85864dd23c8
+    digest: sha256:286f5e1fe23762a23b19382d18f25d158d1efc48f8a02d3b0fae45c1382e911e
   - name: ghcr.io/thomaszachmann/nyrvex
     # Platzhalter aus Nullen wie beim ersten Eintrag: syntaktisch gueltig,
     # garantiert nicht existent. Der erste Pipeline-Lauf ersetzt ihn.
