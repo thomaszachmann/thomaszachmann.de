@@ -200,6 +200,11 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 .contact-list div{padding:13px 0;border-bottom:1px solid var(--border);font-size:.9375rem}
 .contact-list .k{color:var(--text-3);font-size:.8125rem;display:block;margin-bottom:2px}
 .form-note{font-size:.8125rem;color:var(--text-3);margin:12px 0 0}
+.form-status{margin:14px 0 0;padding:11px 13px;border-radius:var(--radius);font-size:.9375rem;border:1px solid}
+.form-status[hidden]{display:none}
+.form-status.ok{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.form-status.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.btn[aria-disabled="true"]{opacity:.6;pointer-events:none}
 
 /* ---------- Footer ---------- */
 footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
@@ -637,7 +642,10 @@ footer{
           </div>
         </div>
 
-        <form id="contact-form" action="https://formspree.io/f/placeholder" method="POST">
+        <!-- Endpunkt wird per AJAX angesprochen, damit der Besucher auf der Seite
+             bleibt. Das action-Attribut ist der Fallback ohne JavaScript und muss
+             deshalb auch in der CSP (form-action) erlaubt sein. -->
+        <form id="contact-form" action="https://formcarry.com/s/-N3SuhAU1pQ" method="POST">
           <div class="field">
             <label for="name">Name</label>
             <input type="text" id="name" name="name" autocomplete="name" required>
@@ -654,9 +662,16 @@ footer{
             <label for="message">Nachricht</label>
             <textarea id="message" name="message" required></textarea>
           </div>
-          <button class="btn btn-primary" type="submit">Anfrage senden</button>
+          <!-- Honeypot: von Menschen nie ausgefuellt, von einfachen Bots schon.
+               Wird unten im Script geprueft. Formcarry bringt zusaetzlich eine
+               eigene Spam-Erkennung mit, das hier ist nur die billige erste Huerde. -->
+          <input type="text" name="website" tabindex="-1" autocomplete="off"
+                 aria-hidden="true" style="position:absolute;left:-9999px">
+          <button class="btn btn-primary" type="submit" id="contact-submit">Anfrage senden</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
           <p class="form-note">
-            Es werden nur die eingegebenen Angaben übermittelt. Näheres in der
+            Die Zustellung erfolgt über Formcarry (Frankfurt). Es werden nur die eingegebenen
+            Angaben übermittelt. Näheres in der
             <a href="datenschutz.html">Datenschutzerklärung</a>.
           </p>
         </form>
@@ -712,22 +727,59 @@ footer{
 </footer>
 
 <script>
-// Solange kein echter Formspree-Endpunkt hinterlegt ist: Fallback auf mailto.
-// Sobald die Formspree-ID eingetragen ist, greift dieser Zweig nicht mehr.
+// Absenden per fetch, damit der Besucher auf der Seite bleibt und eine
+// Bestaetigung sieht. Ohne JavaScript greift das action-Attribut des Formulars
+// und Formcarry zeigt seine eigene Dankeseite - unschoener, aber funktionsfaehig.
 (function () {
   var form = document.getElementById('contact-form');
-  if (!form) return;
+  if (!form || !window.fetch) return;
+
+  var btn = document.getElementById('contact-submit');
+  var out = document.getElementById('form-status');
+  var label = btn.textContent;
+
+  function show(kind, text) {
+    out.className = 'form-status ' + kind;
+    out.textContent = text;
+    out.hidden = false;
+  }
+
   form.addEventListener('submit', function (e) {
-    if (form.getAttribute('action').indexOf('placeholder') === -1) return;
     e.preventDefault();
-    var name = document.getElementById('name').value;
-    var mail = document.getElementById('email').value;
-    var subject = document.getElementById('subject').value || 'Projektanfrage';
-    var body = document.getElementById('message').value
-             + '\n\n--\n' + name + '\n' + mail;
-    window.location.href = 'mailto:thomas@zachmann.work'
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(body);
+
+    // Ausgefuellter Honeypot: so tun, als waere alles gut, und nichts senden.
+    if (form.elements.website && form.elements.website.value) {
+      show('ok', 'Danke — die Anfrage ist angekommen.');
+      return;
+    }
+
+    out.hidden = true;
+    btn.setAttribute('aria-disabled', 'true');
+    btn.textContent = 'Wird gesendet …';
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { Accept: 'application/json' }
+    }).then(function (res) {
+      return res.json();
+    }).then(function (data) {
+      // Formcarry antwortet auch im Fehlerfall mit HTTP 200 und meldet den
+      // echten Status in data.code. Wer nur res.ok prueft, meldet Fehler
+      // faelschlich als Erfolg.
+      if (!data || data.code !== 200) throw new Error(data && data.message);
+      form.reset();
+      show('ok', 'Danke — die Anfrage ist angekommen. Ich melde mich in der Regel '
+                + 'am selben Werktag.');
+    }).catch(function () {
+      // Kein Datenverlust: das Formular behaelt seinen Inhalt, und die
+      // Mailadresse steht als Ausweichweg direkt daneben.
+      show('err', 'Das Senden hat nicht geklappt. Bitte schreiben Sie direkt an '
+                + 'thomas@zachmann.work oder rufen Sie an.');
+    }).then(function () {
+      btn.removeAttribute('aria-disabled');
+      btn.textContent = label;
+    });
   });
 })();
 </script>

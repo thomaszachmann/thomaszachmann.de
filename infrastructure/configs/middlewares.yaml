@@ -16,6 +16,9 @@ spec:
     forceSTSHeader: true
     # Die Seite laedt keinerlei externe Ressourcen: Fonts sind self-hosted,
     # das Favicon ist eine data:-URI. Deshalb kann default-src 'none' sein.
+    # Einzige Ausnahme ist das Kontaktformular: es sendet an Formcarry.
+    # connect-src deckt den Normalfall per fetch ab, form-action den Fallback
+    # ohne JavaScript. Beide sind exakt auf diese eine Domain begrenzt.
     # 'unsafe-inline' ist noetig, weil CSS und ein Script inline in der
     # index.html stehen. Das Auslagern in externe Dateien wuerde das
     # entfernen - notiert als Folgearbeit, aendert aber Website-Inhalt.
@@ -26,7 +29,8 @@ spec:
       script-src 'self' 'unsafe-inline';
       font-src 'self';
       base-uri 'none';
-      form-action 'none';
+      connect-src https://formcarry.com;
+      form-action https://formcarry.com;
       frame-ancestors 'none'
     permissionsPolicy: "geolocation=(), microphone=(), camera=()"
 ---
