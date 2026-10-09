@@ -22,7 +22,7 @@ images:
   - name: ghcr.io/thomaszachmann/nyrvex
     # Platzhalter aus Nullen wie beim ersten Eintrag: syntaktisch gueltig,
     # garantiert nicht existent. Der erste Pipeline-Lauf ersetzt ihn.
-    digest: sha256:5a053255e30d45d9fec2f7a554476c40dcdb70d106fa8daca54d87ed39a4bcdf
+    digest: sha256:8bd05ccf6a664397ec53edd54b3696842ec501907033a352cdd5316bdaf85932
   - name: ghcr.io/thomaszachmann/nyrvex-de
     # Platzhalter aus Nullen: syntaktisch gueltig, garantiert nicht existent.
     # Der erste Pipeline-Lauf fuer sites/nyrvex-de/ ersetzt ihn. Bis dahin
