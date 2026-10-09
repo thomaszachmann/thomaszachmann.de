@@ -15,11 +15,10 @@
 <meta name="theme-color" content="#f4f1ec">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23111111'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
 
+<link rel="stylesheet" href="/site.css">
 <style>
-/* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
-@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit.woff2) format('woff2')}
-@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/jetbrains-mono.woff2) format('woff2')}
-
+/* Startseite: Buttons mit 8px Abstand statt 9px aus site.css */
+.btn{gap:8px}
 /* ---------- Quiet Blue ---------- */
 :root{
   /* Farben aus dem Buchumschlag (cover-berg.typ): Papier, Schwarz, Grau,
@@ -44,61 +43,9 @@
   --wrap:1120px;
 }
 
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:'Outfit',system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:17px;font-weight:350;line-height:1.65;
-  -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3{margin:0;font-weight:550;letter-spacing:-.015em;line-height:1.2}
-/* Deutsche Komposita brechen sonst aus schmalen Viewports aus */
-h1,h2,h3,p,dd,li{overflow-wrap:break-word;hyphens:auto}
 h1{font-size:clamp(1.75rem,6.4vw,3.15rem);letter-spacing:-.025em}
-h2{font-size:clamp(1.5rem,2.6vw,1.9rem)}
-h3{font-size:1.0625rem;font-weight:550;letter-spacing:-.005em}
-p{margin:0 0 1.1rem}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline;text-underline-offset:3px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
 
-.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
-.prose{max-width:66ch}
 section{padding:88px 0}
-.tinted{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.eyebrow{
-  font-family:'JetBrains Mono',ui-monospace,monospace;
-  font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--text-3);margin:0 0 14px;
-}
-.skip{position:absolute;left:-9999px}
-.skip:focus{left:16px;top:12px;z-index:100;background:#fff;padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius)}
-
-/* ---------- Nav ---------- */
-header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border)}
-nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.brand{color:var(--text);font-weight:550;letter-spacing:-.02em;font-size:1.0625rem}
-.brand:hover{text-decoration:none}
-.nav-links{display:flex;align-items:center;gap:30px;font-size:.9375rem}
-.nav-links a{color:var(--text-2)}
-.nav-links a:hover{color:var(--text);text-decoration:none}
-.nav-links a.btn-primary,.nav-links a.btn-primary:hover{color:#fff}
-@media(max-width:820px){.nav-links a:not(.btn){display:none}}
-
-/* ---------- Buttons ---------- */
-.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 18px;border-radius:var(--radius);
-  font-size:.9375rem;font-weight:500;line-height:1;
-  border:1px solid transparent;cursor:pointer;
-  transition:background-color .15s ease,border-color .15s ease;
-}
-.btn:hover{text-decoration:none}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-hover)}
-.btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}
-.btn-secondary:hover{border-color:#cbd5e1;background:var(--surface)}
 
 /* ---------- Hero ---------- */
 .hero{padding:104px 0 80px}
@@ -206,24 +153,6 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;ga
 .form-status.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
 .btn[aria-disabled="true"]{opacity:.6;pointer-events:none}
 
-/* ---------- Footer ---------- */
-footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem}
-.foot-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
-@media(max-width:760px){.foot-cols{grid-template-columns:1fr 1fr;gap:32px}}
-.foot-cols p{color:var(--text-2);margin:0}
-.foot-cols h4{font-size:.9375rem;font-weight:550;margin:0 0 11px}
-.foot-cols ul{list-style:none;margin:0;padding:0}
-.foot-cols li{margin-bottom:7px}
-.foot-cols li a{color:var(--text-2)}
-.foot-cols li a:hover{color:var(--text)}
-.foot-bottom{margin-top:38px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-3);font-size:.875rem}
-/* Technik-Hinweis: bewusst leiser als die Copyright-Zeile */
-.foot-tech{display:flex;align-items:flex-start;gap:.6rem;margin:.5rem 0 0;color:var(--text-3);font-size:.8125rem;line-height:1.55}
-.foot-tech img{flex:none;width:17px;height:17px;margin-top:.12rem}
-.foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
-.foot-tech a:hover{color:var(--accent)}
-
-
 /* ================= Prototyp: Schichtenstapel ================= */
 h1,h2,h3{font-weight:600;letter-spacing:-.025em;line-height:1.1}
 h1{font-size:clamp(2rem,6.4vw,3.6rem);letter-spacing:-.035em}
@@ -276,7 +205,6 @@ footer{
   background:linear-gradient(90deg,var(--s1) 0 25%,var(--s2) 25% 50%,var(--s3) 50% 75%,var(--s4) 75% 92%,var(--signal) 92%) top/100% 6px no-repeat;
 }
 
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 
