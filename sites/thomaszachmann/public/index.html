@@ -20,28 +20,6 @@
 /* Startseite: Buttons mit 8px Abstand statt 9px aus site.css */
 .btn{gap:8px}
 /* ---------- Quiet Blue ---------- */
-:root{
-  /* Farben aus dem Buchumschlag (cover-berg.typ): Papier, Schwarz, Grau,
-     Orange. Dazu Schiefertoene aus dem Himmel des Motivs. */
-  --bg:#f4f1ec;
-  --surface:#ebe7df;
-  --border:#dcd6cb;
-  --text:#111111;
-  --text-2:#4a4a4a;
-  --text-3:#625d57;
-  /* Das Umschlag-Orange (#fe621d) erreicht auf Papier nur 2.7:1 und ist
-     deshalb reine Flaechenfarbe (--signal). Fuer Text und Linien die
-     dunklere Stufe: 4.6:1. */
-  --accent:#c2410c;
-  --accent-hover:#9a3412;
-  --signal:#fe621d;
-  --s1:#1f2b38;
-  --s2:#34465a;
-  --s3:#566a80;
-  --s4:#8a9bb0;
-  --radius:0;
-  --wrap:1120px;
-}
 
 h1{font-size:clamp(1.75rem,6.4vw,3.15rem);letter-spacing:-.025em}
 
@@ -153,21 +131,8 @@ section{padding:88px 0}
 .form-status.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}
 .btn[aria-disabled="true"]{opacity:.6;pointer-events:none}
 
-/* ================= Prototyp: Schichtenstapel ================= */
-h1,h2,h3{font-weight:600;letter-spacing:-.025em;line-height:1.1}
+/* ================= Startseite: Hero mit Schichtenstapel ================= */
 h1{font-size:clamp(2rem,6.4vw,3.6rem);letter-spacing:-.035em}
-h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
-
-.brand{display:inline-flex;align-items:center;gap:10px;font-weight:600}
-.brand::before{content:"";width:12px;height:12px;background:var(--signal);flex:none}
-
-.btn{padding:13px 20px;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
-.btn-primary{background:var(--text);color:var(--bg)}
-.btn-primary:hover{background:var(--signal);color:var(--text)}
-.nav-links a.btn-primary{color:var(--bg)}
-.nav-links a.btn-primary:hover{color:var(--text)}
-.btn-secondary{background:transparent;color:var(--text);border-color:var(--text)}
-.btn-secondary:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
 
 .status .dot{width:9px;height:9px;border-radius:0;background:var(--signal)}
 
@@ -190,7 +155,6 @@ h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
 .stack li:nth-child(3){margin-left:20%;background:var(--s3)}
 .stack li:nth-child(4){margin-left:10%;background:var(--s2)}
 
-.tinted{border-color:var(--border)}
 .focus article{border-top:6px solid var(--s1)}
 .focus article:nth-child(2){border-top-color:var(--s2)}
 .focus article:nth-child(3){border-top-color:var(--s3)}
@@ -199,11 +163,6 @@ h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
 }
 
 .field input,.field textarea{background:#faf8f4;border-color:#c9c2b5}
-
-footer{
-  border-top:0;
-  background:linear-gradient(90deg,var(--s1) 0 25%,var(--s2) 25% 50%,var(--s3) 50% 75%,var(--s4) 75% 92%,var(--signal) 92%) top/100% 6px no-repeat;
-}
 
 </style>
 </head>
