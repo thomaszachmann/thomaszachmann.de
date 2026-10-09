@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Prüft, dass jede lokal referenzierte Datei in den HTML-Seiten wirklich existiert.
-# Erfasst HTML-Attribute (href, src) UND CSS-url(...) aus inline <style>-Blöcken —
-# die self-hosted Fonts stehen nur dort und wären sonst unsichtbar.
+# Erfasst HTML-Attribute (href, src) UND CSS-url(...) aus inline <style>-Blöcken
+# und aus eigenen .css-Dateien — die self-hosted Fonts stehen nur dort und wären
+# sonst unsichtbar. Relative Pfade gelten, wie im Browser, relativ zur Datei, in
+# der sie stehen: in site.css also relativ zu site.css, nicht zur HTML-Seite.
 # Externe Referenzen (http, mailto, tel, data:, Anker) werden übersprungen.
 set -euo pipefail
 
@@ -15,9 +17,9 @@ fi
 missing="$(mktemp)"
 trap 'rm -f "$missing"' EXIT
 
-html_count=0
+file_count=0
 while IFS= read -r -d '' html; do
-  html_count=$((html_count + 1))
+  file_count=$((file_count + 1))
   while IFS= read -r ref; do
     case "$ref" in
       ''|'#'*|http://*|https://*|//*|data:*|mailto:*|tel:*) continue ;;
@@ -38,14 +40,17 @@ while IFS= read -r -d '' html; do
     fi
   done < <(
     {
+      # "|| true": kein Treffer ist hier der Normalfall, kein Fehler. Ohne das
+      # beendet grep mit Exit 1 unter set -e/pipefail die ganze Subshell - in
+      # einer .css-Datei (keine href/src) wuerden die url() dann nie gelesen.
       # HTML-Attribute
-      grep -oE '(href|src)="[^"]*"' "$html" | sed -E 's/^(href|src)="//; s/"$//'
-      # CSS url(...) — auch aus inline <style>-Bloecken. Die self-hosted Fonts
-      # stehen genau hier und wuerden sonst uebersehen.
-      grep -oE 'url\([^)]*\)' "$html" | sed -E 's/^url\(//; s/\)$//' | tr -d "\"'"
+      { grep -oE '(href|src)="[^"]*"' "$html" || true; } | sed -E 's/^(href|src)="//; s/"$//'
+      # CSS url(...) — aus inline <style>-Bloecken und aus .css-Dateien. Die
+      # self-hosted Fonts stehen genau hier und wuerden sonst uebersehen.
+      { grep -oE 'url\([^)]*\)' "$html" || true; } | sed -E 's/^url\(//; s/\)$//' | tr -d "\"'"
     } | sort -u
   )
-done < <(find "$ROOT" -name '*.html' -print0)
+done < <(find "$ROOT" \( -name '*.html' -o -name '*.css' \) -print0)
 
 if [ -s "$missing" ]; then
   echo "Fehlende referenzierte Dateien:" >&2
@@ -55,4 +60,4 @@ if [ -s "$missing" ]; then
   exit 1
 fi
 
-echo "OK: alle lokalen Referenzen in $html_count HTML-Datei(en) aufgelöst."
+echo "OK: alle lokalen Referenzen in $file_count HTML- und CSS-Datei(en) aufgelöst."
