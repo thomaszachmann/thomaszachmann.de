@@ -12,8 +12,8 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thomaszachmann.de">
 <meta property="og:locale" content="de_DE">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+<meta name="theme-color" content="#f4f1ec">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23111111'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
 
 <style>
 /* ---------- Fonts: self-hosted, keine externen Requests (DSGVO) ---------- */
@@ -22,15 +22,25 @@
 
 /* ---------- Quiet Blue ---------- */
 :root{
-  --bg:#ffffff;
-  --surface:#f8fafc;
-  --border:#e2e8f0;
-  --text:#0f172a;
-  --text-2:#475569;
-  --text-3:#64748b;
-  --accent:#1d4ed8;
-  --accent-hover:#1e40af;
-  --radius:6px;
+  /* Farben aus dem Buchumschlag (cover-berg.typ): Papier, Schwarz, Grau,
+     Orange. Dazu Schiefertoene aus dem Himmel des Motivs. */
+  --bg:#f4f1ec;
+  --surface:#ebe7df;
+  --border:#dcd6cb;
+  --text:#111111;
+  --text-2:#4a4a4a;
+  --text-3:#625d57;
+  /* Das Umschlag-Orange (#fe621d) erreicht auf Papier nur 2.7:1 und ist
+     deshalb reine Flaechenfarbe (--signal). Fuer Text und Linien die
+     dunklere Stufe: 4.6:1. */
+  --accent:#c2410c;
+  --accent-hover:#9a3412;
+  --signal:#fe621d;
+  --s1:#1f2b38;
+  --s2:#34465a;
+  --s3:#566a80;
+  --s4:#8a9bb0;
+  --radius:0;
   --wrap:1120px;
 }
 
@@ -208,6 +218,59 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
 .foot-tech a{color:var(--text-3);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .foot-tech a:hover{color:var(--accent)}
 
+
+/* ================= Prototyp: Schichtenstapel ================= */
+h1,h2,h3{font-weight:600;letter-spacing:-.025em;line-height:1.1}
+h1{font-size:clamp(2rem,6.4vw,3.6rem);letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
+
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:600}
+.brand::before{content:"";width:12px;height:12px;background:var(--signal);flex:none}
+
+.btn{padding:13px 20px;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-primary:hover{background:var(--signal);color:var(--text)}
+.nav-links a.btn-primary{color:var(--bg)}
+.nav-links a.btn-primary:hover{color:var(--text)}
+.btn-secondary{background:transparent;color:var(--text);border-color:var(--text)}
+.btn-secondary:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+.status .dot{width:9px;height:9px;border-radius:0;background:var(--signal)}
+
+.hero{padding:104px 0 96px}
+.hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:64px;align-items:end}
+@media(max-width:940px){.hero-grid{grid-template-columns:1fr;gap:48px}}
+/* Nur am Bindestrich umbrechen, nicht mitten in "Plattformen" */
+.hero h1{max-width:18ch;hyphens:manual}
+
+/* Jede Stufe eine Schicht der Plattform, oben die Anwendung. Die Einrueckung
+   steigt nach oben an wie der Weg auf dem Umschlag. */
+.stack{
+  list-style:none;margin:0;padding:0;display:grid;gap:6px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+}
+.stack li{padding:14px 16px;color:#fff;background:var(--s1);hyphens:none}
+.stack li:nth-child(1){margin-left:40%;background:var(--signal);color:var(--text)}
+.stack li:nth-child(2){margin-left:30%;background:var(--s4);color:var(--text)}
+.stack li:nth-child(3){margin-left:20%;background:var(--s3)}
+.stack li:nth-child(4){margin-left:10%;background:var(--s2)}
+
+.tinted{border-color:var(--border)}
+.focus article{border-top:6px solid var(--s1)}
+.focus article:nth-child(2){border-top-color:var(--s2)}
+.focus article:nth-child(3){border-top-color:var(--s3)}
+@media(max-width:940px){
+  .focus article,.focus article:first-child{border-top-width:6px}
+}
+
+.field input,.field textarea{background:#faf8f4;border-color:#c9c2b5}
+
+footer{
+  border-top:0;
+  background:linear-gradient(90deg,var(--s1) 0 25%,var(--s2) 25% 50%,var(--s3) 50% 75%,var(--s4) 75% 92%,var(--signal) 92%) top/100% 6px no-repeat;
+}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -234,7 +297,8 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
 
   <!-- ================= HERO ================= -->
   <section class="hero">
-    <div class="wrap">
+    <div class="wrap hero-grid">
+      <div>
       <p class="status"><span class="dot" aria-hidden="true"></span>Verfügbar für neue Projekte</p>
       <h1>Enterprise-Plattformen für Kubernetes, Cloud und AI</h1>
       <p class="lead">
@@ -247,6 +311,14 @@ footer{border-top:1px solid var(--border);padding:48px 0 28px;font-size:.9375rem
         <a class="btn btn-primary" href="#kontakt">Projekt besprechen</a>
         <a class="btn btn-secondary" href="https://github.com/thomaszachmann" rel="noopener">GitHub ansehen</a>
       </div>
+      </div>
+      <ol class="stack" aria-label="Plattform-Schichten, von oben nach unten">
+        <li>AI Applications</li>
+        <li>Model Serving</li>
+        <li>Platform Services</li>
+        <li>Kubernetes</li>
+        <li>Compute &amp; GPU</li>
+      </ol>
     </div>
   </section>
 
