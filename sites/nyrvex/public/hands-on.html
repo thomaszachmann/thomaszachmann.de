@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Five free lab guides in German: Kubernetes Observability, Kyverno, Helm Charts, Ceph and Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Hands-On series — free lab guides on Kubernetes, Ceph, Helm and Docker">
+<meta property="og:description" content="Five free lab guides in German: Kubernetes Observability, Kyverno, Helm Charts, Ceph and Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nyrvex.com/hands-on">
+<link rel="canonical" href="https://nyrvex.com/hands-on">
+<link rel="alternate" hreflang="en" href="https://nyrvex.com/hands-on">
+<link rel="alternate" hreflang="de" href="https://nyrvex.de/hands-on">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:image" content="https://nyrvex.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Hands-On series — free lab guides on Kubernetes, Ceph, Helm and Docker</title>
+<style>
+/* Schriften lokal ausgeliefert — keine Verbindung zu Dritten */
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/archivo-400-700-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/archivo-400-700-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-400-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/ibm-plex-mono-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/ibm-plex-mono-600-latin.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url('/fonts/source-serif-4-400-600-latin-ext.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/source-serif-4-400-600-latin.woff2') format('woff2');
+}
+</style>
+<style>
+  :root{
+    --paper:#f1f2ee;
+    --paper-2:#e6e8e1;
+    --line:#c6cabe;
+    --line-soft:#d8dbd2;
+    --ink:#0e1620;
+    --ink-2:#4d5763;
+    --ink-3:#7d8794;
+    --signal:#b24418;
+    --signal-wash:#f6e7e0;
+    --plate:#0e1620;
+    --plate-2:#18222f;
+    --plate-line:#2e3a49;
+    --plate-ink:#e8eaec;
+    --plate-ink-2:#9aa5b2;
+    --plate-signal:#e0673a;
+    --ok:#4f8a68;
+    --disp:"Archivo",Helvetica,Arial,sans-serif;
+    --serif:"Source Serif 4",Charter,Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#12181f;
+      --paper-2:#1a222b;
+      --line:#2c3742;
+      --line-soft:#242d37;
+      --ink:#e9ebee;
+      --ink-2:#a4aeba;
+      --ink-3:#75808d;
+      --signal:#e0673a;
+      --signal-wash:#2a1a13;
+      --plate:#080c12;
+      --plate-2:#111922;
+      --plate-line:#26313d;
+      --ok:#63b083;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12181f;--paper-2:#1a222b;--line:#2c3742;--line-soft:#242d37;
+    --ink:#e9ebee;--ink-2:#a4aeba;--ink-3:#75808d;
+    --signal:#e0673a;--signal-wash:#2a1a13;
+    --plate:#080c12;--plate-2:#111922;--plate-line:#26313d;--ok:#63b083;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.63;-webkit-font-smoothing:antialiased}
+  a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 40%,transparent)}
+  a:hover{border-bottom-color:var(--signal)}
+  a:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+  .sheet{max-width:1060px;margin:0 auto;padding:0 28px}
+  .col{max-width:660px}
+
+  h1,h2,h3,.disp{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600}
+  h1{
+    font-size:clamp(2.116rem,1.248rem+3.1vw,3.418rem);line-height:1.06;
+    letter-spacing:-0.028em;font-variation-settings:"wdth" 116;font-weight:700;
+    margin:0 0 26px;text-wrap:balance;
+  }
+  h2{font-size:clamp(1.736rem,1.248rem+1.7vw,2.441rem);line-height:1.12;letter-spacing:-0.022em;margin:0 0 18px;text-wrap:balance}
+  p{margin:0 0 19px}
+  em{font-style:italic}
+
+  /* ---------- Maßlinie ---------- */
+  .mass{display:flex;align-items:center;gap:16px;margin:0 0 30px}
+  .mass .lbl{font-family:var(--mono);font-size:0.759rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);white-space:nowrap}
+  .mass .rule{flex:1;height:7px;border-top:1px solid var(--line);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+
+  /* ---------- Kopf ---------- */
+  header.top{background:var(--plate);color:var(--plate-ink)}
+  .top .sheet{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px;flex-wrap:wrap}
+  .wordmark{font-family:var(--disp);font-variation-settings:"wdth" 120;font-weight:700;font-size:1.541rem;letter-spacing:-0.02em;color:var(--plate-ink);border:0}
+  .wordmark b{color:var(--plate-signal);font-weight:700}
+  .top nav{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:0.792rem;letter-spacing:.06em;text-transform:uppercase}
+  .top nav a{color:var(--plate-ink-2);border:0}
+  .top nav a:hover{color:var(--plate-signal)}
+  .lang{display:flex;gap:10px;align-items:center;padding-left:20px;margin-left:2px;border-left:1px solid var(--plate-line)}
+  .lang a{color:var(--plate-ink-2)}
+  .lang .on{color:var(--plate-signal);font-weight:600}
+
+  /* ---------- Platte (dunkel) ---------- */
+  .plate{background:var(--plate);color:var(--plate-ink)}
+  .plate .eyebrow{font-family:var(--mono);font-size:0.781rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 20px}
+  .plate h1{color:var(--plate-ink)}
+  .plate .lead{font-size:1.291rem;line-height:1.55;color:var(--plate-ink-2);max-width:620px}
+  .plate .lead b{color:var(--plate-ink);font-weight:600}
+  .claim{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:clamp(1.248rem,0.977rem+.9vw,1.627rem);color:var(--plate-signal);margin:26px 0 0;letter-spacing:-0.012em}
+  .hero{padding:60px 0 26px}
+  .masthead{font-family:var(--disp);font-variation-settings:"wdth" 125;font-weight:700;font-size:clamp(3.906rem,1.627rem+8.6vw,8.029rem);line-height:.86;letter-spacing:-0.045em;color:var(--plate-ink);margin:0 0 22px}
+  .masthead b{color:var(--plate-signal);font-weight:700}
+  .hero .stamp{margin-top:34px}
+
+  .stamp{border:1px solid var(--plate-line);padding:13px 17px;display:inline-block;max-width:100%}
+  .stamp .k{font-family:var(--mono);font-size:0.684rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-ink-2);display:block;margin-bottom:6px}
+  .stamp .v{font-family:var(--mono);font-size:0.857rem;color:var(--plate-ink);line-height:1.75;display:block}
+
+  /* ---------- Diagramm ---------- */
+  .diagram{padding:8px 0 74px}
+  .diagram figure{margin:0}
+  .diagram svg{display:block;width:100%;height:auto;overflow:visible}
+  .d-box{fill:none;stroke:var(--plate-line);stroke-width:1}
+  .d-fill{fill:var(--plate-2)}
+  .d-gap{fill:none;stroke:var(--plate-signal);stroke-width:1.5;stroke-dasharray:7 6}
+  .d-line{stroke:var(--plate-line);stroke-width:1}
+  .d-t{font-family:var(--mono);font-size:13px;fill:var(--plate-ink)}
+  .d-s{font-family:var(--mono);font-size:11.4px;fill:var(--plate-ink-2)}
+  .d-cap{font-family:var(--mono);font-size:11.4px;letter-spacing:.16em;fill:var(--plate-ink-2)}
+  .d-name{font-family:var(--disp);font-variation-settings:"wdth" 125;font-size:49.9px;font-weight:700;fill:var(--plate-signal)}
+  .d-sig{font-family:var(--mono);font-size:12.5px;fill:var(--plate-signal)}
+  @media (prefers-reduced-motion:no-preference){
+    .d-gap{stroke-dashoffset:340;animation:draw 1.4s .25s ease-out forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+  }
+  .diagram figcaption{font-family:var(--mono);font-size:0.792rem;color:var(--plate-ink-2);margin-top:22px;letter-spacing:.03em}
+
+  /* ---------- Abschnitte ---------- */
+  section{padding:74px 0}
+  section + section{border-top:1px solid var(--line-soft)}
+
+  /* ---------- Randnotiz ---------- */
+  aside.note{font-family:var(--mono);font-size:0.814rem;line-height:1.6;color:var(--ink-3);border-left:2px solid var(--signal);padding-left:14px;margin:0 0 24px}
+  @media (min-width:1080px){
+    aside.note{float:right;clear:right;width:236px;margin:.35rem -292px 1.5rem 46px}
+  }
+
+  /* ---------- Tabelle ---------- */
+  .tablewrap{overflow-x:auto;margin:26px 0 12px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:1.031rem}
+  th{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 18px 10px 0;border-bottom:1.5px solid var(--ink)}
+  td{padding:12px 18px 12px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.45}
+  td:last-child,th:last-child{padding-right:0}
+  td.n{font-family:var(--mono);font-size:0.868rem;color:var(--signal);font-weight:600;width:34px;padding-top:14px}
+  td.sys{font-family:var(--mono);font-size:0.879rem;color:var(--ink-2);white-space:nowrap}
+  .caption{font-family:var(--mono);font-size:0.803rem;color:var(--ink-3);margin:0 0 24px;letter-spacing:.02em}
+
+  /* ---------- Zitatplatte ---------- */
+  .zitat{border-left:4px solid var(--signal);background:var(--signal-wash);padding:26px 28px;margin:4px 0 24px}
+  .zitat .k{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:12px}
+  .zitat p{margin:0;font-family:var(--disp);font-variation-settings:"wdth" 108;font-weight:500;font-size:1.541rem;line-height:1.24;letter-spacing:-0.015em;color:var(--ink)}
+  .zitat .cite{font-family:var(--mono);font-size:0.781rem;color:var(--ink-3);margin-top:14px;font-weight:400;letter-spacing:.02em}
+
+  /* ---------- Bausteine als Kreislauf ---------- */
+  .spine{position:relative;margin:30px 0 0;padding-left:38px}
+  .spine::before{content:"";position:absolute;left:5px;top:10px;bottom:44px;width:1px;background:var(--line)}
+  .bs{position:relative;padding:0 0 30px}
+  .bs::before{content:"";position:absolute;left:-38px;top:9px;width:11px;height:11px;border:2px solid var(--signal);background:var(--paper);border-radius:50%}
+  .bs h3{font-family:var(--disp);font-variation-settings:"wdth" 112;font-weight:600;font-size:1.28rem;letter-spacing:-0.01em;margin:0 0 2px}
+  .bs .was{font-family:var(--mono);font-size:0.803rem;color:var(--signal);letter-spacing:.09em;text-transform:uppercase;margin:0 0 9px}
+  .bs p{margin:0}
+  .loop{position:relative;font-family:var(--mono);font-size:0.814rem;color:var(--ink-3);padding-left:0;line-height:1.5}
+  .loop::before{content:"";position:absolute;left:-38px;top:2px;width:11px;height:11px;border:2px dashed var(--line);border-radius:50%;background:var(--paper)}
+
+  /* ---------- Buch ---------- */
+  .buch{display:grid;grid-template-columns:236px minmax(0,1fr);gap:46px;align-items:start}
+  .buch-cover img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+  .buch-text{max-width:600px}
+  .fakten{margin:26px 0 0;padding:0;border-top:1px solid var(--line-soft)}
+  .fakten div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+  .fakten dt{font-family:var(--mono);font-size:0.738rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+  .fakten dd{margin:0;font-size:1.052rem;line-height:1.5}
+  .btnrow{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin:28px 0 14px}
+  .btn{font-family:var(--mono);font-size:0.89rem;font-weight:600;letter-spacing:.05em;background:var(--signal);color:#fff;padding:14px 24px;border:0;display:inline-block}
+  .btn:hover{background:var(--ink);color:var(--paper);border:0}
+  @media (max-width:720px){.buch{grid-template-columns:1fr;gap:26px}.buch-cover{max-width:214px}}
+
+  /* ---------- Terminal ---------- */
+  code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1px 5px;border:1px solid var(--line-soft)}
+  .term{background:var(--plate);padding:26px 24px;margin:26px 0 12px;overflow-x:auto;border-left:4px solid var(--plate-signal)}
+  .term pre{margin:0;font-family:var(--mono);font-size:0.868rem;line-height:1.78;color:var(--plate-ink-2);font-variant-numeric:tabular-nums}
+  .term .cmd{color:var(--plate-ink);font-weight:500}
+  .term .pr{color:#5d6874}
+  .term .cm{color:#5d6874}
+  .term .ok{color:#5fbf8b;font-weight:500}
+  .term .wt{color:var(--plate-signal);font-weight:500}
+  .term .em{color:var(--plate-ink);font-weight:500}
+
+  /* ---------- Negativliste ---------- */
+  .nicht{margin:26px 0 0;padding:0;list-style:none}
+  .nicht li{padding:16px 0;border-top:1px solid var(--line-soft)}
+  .nicht li:last-child{border-bottom:1px solid var(--line-soft)}
+  .nicht b{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.107rem;display:block;margin-bottom:4px;letter-spacing:-0.008em}
+
+  /* ---------- Fragen ---------- */
+  .frage{padding:24px 0;border-top:1px solid var(--line-soft)}
+  .frage:first-of-type{border-top:1.5px solid var(--ink)}
+  .frage h3{font-family:var(--disp);font-variation-settings:"wdth" 110;font-weight:600;font-size:1.389rem;letter-spacing:-0.015em;margin:0 0 7px}
+  .frage p{margin:0;color:var(--ink-2);font-size:1.107rem}
+  .kontakt{margin-top:36px;padding:26px 28px;border:1px solid var(--line);background:var(--paper-2)}
+  .kontakt p:last-child{margin-bottom:0}
+  .todo{font-family:var(--mono);font-size:0.781rem;background:var(--signal);color:#fff;padding:2px 7px;white-space:nowrap}
+
+  /* ---------- Fuß ---------- */
+  footer{background:var(--plate);color:var(--plate-ink-2)}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:34px;padding:56px 0 40px}
+  .fgrid h4{font-family:var(--mono);font-size:0.716rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--plate-signal);margin:0 0 13px}
+  .fgrid ul{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:0.857rem;line-height:2.05}
+  .fgrid p{font-family:var(--mono);font-size:0.857rem;line-height:1.7;margin:0}
+  footer a{color:var(--plate-ink);border-bottom-color:#39434f}
+  footer a:hover{color:var(--plate-signal);border-bottom-color:var(--plate-signal)}
+  .fbot{border-top:1px solid var(--plate-line);font-family:var(--mono);font-size:0.803rem;color:#68727e;padding:20px 0 44px}
+  /* Technik-Hinweis, wie auf thomaszachmann.de: bewusst leiser als die
+     Copyright-Zeile. Kein eigener Block im Raster - er gehoert zur Fusszeile,
+     nicht zu den Spalten darueber. */
+  .fbot p{margin:0}
+  .fbot .ftech{display:flex;align-items:flex-start;gap:.6rem;margin-top:11px;font-size:0.759rem;line-height:1.6;color:#5d6874}
+  .fbot .ftech img{flex:none;width:16px;height:16px;margin-top:.15rem}
+  .fbot .ftech a{color:var(--plate-ink-2);border-bottom:1px solid #39434f}
+  .fbot .ftech a:hover{color:var(--plate-signal);border-bottom-color:var(--plate-signal)}
+</style>
+<style>
+  /* Der dunkle Seitenkopf. Steht sonst im impressumseigenen Block; hier
+     dupliziert, damit diese Seite nicht von einer fremden Datei abhaengt. */
+  .pagehead{padding:56px 0 52px}
+  .pagehead h1{font-size:clamp(2.061rem,1.411rem+2vw,3.146rem);margin:0 0 18px}
+
+  /* Bejahende Aufzaehlung. Optisch identisch zu ".nicht", aber unter diesem
+     Namen zu lesen waere irrefuehrend — dort steht, was nyrvex NICHT ist. */
+  .tun{margin:26px 0 0;padding:0;list-style:none}
+  .tun li{padding:14px 0;border-top:1px solid var(--line-soft);font-size:1.052rem}
+  .tun li:last-child{border-bottom:1px solid var(--line-soft)}
+
+  /* Inhaltsverzeichnis. Zwei Spalten erst ab 720px: darunter wuerden die
+     Kapitelnamen umbrechen und die Nummern verlieren ihren Bezug. */
+  .kapitel{margin:26px 0 0;padding:0;list-style:none;counter-reset:kap}
+  @media (min-width:720px){.kapitel{columns:2;column-gap:46px}}
+  .kapitel li{counter-increment:kap;break-inside:avoid;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  .kapitel li::before{content:counter(kap);font-family:var(--mono);font-size:0.868rem;font-weight:600;color:var(--signal);padding-top:3px}
+  .kapitel span{font-size:1.031rem;line-height:1.4}
+
+  .marke{font-family:var(--mono);font-size:0.781rem;line-height:1.7;color:var(--ink-3);border-top:1px solid var(--line-soft);padding-top:20px;margin-top:44px}
+</style>
+</head>
+<body>
+<header class="top"><div class="sheet">
+<a class="wordmark" href="/">nyrvex<b>.</b></a>
+<nav>
+<a href="/">Home</a>
+<a href="/imprint.html">Legal notice</a>
+<a href="/privacy.html">Privacy</a>
+<span class="lang"><span class="on">EN</span><a href="https://nyrvex.de/hands-on">DE</a></span>
+</nav></div></header>
+<div class="plate"><div class="sheet pagehead">
+  <p class="eyebrow">Lab guides</p>
+  <h1>Hands-On series</h1>
+  <p class="lead">Five compact guides for engineers preparing for a technical interview. <b>Free PDFs, in German.</b></p>
+  <div class="stamp" style="margin-top:32px">
+    <span class="k">Edition</span>
+    <span class="v">5 books · 578 pages in total · German<br>PDF · free download · CC BY-ND 4.0</span>
+  </div>
+</div></div>
+
+<main>
+  <section id="observability">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Kubernetes Observability</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/hands-on-observability.webp" width="693" height="1040" loading="lazy" alt="Cover of Kubernetes Observability Hands-On">
+        </div>
+        <div class="buch-text">
+          <h2>Kubernetes Observability Hands-On</h2>
+          <p>Metrics, logs and traces on Kubernetes, from the Prometheus pull model to S3 for old data.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>126 pages · 36 chapters · 8 parts</dd></div>
+            <div><dt>Covers</dt><dd>Prometheus, Alertmanager, Grafana, Thanos, Mimir, Loki, Alloy, Tempo</dd></div>
+            <div><dt>For</dt><dd>Prometheus 3.15, Grafana 13.3, Thanos 0.42, Mimir 3.2, Loki 3.7, Tempo 3.1, Alloy 1.21</dd></div>
+            <div><dt>Note</dt><dd>Commands, configurations and sample output have not been run on a cluster.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1.4 MB, in German · <a href="https://creativecommons.org/licenses/by-nd/4.0/">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="/pdf/Kubernetes-Observability-Hands-On.pdf">Download PDF</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="kyverno">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Kyverno</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/hands-on-kyverno.webp" width="693" height="1040" loading="lazy" alt="Cover of Kyverno Hands-On">
+        </div>
+        <div class="buch-text">
+          <h2>Kyverno Hands-On</h2>
+          <p>Policy as code for Kubernetes: the CEL policy types, the classic ClusterPolicy world, migration, testing and operations.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>116 pages · 40 chapters · 7 parts</dd></div>
+            <div><dt>Covers</dt><dd>ValidatingPolicy, MutatingPolicy, GeneratingPolicy, ImageValidatingPolicy, DeletingPolicy, ClusterPolicy, Kyverno CLI</dd></div>
+            <div><dt>For</dt><dd>Kyverno 1.19 (chart 3.9), with a look at 1.20</dd></div>
+            <div><dt>Note</dt><dd>Commands, policies and sample output have not been run on a cluster or with the Kyverno CLI.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1.3 MB, in German · <a href="https://creativecommons.org/licenses/by-nd/4.0/">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="/pdf/Kyverno-Hands-On.pdf">Download PDF</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="helm-charts">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Helm Charts</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/hands-on-helm-charts.webp" width="693" height="1040" loading="lazy" alt="Cover of Helm Charts Hands-On">
+        </div>
+        <div class="buch-text">
+          <h2>Helm Charts Hands-On</h2>
+          <p>From the first release to your own charts: templates, advanced charts, operations, delivery and troubleshooting.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>114 pages · 41 chapters · 8 parts</dd></div>
+            <div><dt>Covers</dt><dd>Charts, Go templates, Sprig, hooks, CRDs, OCI registries, helm-unittest, GitOps</dd></div>
+            <div><dt>For</dt><dd>Helm 4 (commands as of Helm 4.3)</dd></div>
+            <div><dt>Note</dt><dd>Commands, charts and sample output have not been run.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1.3 MB, in German · <a href="https://creativecommons.org/licenses/by-nd/4.0/">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="/pdf/Helm-Charts-Hands-On.pdf">Download PDF</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="ceph">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Ceph</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/hands-on-ceph.webp" width="693" height="1040" loading="lazy" alt="Cover of Ceph Hands-On">
+        </div>
+        <div class="buch-text">
+          <h2>Ceph Hands-On</h2>
+          <p>How Ceph thinks and how to run it: RADOS, CRUSH and placement groups, the storage interfaces, operations and troubleshooting.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>111 pages · 38 chapters · 7 parts</dd></div>
+            <div><dt>Covers</dt><dd>cephadm, RBD, CephFS, RGW, Rook and CSI, BlueStore, erasure coding</dd></div>
+            <div><dt>For</dt><dd>Ceph Tentacle (20.2) with cephadm</dd></div>
+            <div><dt>Note</dt><dd>Commands and sample output have not been run on a cluster.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1.1 MB, in German · <a href="https://creativecommons.org/licenses/by-nd/4.0/">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="/pdf/Ceph-Hands-On.pdf">Download PDF</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="dockerfiles">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Dockerfiles</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/hands-on-dockerfiles.webp" width="693" height="1040" loading="lazy" alt="Cover of Dockerfiles Hands-On">
+        </div>
+        <div class="buch-text">
+          <h2>Dockerfiles Hands-On</h2>
+          <p>Every Dockerfile instruction with its pitfalls, then better builds, language patterns, security and CI.</p>
+          <dl class="fakten">
+            <div><dt>Length</dt><dd>111 pages · 38 chapters · 7 parts</dd></div>
+            <div><dt>Covers</dt><dd>BuildKit, multi-stage builds, secrets, multi-arch, Node.js, Python, Go, Java, SBOM, signing</dd></div>
+            <div><dt>For</dt><dd>Docker Engine 29 and Buildx 0.38 with BuildKit</dd></div>
+            <div><dt>Note</dt><dd>Dockerfiles, commands and output have not been built or run.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1.2 MB, in German · <a href="https://creativecommons.org/licenses/by-nd/4.0/">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="/pdf/Dockerfiles-Hands-On.pdf">Download PDF</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="licence">
+    <div class="sheet"><div class="col">
+      <p>These books have no English edition. The licence allows you to share them unchanged, with attribution; it does not allow adaptations, translations included.</p>
+      <p class="marke">All product names are trademarks of their respective owners. These books are independent publications and are not affiliated with, or endorsed by, any of them.</p>
+    </div></div>
+  </section>
+</main>
+
+<footer><div class="sheet"><div class="fgrid">
+<div><h4>nyrvex</h4><p>The control plane layer for AI infrastructure.<br>An architecture, not a product.</p></div>
+<div><h4>Page</h4><ul><li><a href="/">Home</a></li><li><a href="/#thesis">The thesis</a></li></ul></div>
+<div><h4>Books</h4><ul><li><a href="/enterprise-ai-platform">Enterprise AI Platform</a></li><li><a href="/vault-in-practice">Vault in Practice</a></li><li><a href="/hands-on">Hands-On series — free PDFs</a></li><li><a href="https://thomaszachmann.de/buch">AI Platform in German — free</a></li></ul></div>
+<div><h4>Legal</h4><ul><li><a href="/imprint.html">Legal notice</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="mailto:contact@nyrvex.com">Contact</a></li></ul></div>
+</div><div class="fbot">
+      <p>© 2026 Thomas Zachmann · Ohlendiekskamp 54, 22399 Hamburg</p>
+      <p class="ftech"><img src="/img/kubernetes.svg" alt="" width="16" height="16" aria-hidden="true"><span>This site runs on Kubernetes: k3s on a single node at Hetzner in Falkenstein, provisioned with Terraform, deployed via GitOps with Flux. <a href="https://github.com/thomaszachmann/thomaszachmann.de">Source on GitHub</a>.</span></p>
+    </div></div></footer>
+</body>
+</html>
