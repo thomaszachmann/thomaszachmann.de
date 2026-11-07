@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes absichern — Hands-on-Handbuch · kostenlos als PDF</title>
+<meta name="description" content="Kostenloses Hands-on-Handbuch, 122 Seiten: eine durchgängige Security-Architektur auf k3s mit Cilium, RBAC, Pod Security Admission, Kyverno, Falco, Trivy, Audit-Logs, Grafana, Loki und Tempo. PDF, ohne Anmeldung.">
+<meta name="author" content="Thomas Zachmann">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thomaszachmann.de/kubernetes-absichern">
+<meta property="og:title" content="Kubernetes absichern — Hands-on-Handbuch">
+<meta property="og:description" content="Eine durchgängige Security-Architektur auf k3s, Befehl für Befehl aufgebaut. 122 Seiten, kostenlos als PDF, ohne Anmeldung.">
+<meta property="og:type" content="book">
+<meta property="og:url" content="https://thomaszachmann.de/kubernetes-absichern">
+<meta property="og:image" content="https://thomaszachmann.de/img/kubernetes-absichern-cover.webp">
+<meta property="og:locale" content="de_DE">
+<meta name="theme-color" content="#f4f1ec">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23111111'/><text x='16' y='22' font-family='Helvetica,Arial,sans-serif' font-size='15' font-weight='600' fill='%23fff' text-anchor='middle'>TZ</text></svg>">
+
+<link rel="stylesheet" href="/site.css">
+<style>
+/* ---------- Quiet Blue: identisch zur Startseite ---------- */
+
+h1{font-size:clamp(1.75rem,5.4vw,2.75rem);letter-spacing:-.025em}
+
+section{padding:76px 0}
+
+.nav-links a[aria-current="page"]{color:var(--text)}
+
+.btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- Kopf der Buchseite ---------- */
+.book-hero{padding:56px 0 72px}
+.book-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:64px;align-items:start}
+@media(max-width:880px){.book-grid{grid-template-columns:1fr;gap:44px}}
+.book-hero h1{margin-bottom:18px;max-width:18ch;text-wrap:balance}
+.book-hero .lead{font-size:1.1875rem;color:var(--text-2);max-width:52ch;margin-bottom:26px}
+/* Der Umschlag hat selbst einen fast weissen Grund. Ohne Rahmen zerfliesst er
+   auf der weissen Seite, deshalb eine duenne Kante statt eines Schattens. */
+.cover{
+  display:block;width:100%;max-width:340px;height:auto;
+  border:1px solid var(--border);border-radius:var(--radius);
+}
+@media(max-width:880px){.cover{max-width:260px}}
+.book-facts{border-top:1px solid var(--border);margin:0 0 28px;max-width:52ch}
+.book-facts div{display:flex;justify-content:space-between;gap:20px;padding:11px 0;border-bottom:1px solid var(--border);font-size:.9375rem}
+.book-facts dt{color:var(--text-3);margin:0;flex:none}
+.book-facts dd{margin:0;text-align:right;color:var(--text)}
+.dl-note{font-size:.875rem;color:var(--text-3);margin:14px 0 0;max-width:46ch}
+
+/* ---------- Inhalt: Teile und Anhaenge ---------- */
+.parts{border-top:1px solid var(--border);margin-top:34px;max-width:92ch}
+.parts > div{
+  display:grid;grid-template-columns:96px 1fr;gap:28px;
+  padding:18px 0;border-bottom:1px solid var(--border);
+}
+@media(max-width:760px){.parts > div{grid-template-columns:1fr;gap:6px;padding:16px 0}}
+.parts dt{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.8125rem;color:var(--text-3);margin:.2rem 0 0;white-space:nowrap;
+}
+.parts dd{margin:0}
+.parts dd strong{font-weight:550}
+.parts dd span{display:block;color:var(--text-2);font-size:.9375rem;margin-top:3px}
+
+/* ---------- "Was es nicht ist" ---------- */
+.nots{margin-top:30px;max-width:72ch;list-style:none;padding:0}
+.nots li{padding:13px 0;border-bottom:1px solid var(--border);font-size:.9375rem;color:var(--text-2)}
+.nots li:first-child{border-top:1px solid var(--border)}
+.nots strong{color:var(--text);font-weight:550}
+/* Weisser Grund, nicht --surface: der Abschnitt ist selbst getoent, sonst
+   verschwindet das Kommando in seinem Hintergrund. */
+.nots code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.8125rem;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 5px}
+
+/* ---------- Abschluss ---------- */
+.closing{text-align:left}
+.closing .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header>
+  <nav class="wrap">
+    <a class="brand" href="/">Thomas Zachmann</a>
+    <div class="nav-links">
+      <a href="/#profil">Profil</a>
+      <a href="/#schwerpunkte">Schwerpunkte</a>
+      <a href="/leistungen">Leistungen</a>
+      <a href="/buch" aria-current="page">Buch</a>
+      <a href="/#kompetenz">Kompetenz</a>
+      <a href="/#projekte">Projekte</a>
+      <a class="btn btn-primary" href="/#kontakt">Kontakt</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= KOPF ================= -->
+  <section class="book-hero">
+    <div class="wrap book-grid">
+      <div>
+        <p class="eyebrow">Hands-on-Handbuch · Kostenlos</p>
+        <h1>Kubernetes absichern</h1>
+        <p class="lead">
+          Eine durchgängige Security-Architektur auf k3s, Befehl für Befehl
+          aufgebaut: von der leeren Ubuntu-VM bis zur Angriffsübung gegen das
+          eigene Cluster. Kein langes Skript zum Abtippen, sondern jeder Befehl
+          einzeln, mit einer Erklärung, warum er nötig ist.
+        </p>
+
+        <dl class="book-facts">
+          <div><dt>Umfang</dt><dd>122 Seiten · 17 Kapitel · Anhang</dd></div>
+          <div><dt>Für</dt><dd>k3s 1.36 · Cilium 1.20 · Kyverno 1.19</dd></div>
+          <div><dt>Format</dt><dd>PDF · 1,9 MB · nur auf Deutsch</dd></div>
+          <div><dt>Stand</dt><dd>November 2026</dd></div>
+          <div><dt>Preis</dt><dd>kostenlos</dd></div>
+          <div>
+            <dt>Lizenz</dt>
+            <dd><a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de" rel="license noopener">CC BY-ND 4.0</a></dd>
+          </div>
+        </dl>
+
+        <a class="btn btn-primary" href="/kubernetes-absichern.pdf" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/>
+          </svg>
+          PDF herunterladen
+        </a>
+        <p class="dl-note">
+          Kein Formular, keine E-Mail-Adresse, kein Newsletter. Der Link lädt die
+          Datei direkt. Weitergabe der unveränderten Datei ist ausdrücklich
+          erlaubt.
+        </p>
+        <p class="dl-note">
+          Das Buch gehört zur
+          <a href="https://nyrvex.de/hands-on" rel="noopener">Hands-On-Reihe bei Nyrvex</a>.
+        </p>
+      </div>
+
+      <div>
+        <img class="cover" src="img/kubernetes-absichern-cover.webp" width="720" height="948"
+             alt="Umschlag des Hands-on-Handbuchs „Kubernetes absichern“ von Thomas Zachmann">
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORUM ES GEHT ================= -->
+  <section id="worum" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Worum es geht</p>
+      <h2>Schichten statt Insellösungen</h2>
+      <div class="prose" style="margin-top:18px;color:var(--text-2)">
+        <p>
+          Einzelne Sicherheitswerkzeuge sind schnell installiert. Schwer ist etwas
+          anderes: zu verstehen, welches Werkzeug welche Lücke schließt, wo sie sich
+          überschneiden und was passiert, wenn eines ausfällt.
+        </p>
+        <p>
+          Das Buch baut deshalb Schicht für Schicht eine Architektur auf, in der jede
+          Schicht davon ausgeht, dass die vorherige versagt hat. Jedes Kapitel folgt
+          demselben Ablauf: erst melden, dann auswerten, zuletzt durchsetzen. Zu
+          jedem Schritt gibt es eine Prüfung, woran man erkennt, dass er gewirkt hat.
+        </p>
+        <p style="margin-bottom:0">
+          Vorausgesetzt werden Grundkenntnisse in Linux und Kubernetes. Gebraucht
+          wird eine Ubuntu-VM mit rund 8 GB RAM und ein Laptop mit
+          <code>kubectl</code> und <code>helm</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INHALT ================= -->
+  <section id="inhalt">
+    <div class="wrap">
+      <p class="eyebrow">Inhalt</p>
+      <h2>Von der leeren VM bis zur Angriffsübung</h2>
+
+      <dl class="parts">
+        <div>
+          <dt>Kap. 1–2</dt>
+          <dd>
+            <strong>Architektur und Fundament</strong>
+            <span>Verteidigung in Schichten, k3s mit Cilium statt Flannel und
+            kube-proxy, Kubeconfig auf dem Laptop.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Kap. 3–4</dt>
+          <dd>
+            <strong>Zugriff und Zulassung</strong>
+            <span>RBAC mit eigenen Nutzern und Service-Accounts, Pod Security
+            Admission mit Ausnahmen pro Namespace.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Kap. 5–6</dt>
+          <dd>
+            <strong>Regeln und Netzwerk</strong>
+            <span>Kyverno mit ValidatingPolicy, Cilium Default-Deny, L7- und
+            FQDN-Regeln, Hubble.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Kap. 7–8</dt>
+          <dd>
+            <strong>Erkennen und Scannen</strong>
+            <span>Falco als DaemonSet mit eigenen Regeln, Trivy Operator für
+            laufende Schwachstellen-Scans.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Kap. 9–12</dt>
+          <dd>
+            <strong>Nachweis und zentrale Sicht</strong>
+            <span>Kubernetes-Audit-Logs, Prometheus, Grafana, Loki, Alloy, Tempo,
+            ein gemeinsames Dashboard und eine Angriffsübung.</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Kap. 13–16</dt>
+          <dd>
+            <strong>Betrieb und Zusatzteil</strong>
+            <span>Fehlersuche und Dauerbetrieb, optional TLS und Secrets mit
+            cert-manager, OpenBao und External Secrets.</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= PRUEFUNG ================= -->
+  <section id="pruefung" class="tinted">
+    <div class="wrap">
+      <p class="eyebrow">Ehrlich gesagt</p>
+      <h2>Was geprüft wurde und was nicht</h2>
+      <ul class="nots">
+        <li>
+          <strong>Geprüft.</strong> Alle Helm-Werte wurden mit <code>helm template</code>
+          gegen die genannten Chart-Versionen gerendert, die Kyverno-Policies liefen
+          mit der Kyverno CLI gegen gute und schlechte Beispiel-Pods, Manifeste wurden
+          gegen die CRD-Schemas geprüft.
+        </li>
+        <li>
+          <strong>Nicht geprüft.</strong> Das Buch wurde nicht vollständig auf einem
+          Cluster durchgespielt. Alloy-Konfiguration, Falco-Regeln,
+          CiliumNetworkPolicies, TraceQL-Abfragen und <code>bao</code>-Befehle folgen
+          der offiziellen Dokumentation, liefen aber nicht gegen die echten Programme.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= ABSCHLUSS ================= -->
+  <section id="download">
+    <div class="wrap closing">
+      <p class="eyebrow">Download</p>
+      <h2>122 Seiten, kostenlos</h2>
+      <p class="prose" style="margin-top:16px;color:var(--text-2)">
+        Wenn Sie einen Cluster nicht im Lab, sondern in Produktion absichern müssen:
+        Ich mache das beruflich.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/kubernetes-absichern.pdf" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/>
+          </svg>
+          PDF herunterladen
+        </a>
+        <a class="btn btn-secondary" href="/#kontakt">Projekt besprechen</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Thomas Zachmann</h4>
+        <p>
+          Freiberuflicher Platform Engineer.<br>
+          Enterprise-Plattformen für Kubernetes, Cloud und AI.
+        </p>
+      </div>
+      <div>
+        <h4>Seite</h4>
+        <ul>
+          <li><a href="/#profil">Profil</a></li>
+          <li><a href="/#schwerpunkte">Schwerpunkte</a></li>
+          <li><a href="/private-cloud-kubernetes">Private Cloud &amp; Kubernetes</a></li>
+          <li><a href="/enterprise-ai">Enterprise AI</a></li>
+          <li><a href="/buch">Buch</a></li>
+          <li><a href="/#kompetenz">Kompetenz</a></li>
+          <li><a href="/#projekte">Projekte</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="mailto:thomas@zachmann.work">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-bottom">
+      © 2026 Thomas Zachmann · Ohlendiekskamp 54 · 22399 Hamburg
+    </p>
+    <p class="foot-tech">
+      <img src="img/kubernetes.svg" alt="" width="17" height="17" aria-hidden="true">
+      <span>Diese Seite läuft auf Kubernetes: k3s auf einem Node bei Hetzner in
+      Falkenstein, provisioniert mit Terraform, ausgerollt per GitOps mit Flux.
+      <a href="https://github.com/thomaszachmann/thomaszachmann.de">Quellcode auf GitHub</a>.</span>
+    </p>
+  </div>
+</footer>
+</body>
+</html>

@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Fünf kostenlose Lab Guides: Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta name="description" content="Sechs kostenlose Lab Guides: Kubernetes-Security, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
 <meta name="color-scheme" content="light dark">
-<meta property="og:title" content="Hands-On-Reihe — kostenlose Lab Guides zu Kubernetes, Ceph, Helm und Docker">
-<meta property="og:description" content="Fünf kostenlose Lab Guides: Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta property="og:title" content="Hands-On-Reihe — kostenlose Lab Guides zu Kubernetes, Security, Ceph, Helm und Docker">
+<meta property="og:description" content="Sechs kostenlose Lab Guides: Kubernetes-Security, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nyrvex.de/hands-on">
 <link rel="canonical" href="https://nyrvex.de/hands-on">
@@ -18,7 +18,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Hands-On-Reihe — kostenlose Lab Guides zu Kubernetes, Ceph, Helm und Docker</title>
+<title>Hands-On-Reihe — kostenlose Lab Guides zu Kubernetes, Security, Ceph, Helm und Docker</title>
 <style>
 /* Schriften lokal ausgeliefert — keine Verbindung zu Dritten */
 @font-face {
@@ -361,14 +361,36 @@
 <div class="plate"><div class="sheet pagehead">
   <p class="eyebrow">Lab Guides</p>
   <h1>Hands-On-Reihe</h1>
-  <p class="lead">Fünf kompakte Bücher für alle, die sich auf ein technisches Interview vorbereiten. <b>Kostenlos als PDF, auf Deutsch und Englisch.</b></p>
+  <p class="lead">Sechs kompakte Bücher für alle, die sich auf ein technisches Interview vorbereiten. <b>Kostenlos als PDF, auf Deutsch und fast alle auch auf Englisch.</b></p>
   <div class="stamp" style="margin-top:32px">
     <span class="k">Ausgabe</span>
-    <span class="v">5 Bücher · 578 Seiten insgesamt · Deutsch und Englisch<br>PDF · kostenloser Download · CC BY-ND 4.0</span>
+    <span class="v">6 Bücher · 700 Seiten insgesamt · Deutsch, fünf davon auch auf Englisch<br>PDF · kostenloser Download · CC BY-ND 4.0</span>
   </div>
 </div></div>
 
 <main>
+  <section id="kubernetes-absichern">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Kubernetes-Security</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/kubernetes-absichern-cover.webp" width="720" height="948" loading="lazy" alt="Umschlag von Kubernetes absichern">
+        </div>
+        <div class="buch-text">
+          <h2>Kubernetes absichern</h2>
+          <p>Eine durchgängige Security-Architektur auf k3s, Befehl für Befehl aufgebaut: von der leeren Ubuntu-VM bis zur Angriffsübung gegen das eigene Cluster.</p>
+          <dl class="fakten">
+            <div><dt>Umfang</dt><dd>122 Seiten · 17 Kapitel · Anhang</dd></div>
+            <div><dt>Inhalt</dt><dd>k3s, Cilium, RBAC, Pod Security Admission, Kyverno, Falco, Trivy Operator, Audit-Logs, Grafana, Loki, Tempo, optional cert-manager, OpenBao und External Secrets</dd></div>
+            <div><dt>Für</dt><dd>k3s 1.36, Cilium 1.20, Kyverno 1.19 (Chart 3.9)</dd></div>
+            <div><dt>Hinweis</dt><dd>Helm-Werte wurden gerendert und die Kyverno-Policies mit der Kyverno CLI geprüft. Das Buch wurde nicht vollständig auf einem Cluster durchgespielt.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1,9 MB · nur auf Deutsch · <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de">CC BY-ND 4.0</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="https://nyrvex.com/pdf/Kubernetes-Absichern-Hands-On.pdf">PDF herunterladen</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
   <section id="observability">
     <div class="sheet">
       <div class="mass"><span class="lbl">Kubernetes Observability</span><span class="rule"></span></div>
