@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Neun kostenlose Lab Guides: Kubernetes-Security, Kubernetes-Monitoring, Kubernetes-Debugging, Linkerd, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta name="description" content="Zehn kostenlose Lab Guides: k0s und LINSTOR, Kubernetes-Security, Kubernetes-Monitoring, Kubernetes-Debugging, Linkerd, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
 <meta name="color-scheme" content="light dark">
 <meta property="og:title" content="Hands-On-Reihe — kostenlose Lab Guides zu Kubernetes, Security, Ceph, Helm und Docker">
-<meta property="og:description" content="Neun kostenlose Lab Guides: Kubernetes-Security, Kubernetes-Monitoring, Kubernetes-Debugging, Linkerd, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
+<meta property="og:description" content="Zehn kostenlose Lab Guides: k0s und LINSTOR, Kubernetes-Security, Kubernetes-Monitoring, Kubernetes-Debugging, Linkerd, Kubernetes Observability, Kyverno, Helm Charts, Ceph und Dockerfiles. PDF, CC BY-ND 4.0.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nyrvex.de/hands-on">
 <link rel="canonical" href="https://nyrvex.de/hands-on">
@@ -361,14 +361,36 @@
 <div class="plate"><div class="sheet pagehead">
   <p class="eyebrow">Lab Guides</p>
   <h1>Hands-On-Reihe</h1>
-  <p class="lead">Neun kompakte Bücher für alle, die sich auf ein technisches Interview vorbereiten. <b>Kostenlos als PDF, auf Deutsch und Englisch.</b></p>
+  <p class="lead">Zehn kompakte Bücher für alle, die sich auf ein technisches Interview vorbereiten. <b>Kostenlos als PDF, auf Deutsch und Englisch.</b></p>
   <div class="stamp" style="margin-top:32px">
     <span class="k">Ausgabe</span>
-    <span class="v">9 Bücher · 1.166 Seiten insgesamt · Deutsch und Englisch<br>PDF · kostenloser Download · CC BY-ND 4.0</span>
+    <span class="v">10 Bücher · 1.360 Seiten insgesamt · Deutsch und Englisch<br>PDF · kostenloser Download · CC BY-ND 4.0</span>
   </div>
 </div></div>
 
 <main>
+  <section id="k0s-linstor">
+    <div class="sheet">
+      <div class="mass"><span class="lbl">Replizierter Speicher</span><span class="rule"></span></div>
+      <div class="buch">
+        <div class="buch-cover">
+          <img src="/img/k0s-und-linstor-cover.webp" width="720" height="948" loading="lazy" alt="Umschlag von k0s und LINSTOR">
+        </div>
+        <div class="buch-text">
+          <h2>k0s und LINSTOR</h2>
+          <p>Kubernetes mit k0s und repliziertem Block-Speicher mit LINSTOR und DRBD, Befehl für Befehl auf vier VMs aufgebaut und danach absichtlich kaputtgemacht: Controller-Failover, Node-Ausfall, Split-Brain, volle Volumes, Backup, Plattentausch und Updates, mit im Lab gemessenen Ausfallzeiten.</p>
+          <dl class="fakten">
+            <div><dt>Umfang</dt><dd>127 Seiten · 19 Kapitel · Anhang</dd></div>
+            <div><dt>Inhalt</dt><dd>k0s, k0sctl, LINSTOR, DRBD, drbd-reactor, Piraeus als CSI-Treiber, Zonen und Witness, Writecache, Velero, Ansible, Prometheus-Alarme</dd></div>
+            <div><dt>Für</dt><dd>k0s 1.36/1.37, LINSTOR 1.33/1.35, DRBD 9.3, Piraeus 2.12</dd></div>
+            <div><dt>Hinweis</dt><dd>Auf vier VMs durchgespielt. Nicht getestet: die Ansible-Rollen gegen einen leeren Node, ein laufender Prometheus-Stack, mehrere k0s-Controller.</dd></div>
+            <div><dt>Format</dt><dd>PDF, 1,9 MB · <a href="https://creativecommons.org/licenses/by-nd/4.0/deed.de">CC BY-ND 4.0</a> · Dateien auf <a href="https://github.com/thomaszachmann/k0s-linstor">GitHub</a></dd></div>
+          </dl>
+          <p class="btnrow"><a class="btn" href="https://nyrvex.com/pdf/K0s-und-LINSTOR-Hands-On.pdf">PDF herunterladen</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
   <section id="kubernetes-absichern">
     <div class="sheet">
       <div class="mass"><span class="lbl">Kubernetes-Security</span><span class="rule"></span></div>
