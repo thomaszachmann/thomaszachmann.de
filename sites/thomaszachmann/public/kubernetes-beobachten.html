@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kubernetes beobachten — Hands-on-Handbuch · kostenlos als PDF</title>
-<meta name="description" content="Kostenloses Hands-on-Handbuch, 153 Seiten: Monitoring, Logging, Alerting und Tracing für mehrere k3s-Cluster mit Prometheus, Thanos, Grafana, Loki, Alloy und Tempo, S3 im Cluster und auf AWS, Backup und fertigen Dashboards. PDF, ohne Anmeldung.">
+<meta name="description" content="Kostenloses Hands-on-Handbuch, 220 Seiten: Monitoring, Logging, Alerting und Tracing für mehrere k3s-Cluster mit Prometheus, Thanos, Grafana, Loki, Alloy und Tempo, S3 im Cluster und auf AWS, Backup und fertigen Dashboards. PDF, ohne Anmeldung.">
 <meta name="author" content="Thomas Zachmann">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://thomaszachmann.de/kubernetes-beobachten">
 <meta property="og:title" content="Kubernetes beobachten — Hands-on-Handbuch">
-<meta property="og:description" content="Eine zentrale Observability-Plattform für mehrere k3s-Cluster, Befehl für Befehl aufgebaut. 153 Seiten, kostenlos als PDF, ohne Anmeldung.">
+<meta property="og:description" content="Eine zentrale Observability-Plattform für mehrere k3s-Cluster, Befehl für Befehl aufgebaut. 220 Seiten, kostenlos als PDF, ohne Anmeldung.">
 <meta property="og:type" content="book">
 <meta property="og:url" content="https://thomaszachmann.de/kubernetes-beobachten">
 <meta property="og:image" content="https://thomaszachmann.de/img/kubernetes-beobachten-cover.webp">
@@ -112,9 +112,9 @@ section{padding:76px 0}
         </p>
 
         <dl class="book-facts">
-          <div><dt>Umfang</dt><dd>153 Seiten · 15 Kapitel · Anhang</dd></div>
+          <div><dt>Umfang</dt><dd>220 Seiten · 17 Kapitel · Anhang</dd></div>
           <div><dt>Für</dt><dd>k3s 1.36 · Prometheus · Thanos 0.42 · Loki 3.7 · Tempo · Alloy 1.21</dd></div>
-          <div><dt>Format</dt><dd>PDF · 2,5 MB · Deutsch</dd></div>
+          <div><dt>Format</dt><dd>PDF · 8,6 MB · Deutsch</dd></div>
           <div><dt>Stand</dt><dd>November 2026</dd></div>
           <div><dt>Preis</dt><dd>kostenlos</dd></div>
           <div>
@@ -233,6 +233,14 @@ section{padding:76px 0}
             Burn-Rate, Pyroscope, DSGVO, Fehlersuche und Updates.</span>
           </dd>
         </div>
+        <div>
+          <dt>Kap. 15–16</dt>
+          <dd>
+            <strong>Enterprise und Multi-Tenancy</strong>
+            <span>Was ein Ausfall der Zentrale kostet (gemessen), Hochverfügbarkeit
+            ohne Datenverlust, Mandanten mit Thanos sauber trennen.</span>
+          </dd>
+        </div>
       </dl>
     </div>
   </section>
@@ -244,16 +252,17 @@ section{padding:76px 0}
       <h2>Was geprüft wurde und was nicht</h2>
       <ul class="nots">
         <li>
-          <strong>Geprüft.</strong> Alle Helm-Werte wurden mit <code>helm template</code>
-          gegen die genannten Chart-Versionen gerendert, Manifeste und Alarmregeln
-          mit <code>kubeconform</code> gegen Kubernetes 1.36 und die CRD-Schemas
-          geprüft, Dashboards und JSON-Dateien auf Gültigkeit.
+          <strong>Durchgespielt.</strong> Im November 2026 wurde das ganze Buch
+          auf drei k3s-VMs (k3s 1.36) Befehl für Befehl nachgebaut: Installation,
+          Alarme bis zur Mail, Logs, Traces, Dashboards, Velero-Backup, ein
+          66-minütiger Ausfall der Zentrale und die Multi-Tenancy mit Thanos.
+          Die Screenshots im Buch stammen aus diesem Lauf.
         </li>
         <li>
-          <strong>Nicht geprüft.</strong> Das Buch wurde nicht auf echten Clustern
-          durchgespielt. Alloy-Konfigurationen, PromQL-, LogQL- und TraceQL-Abfragen
-          und die Alertmanager-Konfiguration folgen der offiziellen Dokumentation,
-          liefen aber nicht gegen die echten Programme.
+          <strong>Nicht durchgespielt.</strong> Das Kapitel zu S3 auf AWS und die
+          etcd-Snapshots sind im Buch als ungetestet markiert. Das Enterprise-Kapitel
+          beschreibt Architekturen, die über das Labor hinausgehen, und trennt
+          klar zwischen getestet und Beispiel.
         </li>
       </ul>
     </div>
@@ -263,7 +272,7 @@ section{padding:76px 0}
   <section id="download">
     <div class="wrap closing">
       <p class="eyebrow">Download</p>
-      <h2>153 Seiten, kostenlos</h2>
+      <h2>220 Seiten, kostenlos</h2>
       <p class="prose" style="margin-top:16px;color:var(--text-2)">
         Wenn Sie Monitoring nicht im Lab, sondern für produktive Cluster aufbauen
         müssen: Ich mache das beruflich.
