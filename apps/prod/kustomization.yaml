@@ -28,4 +28,4 @@ images:
     # Der erste Pipeline-Lauf fuer sites/nyrvex-de/ ersetzt ihn. Bis dahin
     # kann der Pod das Image nicht ziehen - gewollt, denn nyrvex.de ist noch
     # nicht ausgerollt.
-    digest: sha256:07ce25142b6f7ec6ebc81d43a8c2a5497d70945d02229b0959090a3724e89430
+    digest: sha256:749d0c05ace0489d32c8a2661adfd174902c378f86a6d973eff8615525caa601
