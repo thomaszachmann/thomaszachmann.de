@@ -1,125 +1,125 @@
 # thomaszachmann.de
 
-Website und Plattform. Ein k3s-Single-Node bei Hetzner Cloud, per Terraform
-provisioniert, per Flux verwaltet. Live seit 2026-08-27.
+Website and platform. A single-node k3s cluster on Hetzner Cloud, provisioned
+with Terraform, managed with Flux. Live since 2026-08-27.
 
-**Runbooks — hier fängst du an:**
+**Runbooks — start here:**
 
-- [Feature deployen](docs/runbooks/feature-deployen.md) — Inhalt ändern,
-  Cluster-Konfiguration ändern, Infrastruktur ändern, neue Site hinzufügen,
-  zurückrollen
-- [Cluster neu aufsetzen](docs/runbooks/cluster-neu-aufsetzen.md) — Server neu
-  bauen (~6 min) oder komplett bei Null, alle Kommandos
+- [Deploying a feature](docs/runbooks/feature-deployen.md) — change content,
+  change cluster configuration, change infrastructure, add a new site,
+  roll back
+- [Rebuilding the cluster](docs/runbooks/cluster-neu-aufsetzen.md) — rebuild the
+  server (~6 min) or start completely from scratch, all commands
 
-**Hintergrund:**
+**Background:**
 
-- [Design](docs/superpowers/specs/2026-08-26-hetzner-k3s-website-platform-design.md) — welche Entscheidungen warum
-- [Implementierungsplan](docs/superpowers/plans/2026-08-26-hetzner-k3s-website-platform.md) — wie es gebaut wurde
+- [Design](docs/superpowers/specs/2026-08-26-hetzner-k3s-website-platform-design.md) — which decisions were made and why
+- [Implementation plan](docs/superpowers/plans/2026-08-26-hetzner-k3s-website-platform.md) — how it was built
 
-## Betriebsmodell
+## Operating model
 
-Der Node ist Cattle, kein Pet. Es gibt bewusst keine laufende Drift-Korrektur
-auf OS-Ebene — der Weg zurück zum Soll-Zustand ist der Rebuild, nicht das
-Nachziehen. Der Zustand liegt vollständig im Repo; der Server hält nichts, was
-nicht reproduzierbar wäre.
+The node is cattle, not a pet. There is deliberately no ongoing drift correction
+at the OS level — the way back to the desired state is a rebuild, not patching
+things up. The state lives entirely in the repo; the server holds nothing that
+could not be reproduced.
 
-Die Primary IPs sind eigene Terraform-Ressourcen mit `delete_protection`. Sie
-überleben einen Rebuild, deshalb muss DNS dabei nie angefasst werden.
+The primary IPs are separate Terraform resources with `delete_protection`. They
+survive a rebuild, so DNS never has to be touched.
 
 ## Toolchain
 
-Versionsgebunden in [`mise.toml`](mise.toml), damit sie Teil des
-reproduzierbaren Zustands ist und nicht Zufall der lokalen Maschine:
+Version-pinned in [`mise.toml`](mise.toml), so it is part of the
+reproducible state rather than an accident of the local machine:
 
 ```bash
 mise install
 ```
 
-`kubectl` ist absichtlich auf die k3s-Version des Servers gepinnt. Kubernetes
-unterstützt zwischen Client und apiserver nur ±1 Minor-Version; eine global
-installierte ältere `kubectl` erzeugt sonst Fehlerbilder, die wie
-Cluster-Probleme aussehen, aber keine sind.
+`kubectl` is deliberately pinned to the server's k3s version. Kubernetes
+only supports a skew of ±1 minor version between client and apiserver; an older,
+globally installed `kubectl` otherwise produces symptoms that look like
+cluster problems but aren't.
 
-Nicht über mise: `sops`, `age`, `gh`, `jq`, `docker` — per Homebrew.
+Not managed by mise: `sops`, `age`, `gh`, `jq`, `docker` — installed via Homebrew.
 
-**Wenn `terraform version` etwas anderes zeigt als `mise.toml` sagt:** Es liegt
-ein zweites Binary unter `/opt/homebrew/bin/` und überdeckt die mise-Version.
-Prüfen mit `which -a terraform`.
+**If `terraform version` shows something different from `mise.toml`:** there is
+a second binary under `/opt/homebrew/bin/` shadowing the mise version.
+Check with `which -a terraform`.
 
-## Inhalt ändern
+## Changing content
 
-1. Datei unter `sites/thomaszachmann/public/` bearbeiten
-2. Lokal prüfen: `./scripts/verify-assets.sh sites/thomaszachmann/public`
-3. Committen und pushen
+1. Edit the file under `sites/thomaszachmann/public/`
+2. Check locally: `./scripts/verify-assets.sh sites/thomaszachmann/public`
+3. Commit and push
 
-Alles Weitere passiert von selbst: GitHub Actions baut das Image, schreibt den
-Digest nach `apps/prod/kustomization.yaml`, Flux rollt innerhalb einer Minute
-aus. Gemessen von Commit bis Live: rund zwei Minuten.
+Everything else happens automatically: GitHub Actions builds the image, writes the
+digest to `apps/prod/kustomization.yaml`, and Flux rolls it out within a minute.
+Measured from commit to live: about two minutes.
 
-Der Workflow **deployt nie selbst**. Im Cluster liegt kein Credential mit
-Schreibrecht auf das Repo — der Flux-Deploy-Key ist read-only, per API
-verifiziert.
+The workflow **never deploys by itself**. There is no credential in the cluster with
+write access to the repo — the Flux deploy key is read-only, verified via the
+API.
 
-## Infrastruktur aendern
+## Changing infrastructure
 
 ```bash
 cd terraform
-terraform plan -out=tfplan     # lesen, bevor angewendet wird
+terraform plan -out=tfplan     # read before applying
 terraform apply tfplan
-../scripts/backup-state.sh     # State-Sicherung auffrischen
+../scripts/backup-state.sh     # refresh the state backup
 ```
 
-Der letzte Schritt ist nicht optional. Der State liegt lokal und ist
-gitignored; bei Festplattenverlust muesste ohne Sicherung jede Ressource
-einzeln importiert werden. `backup-state.sh` legt ihn SOPS-verschluesselt
-unter `terraform/state-backup.sops.json` ab, prueft den Round-Trip
-semantisch und verwirft das Backup, wenn es sich nicht zurueckholen laesst.
+The last step is not optional. The state is local and
+gitignored; if the disk were lost without a backup, every resource would have to be
+imported one by one. `backup-state.sh` stores it SOPS-encrypted
+under `terraform/state-backup.sops.json`, checks the round trip
+semantically and discards the backup if it cannot be restored.
 
-Das ist ein Backup, kein Remote-Backend: es gibt kein Locking. Solange nur
-eine Person applyt, ist das kein Problem.
+This is a backup, not a remote backend: there is no locking. As long as only
+one person runs apply, that's not a problem.
 
-Wiederherstellen:
+Restore:
 
 ```bash
 SOPS_AGE_KEY_FILE=age.key sops --decrypt terraform/state-backup.sops.json \
   > terraform/terraform.tfstate
 ```
 
-## Cluster-Zugriff
+## Cluster access
 
-Port 6443 ist von aussen geschlossen. Zugriff nur über einen SSH-Tunnel.
+Port 6443 is closed from the outside. Access only via an SSH tunnel.
 
 ```bash
 cd terraform
-terraform output kube_tunnel_command    # in einem eigenen Terminal ausfuehren
+terraform output kube_tunnel_command    # run in a separate terminal
 terraform output fetch_kubeconfig_command
 
-# im zweiten Terminal:
+# in the second terminal:
 export KUBECONFIG="$PWD/kubeconfig"
 kubectl get nodes
 flux get kustomizations
 ```
 
-## Wenn etwas kaputt ist
+## When something is broken
 
-| Symptom | Erste Diagnose |
+| Symptom | First diagnosis |
 |---|---|
-| Seite nicht erreichbar | `kubectl -n web-thomaszachmann get pods`, dann `kubectl -n traefik get svc` |
-| Zertifikat abgelaufen | `kubectl -n web-thomaszachmann describe certificate thomaszachmann-tls` |
-| Deploy kommt nicht an | `flux get kustomizations`, dann `flux logs --level=error` |
-| Pipeline rot | `gh run view --log-failed` |
+| Site not reachable | `kubectl -n web-thomaszachmann get pods`, then `kubectl -n traefik get svc` |
+| Certificate expired | `kubectl -n web-thomaszachmann describe certificate thomaszachmann-tls` |
+| Deploy doesn't arrive | `flux get kustomizations`, then `flux logs --level=error` |
+| Pipeline red | `gh run view --log-failed` |
 
-**`flux reconcile` braucht `--with-source`, sonst luegt es.** Ohne das Flag
-wendet Flux die zwischengespeicherte Git-Revision erneut an, statt neu zu
-holen — und meldet Erfolg. Ein anschliessendes `kubectl rollout status` meldet
-ebenfalls Erfolg, weil das *alte* Deployment ja ausgerollt ist. Man hat dann
-zwei gruene Meldungen und trotzdem den alten Stand live:
+**`flux reconcile` needs `--with-source`, otherwise it lies.** Without the flag,
+Flux re-applies the cached Git revision instead of fetching again
+— and reports success. A subsequent `kubectl rollout status` also reports
+success, because the *old* Deployment has indeed been rolled out. You then have
+two green messages and still the old state live:
 
 ```bash
-flux reconcile kustomization apps --with-source     # richtig
+flux reconcile kustomization apps --with-source     # correct
 ```
 
-Gegenprobe, die nicht luegt — laeuft das Image, das im Repo steht?
+A cross-check that doesn't lie — is the image from the repo actually running?
 
 ```bash
 grep 'digest:' apps/prod/kustomization.yaml
@@ -127,127 +127,127 @@ kubectl -n web-thomaszachmann get pod -l app.kubernetes.io/name=thomaszachmann \
   -o jsonpath='{.items[0].spec.containers[0].image}'
 ```
 
-Ohne Eingriff loest sich das ohnehin: `apps` reconciled jede Minute. Das Flag
-braucht man nur, wenn man nicht warten will.
+Without intervention it resolves itself anyway: `apps` reconciles every minute. You
+only need the flag if you don't want to wait.
 
-**Nicht `flux reconcile` auf eine Kustomization aufrufen, die absichtlich nicht
-bereit werden kann** — der Befehl wartet auf Readiness und hängt bis zum
-Timeout. Zustand stattdessen abfragen:
+**Don't call `flux reconcile` on a Kustomization that intentionally cannot
+become ready** — the command waits for readiness and hangs until the
+timeout. Query the state instead:
 
 ```bash
 kubectl -n flux-system get kustomizations \
   -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,MESSAGE:.status.conditions[?(@.type=="Ready")].message'
 ```
 
-## Zertifikate
+## Certificates
 
-Zwei ClusterIssuer: `letsencrypt-staging` und `letsencrypt-prod`. **Vor
-Änderungen an den `dnsNames` auf Staging wechseln.** Let's Encrypt erlaubt fünf
-Zertifikate pro Domain und Woche, und ein fehlgeschlagener Versuch schickt
-cert-manager in einen Backoff von einer Stunde.
+Two ClusterIssuers: `letsencrypt-staging` and `letsencrypt-prod`. **Switch to
+staging before changing the `dnsNames`.** Let's Encrypt allows five
+certificates per domain per week, and a failed attempt sends
+cert-manager into a one-hour backoff.
 
-Nach einem fehlgeschlagenen Versuch lässt sich der Backoff zurücksetzen, indem
-man die `Certificate`-Ressource löscht — Flux legt sie neu an, und der Zähler
-beginnt bei null.
+After a failed attempt, the backoff can be reset by deleting the
+`Certificate` resource — Flux recreates it and the counter
+starts at zero.
 
-Das `Certificate` steht bewusst **nicht** im Health-Check der
-`apps`-Kustomization. Seine Bereitschaft hängt an einem externen Dienst; als
-Gate würde es jeden Reconcile bis zum Timeout blockieren und dabei auch andere
-Änderungen aufhalten.
+The `Certificate` is deliberately **not** part of the health check of the
+`apps` Kustomization. Its readiness depends on an external service; as a
+gate it would block every reconcile until the timeout and hold up other
+changes too.
 
-## Sich selbst ausgesperrt
+## Locked yourself out
 
-Der häufigste Betriebsfehler: Die eigene IP hat sich geändert und die Firewall
-lässt SSH nicht mehr durch. Bei einem Telekom-Anschluss passiert das nach jeder
-Zwangstrennung.
+The most common operational mistake: your own IP has changed and the firewall
+no longer lets SSH through. With a Telekom connection this happens after every
+forced disconnect.
 
-Weg zurück über die Hetzner-Konsole (console.hetzner.cloud):
+The way back is via the Hetzner Console (console.hetzner.cloud):
 
-1. Projekt → Firewalls → `tz-web` → Rules → SSH-Regel auf die neue IP ändern.
-   Wirkt sofort.
-2. Danach `admin_ip_cidrs` in `terraform/terraform.tfvars` nachziehen und
-   `terraform apply`, sonst setzt der nächste Apply die alte IP zurück.
+1. Project → Firewalls → `tz-web` → Rules → change the SSH rule to the new IP.
+   Takes effect immediately.
+2. Then update `admin_ip_cidrs` in `terraform/terraform.tfvars` and run
+   `terraform apply`, otherwise the next apply resets the old IP.
 
-Alternativ bietet die Konsole eine Web-Console direkt auf den Node, die an der
-Firewall vorbeigeht.
+Alternatively, the console offers a web console directly on the node that bypasses the
+firewall.
 
-## Bewusste Abweichungen von der Spec
+## Deliberate deviations from the spec
 
-| Abweichung | Grund |
+| Deviation | Reason |
 |---|---|
-| **Ein Cloudflare-Token statt zwei** | Vom Betreiber entschieden. Konsequenz: Das Token, mit dem Terraform DNS verwaltet, liegt entschlüsselt in einem Kubernetes-Secret. Nachziehen kostet ein neues Token und ein `sops --encrypt`, keine Codeänderung. |
-| **SSH-Key wird referenziert, nicht verwaltet** | Der Key lag bereits im Hetzner-Projekt und wird von weiteren Servern benutzt. Würde Terraform ihn besitzen, könnte ein `destroy` deren Zugang mitreissen. |
-| **Kein manueller Bootstrap-Push nach GHCR** | Der Actions-Runner bringt `packages: write` aus seinem `permissions`-Block mit, und GHCR erbt die öffentliche Sichtbarkeit vom Repo. Damit ist lokal kein `write:packages` nötig und das erste Image entsteht auf demselben Weg wie jedes spätere. |
-| **`apps` gated auf das Deployment statt `wait: true`** | Siehe Abschnitt Zertifikate. |
+| **One Cloudflare token instead of two** | Decided by the operator. Consequence: the token Terraform uses to manage DNS is stored decrypted in a Kubernetes secret. Fixing this later costs a new token and a `sops --encrypt`, no code change. |
+| **SSH key is referenced, not managed** | The key already existed in the Hetzner project and is used by other servers. If Terraform owned it, a `destroy` could take their access down with it. |
+| **No manual bootstrap push to GHCR** | The Actions runner gets `packages: write` from its `permissions` block, and GHCR inherits public visibility from the repo. So no `write:packages` is needed locally and the first image is created the same way as every later one. |
+| **`apps` gated on the Deployment instead of `wait: true`** | See the Certificates section. |
 
-## Noch offen
+## Still open
 
-- **Zwei `PLATZHALTER`** in `datenschutz.html`: Log-Aufbewahrungsdauer und
-  zuständige Aufsichtsbehörde. Stehen live auf der Seite.
+- **Two `PLATZHALTER` (placeholders)** in `datenschutz.html`: log retention period and
+  the responsible supervisory authority. They are visible on the live page.
 
-### Umsatzsteuer im Impressum
+### VAT in the legal notice (Impressum)
 
-Der Abschnitt fehlt derzeit bewusst. § 5 Abs. 1 Nr. 6 DDG verlangt die
-USt-IdNr. nur **sofern vorhanden** — wer keine hat, lässt ihn weg. Das
-Impressum ist damit vollständig.
+The section is currently intentionally missing. § 5 (1) No. 6 DDG requires the
+VAT ID only **if one exists** — if you don't have one, you leave it out. The
+legal notice is therefore complete.
 
-Falls eine USt-IdNr. erteilt ist, in `impressum.html` vor „Redaktionell
-verantwortlich" einfügen:
+If a VAT ID has been issued, insert it in `impressum.html` before the heading
+"Redaktionell verantwortlich":
 
 ```html
   <h2>Umsatzsteuer-Identifikationsnummer</h2>
   <p>DE123456789</p>
 ```
 
-Bei Kleinunternehmerregelung stattdessen:
+Under the small-business rule, use this instead:
 
 ```html
   <h2>Umsatzsteuer</h2>
   <p>Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>
 ```
 
-**Die Steuernummer gehört nicht hierher** — sie ist nicht vorgeschrieben und
-sollte nicht veröffentlicht werden. Nur die USt-IdNr. (Format `DE` plus neun
-Ziffern) ist eine Impressumsangabe.
-- **Force-Push-Schutz** ist konfiguriert, aber nicht verifiziert: der einzige
-  belastbare Test waere ein echter Force-Push.
+**The tax number does not belong here** — it is not required and
+should not be published. Only the VAT ID (format `DE` plus nine
+digits) is a legal-notice item.
+- **Force-push protection** is configured but not verified: the only
+  reliable test would be an actual force push.
 
-**Was NICHT durch `terraform apply` heilbar ist:** der private age-Schlüssel
-(`age.key`). Ohne ihn sind die SOPS-verschlüsselten Secrets im Repo unbrauchbar.
-Er gehört in den Passwortmanager, nicht nur auf diese Festplatte.
+**What `terraform apply` CANNOT fix:** the private age key
+(`age.key`). Without it, the SOPS-encrypted secrets in the repo are useless.
+It belongs in the password manager, not only on this disk.
 
-## Disaster Recovery
+## Disaster recovery
 
-Am 2026-08-27 durchgefuehrt und gemessen, nicht geschaetzt.
+Performed and measured on 2026-08-27, not estimated.
 
 ```
-16:58:59  Server zerstoert, Seite offline
-16:59:22  terraform apply FEHLGESCHLAGEN (siehe unten)
-17:00:27  Server neu erstellt, gleiche IP
-17:01:25  cloud-init durch, k3s Ready        (58 s)
-17:02:31  Flux gebootstrappt
-17:04:32  Site laeuft, Seite wieder erreichbar
-17:05:55  Produktivzertifikat neu ausgestellt
-17:06:26  Abnahme vollstaendig gruen
+16:58:59  server destroyed, site offline
+16:59:22  terraform apply FAILED (see below)
+17:00:27  server recreated, same IP
+17:01:25  cloud-init done, k3s Ready         (58 s)
+17:02:31  Flux bootstrapped
+17:04:32  site running, page reachable again
+17:05:55  production certificate reissued
+17:06:26  acceptance checks fully green
 ```
 
-**Gemessene RTO: rund 6 Minuten bis erreichbar, 7 Minuten bis gueltiges TLS.**
-RPO null — alles steht im Repo.
+**Measured RTO: about 6 minutes until reachable, 7 minutes until valid TLS.**
+RPO zero — everything is in the repo.
 
-Belegt: Server-ID wechselte von `163777966` auf `163785180`, also eine
-physisch andere Maschine, bei unveraenderter IPv4 `2.28.5.182`. **DNS musste
-nicht angefasst werden.** Genau dafuer sind die Primary IPs eigene Ressourcen
-mit `delete_protection`.
+Evidence: the server ID changed from `163777966` to `163785180`, i.e. a
+physically different machine, with the IPv4 `2.28.5.182` unchanged. **DNS did
+not have to be touched.** That is exactly why the primary IPs are separate resources
+with `delete_protection`.
 
-### Der Ablauf
+### The procedure
 
 ```bash
 cd terraform
 terraform destroy -target=hcloud_server.web
 terraform apply
-ssh-keygen -R "$(terraform output -raw ipv4)"       # Host-Key ist neu
+ssh-keygen -R "$(terraform output -raw ipv4)"       # host key is new
 eval "$(terraform output -raw fetch_kubeconfig_command)"
-# Tunnel in einem eigenen Terminal: terraform output -raw kube_tunnel_command
+# tunnel in a separate terminal: terraform output -raw kube_tunnel_command
 
 export KUBECONFIG="$PWD/../kubeconfig"
 kubectl create namespace flux-system
@@ -257,49 +257,49 @@ export GITHUB_TOKEN="$(gh auth token)"
 flux bootstrap github --owner=<owner> --repository=thomaszachmann.de \
   --branch=main --path=clusters/prod --personal --version=v2.9.4
 
-../scripts/backup-state.sh    # State hat eine neue Server-ID
+../scripts/backup-state.sh    # state has a new server ID
 ```
 
-### Was die Probe an einem Risiko aufgedeckt hat
+### A risk the drill uncovered
 
-Der erste `terraform apply` scheiterte:
+The first `terraform apply` failed:
 
 ```
 Error: error during placement (resource_unavailable)
 ```
 
-Hetzner hatte in diesem Moment **keine CX33-Kapazitaet in fsn1**. Ein
-Neuversuch 30 Sekunden spaeter klappte. Das ist kein Konfigurationsfehler,
-sondern eine echte Abhaengigkeit: Der Rebuild setzt voraus, dass am
-Zielstandort gerade eine Maschine des gewuenschten Typs frei ist.
+At that moment Hetzner had **no CX33 capacity in fsn1**. A
+retry 30 seconds later worked. This is not a configuration error
+but a real dependency: the rebuild assumes that a machine of the requested type
+is available at the target location right then.
 
-Das trifft die IP-Anker-Konstruktion an ihrer empfindlichen Stelle. Eine
-Primary IP ist **standortgebunden** — eine IP in `fsn1` laesst sich nicht an
-einen Server in `nbg1` haengen. Ein Ausweichen auf einen anderen Standort
-wuerde also genau die Eigenschaft aufgeben, die die schnelle
-Wiederherstellung ausmacht.
+This hits the IP-anchor design at its sensitive spot. A
+primary IP is **bound to a location** — an IP in `fsn1` cannot be attached to
+a server in `nbg1`. Falling back to another location
+would therefore give up exactly the property that makes the fast
+recovery possible.
 
-Vorgehen im Ernstfall, in dieser Reihenfolge:
+What to do in an emergency, in this order:
 
-1. **Neu versuchen.** Kapazitaetsengpaesse sind meist Minutensache.
-2. **Anderen Servertyp am selben Standort** nehmen:
-   `terraform apply -var="server_type=cx43"`. Der IP-Anker haelt, es kostet
-   nur mehr Geld — und man kann spaeter in Ruhe zurueckwechseln.
-3. **Erst als letztes den Standort wechseln.** Dann sind neue Primary IPs
-   noetig und DNS muss nachgezogen werden. Aus 6 Minuten RTO werden dann
-   die DNS-TTL von 300 Sekunden plus Cache-Realitaet.
+1. **Retry.** Capacity shortages usually last minutes.
+2. **Use a different server type at the same location:**
+   `terraform apply -var="server_type=cx43"`. The IP anchor holds, it only costs
+   more money — and you can switch back later at your leisure.
+3. **Change the location only as a last resort.** Then new primary IPs are
+   needed and DNS has to be updated. The 6-minute RTO then becomes
+   the DNS TTL of 300 seconds plus caching reality.
 
-Punkt 2 ist der eigentliche Wert dieser Erkenntnis: Es gibt einen Ausweg, der
-den Anker nicht opfert — aber man muss ihn kennen, bevor man ihn braucht.
+Point 2 is the real value of this finding: there is a way out that
+doesn't sacrifice the anchor — but you have to know it before you need it.
 
-## Kosten
+## Costs
 
-| Posten | €/Monat netto |
+| Item | €/month net |
 |---|---|
-| CX33 (4 vCPU, 8 GB, fsn1) | 8,49 |
-| Primäre IPv4 | ~0,50–0,60 |
-| Cloudflare DNS, GHCR, GitHub Actions | 0,00 |
-| **Summe** | **~9,05 netto, ~10,80 brutto** |
+| CX33 (4 vCPU, 8 GB, fsn1) | 8.49 |
+| Primary IPv4 | ~0.50–0.60 |
+| Cloudflare DNS, GHCR, GitHub Actions | 0.00 |
+| **Total** | **~9.05 net, ~10.80 gross** |
 
-Nicht gebucht: Hetzner-Backups (20 % Aufpreis für einen zustandslosen Node) und
-Load Balancer (durch k3s' ServiceLB ersetzt).
+Not booked: Hetzner backups (20 % surcharge for a stateless node) and
+load balancer (replaced by k3s' ServiceLB).
